@@ -89,47 +89,9 @@
 
         header p {
 
-            margin: 8px 0 12px;
+            margin: 8px 0 0;
 
             font-size: 14px;
-
-        }
-
-
-        /* ============================================================
-           Aboutリンク
-           ============================================================ */
-
-        .about-link {
-
-            display: inline-block;
-
-            padding: 7px 14px;
-
-            border:
-                1px solid
-                rgba(255, 255, 255, 0.7);
-
-            border-radius: 5px;
-
-            color: white;
-
-            text-decoration: none;
-
-            font-size: 13px;
-
-            transition:
-                background-color 0.2s,
-                color 0.2s;
-
-        }
-
-
-        .about-link:hover {
-
-            background-color: white;
-
-            color: #333;
 
         }
 
@@ -589,21 +551,23 @@
         }
 
 
+        /* ============================================================
+           備考
+           
+           一覧画面では表示しない。
+           詳細画面のみ表示する。
+           ============================================================ */
+
         .notes {
 
-            margin-top: 15px;
-
-            padding-top: 12px;
-
-            border-top:
-                1px solid #eee;
-
-            font-size: 14px;
-
-            line-height: 1.6;
+            display: none;
 
         }
 
+
+        /* ============================================================
+           採集地点
+           ============================================================ */
 
         .site-info {
 
@@ -713,15 +677,6 @@
         }
 
 
-        footer a {
-
-            color: white;
-
-            text-decoration: underline;
-
-        }
-
-
         /* ============================================================
            スマートフォン
            ============================================================ */
@@ -730,9 +685,16 @@
             max-width: 600px
         ) {
 
+            header {
+
+                padding: 16px 12px;
+
+            }
+
+
             header h1 {
 
-                font-size: 22px;
+                font-size: 21px;
 
             }
 
@@ -746,9 +708,48 @@
 
             .container {
 
-                padding: 0 12px;
+                padding: 0 10px;
 
-                margin-top: 20px;
+                margin-top: 15px;
+
+            }
+
+
+            .search-box {
+
+                padding: 15px;
+
+                margin-bottom: 15px;
+
+            }
+
+
+            .search-box input {
+
+                font-size: 15px;
+
+            }
+
+
+            .map-container {
+
+                padding: 12px;
+
+                margin-bottom: 15px;
+
+            }
+
+
+            .map-title {
+
+                font-size: 18px;
+
+            }
+
+
+            #map {
+
+                height: 350px;
 
             }
 
@@ -757,12 +758,103 @@
 
                 grid-template-columns: 1fr;
 
+                gap: 15px;
+
             }
 
 
-            #map {
+            /* ========================================================
+               スマートフォンでは
+               画像＋標本ID＋和名＋学名＋分類のみ
+               ======================================================== */
 
-                height: 350px;
+            .specimen-card {
+
+                border-radius: 8px;
+
+            }
+
+
+            .specimen-image {
+
+                height: 210px;
+
+            }
+
+
+            .image-caption {
+
+                font-size: 10px;
+
+                padding: 6px;
+
+            }
+
+
+            .specimen-content {
+
+                padding: 13px 15px 15px;
+
+            }
+
+
+            .specimen-id {
+
+                font-size: 12px;
+
+                margin-bottom: 5px;
+
+            }
+
+
+            .common-name {
+
+                font-size: 20px;
+
+                margin-bottom: 3px;
+
+            }
+
+
+            .scientific-name {
+
+                font-size: 14px;
+
+                margin-bottom: 8px;
+
+            }
+
+
+            .classification {
+
+                font-size: 11px;
+
+                margin-bottom: 0;
+
+            }
+
+
+            /* ========================================================
+               スマートフォンでは詳細情報を非表示
+               ======================================================== */
+
+            .specimen-info {
+
+                display: none;
+
+            }
+
+
+            .site-info {
+
+                display: none;
+
+            }
+
+
+            .notes {
+
+                display: none;
 
             }
 
@@ -805,15 +897,6 @@
     <p>
         北海道むかわ地域の化石標本データベース
     </p>
-
-    <!-- ★追加：Aboutページへのリンク -->
-
-    <a
-        href="about/"
-        class="about-link"
-    >
-        このデータベースについて
-    </a>
 
 </header>
 
@@ -933,12 +1016,6 @@
 <footer>
 
     鵡川高校 化石デジタルライブラリー
-
-    <br>
-
-    <a href="about/">
-        このデータベースについて
-    </a>
 
 </footer>
 
@@ -1373,6 +1450,71 @@ async function loadData() {
 
 
 // ==================================================================
+// ★ サムネイル画像パス作成
+//
+// 一覧画面では images/thumbs/ を優先する。
+// 例：
+//
+// images/MDR250628-01.jpg
+//
+// ↓
+//
+// images/thumbs/MDR250628-01.jpg
+//
+// サムネイルが存在しない場合は元画像に戻す。
+// ==================================================================
+
+function getThumbnailPath(
+    imagePath
+) {
+
+    if (
+        !imagePath ||
+        String(imagePath).trim() === ""
+    ) {
+
+        return "";
+
+    }
+
+
+    const path =
+        String(
+            imagePath
+        ).trim();
+
+
+    if (
+        path.includes(
+            "images/thumbs/"
+        )
+    ) {
+
+        return path;
+
+    }
+
+
+    if (
+        path.includes(
+            "images/"
+        )
+    ) {
+
+        return path.replace(
+            "images/",
+            "images/thumbs/"
+        );
+
+    }
+
+
+    return path;
+
+}
+
+
+// ==================================================================
 // 標本一覧
 // ==================================================================
 
@@ -1444,6 +1586,18 @@ function createSpecimenCard(
         specimen.image.trim() !== ""
     ) {
 
+        const originalImage =
+            String(
+                specimen.image
+            ).trim();
+
+
+        const thumbnailImage =
+            getThumbnailPath(
+                originalImage
+            );
+
+
         imageHtml = `
 
             <a
@@ -1467,7 +1621,11 @@ function createSpecimenCard(
                     class="specimen-image"
 
                     src="${escapeAttribute(
-                        specimen.image
+                        thumbnailImage
+                    )}"
+
+                    data-original="${escapeAttribute(
+                        originalImage
                     )}"
 
                     alt="${escapeAttribute(
@@ -1477,11 +1635,14 @@ function createSpecimenCard(
 
                     loading="lazy"
 
+                    decoding="async"
+
                     onerror="
-                        showImageError(this)
+                        fallbackToOriginalImage(this)
                     "
 
                 >
+
 
                 <div class="image-caption">
 
@@ -1510,12 +1671,6 @@ function createSpecimenCard(
     }
 
 
-    const collectionDate =
-        formatDate(
-            specimen.collection_date
-        );
-
-
     return `
 
         <article
@@ -1534,6 +1689,10 @@ function createSpecimenCard(
             <div class="specimen-content">
 
 
+                <!-- =================================================
+                     標本番号
+                     ================================================= -->
+
                 <div class="specimen-id">
 
                     標本番号：
@@ -1545,6 +1704,10 @@ function createSpecimenCard(
                 </div>
 
 
+                <!-- =================================================
+                     和名
+                     ================================================= -->
+
                 <div class="common-name">
 
                     ${escapeHtml(
@@ -1554,6 +1717,10 @@ function createSpecimenCard(
 
                 </div>
 
+
+                <!-- =================================================
+                     学名
+                     ================================================= -->
 
                 ${
                     specimen.scientific_name
@@ -1578,6 +1745,10 @@ function createSpecimenCard(
                 }
 
 
+                <!-- =================================================
+                     分類
+                     ================================================= -->
+
                 ${
                     specimen.classification
 
@@ -1600,6 +1771,12 @@ function createSpecimenCard(
                     ""
                 }
 
+
+                <!-- =================================================
+                     PCでは表示する詳細情報
+                     
+                     スマートフォンではCSSで非表示
+                     ================================================= -->
 
                 <div class="specimen-info">
 
@@ -1671,7 +1848,9 @@ function createSpecimenCard(
 
 
                     ${
-                        collectionDate
+                        formatDate(
+                            specimen.collection_date
+                        )
 
                         ?
 
@@ -1688,7 +1867,9 @@ function createSpecimenCard(
                             <div class="info-value">
 
                                 ${escapeHtml(
-                                    collectionDate
+                                    formatDate(
+                                        specimen.collection_date
+                                    )
                                 )}
 
                             </div>
@@ -1706,36 +1887,19 @@ function createSpecimenCard(
                 </div>
 
 
-                ${
-                    specimen.notes
+                <!-- =================================================
+                     備考は一覧画面では表示しない
+                     ================================================= -->
 
-                    ?
+                <!-- 備考は詳細画面のみ表示 -->
 
-                    `
 
-                    <div class="notes">
-
-                        <strong>
-
-                            備考
-
-                        </strong>
-
-                        <br>
-
-                        ${escapeHtml(
-                            specimen.notes
-                        )}
-
-                    </div>
-
-                    `
-
-                    :
-
-                    ""
-                }
-
+                <!-- =================================================
+                     採集地点
+                     
+                     PCのみ表示
+                     スマートフォンでは非表示
+                     ================================================= -->
 
                 ${
                     specimen.site_id
@@ -1782,7 +1946,68 @@ function createSpecimenCard(
 
 
 // ==================================================================
-// 詳細画面
+// ★ 画像フォールバック
+//
+// サムネイルがない場合、元画像を読み込む。
+// これにより既存画像をすべて作り直さなくても動作する。
+// ==================================================================
+
+function fallbackToOriginalImage(
+    image
+) {
+
+    const original =
+        image.dataset.original;
+
+
+    if (
+        !original
+    ) {
+
+        showImageError(
+            image
+        );
+
+        return;
+
+    }
+
+
+    if (
+        image.src.endsWith(
+            original
+        )
+    ) {
+
+        showImageError(
+            image
+        );
+
+        return;
+
+    }
+
+
+    image.onerror = function () {
+
+        showImageError(
+            image
+        );
+
+    };
+
+
+    image.src =
+        original;
+
+}
+
+
+// ==================================================================
+// ★ 詳細画面
+//
+// 「画像＋詳細情報＋備考」を表示する。
+// 詳細情報側にはスクロールバーを出さない。
 // ==================================================================
 
 function openSpecimenDetail(
@@ -1839,8 +2064,15 @@ function openSpecimenDetail(
 
     <style>
 
+
+        /* ============================================================
+           全体
+           ============================================================ */
+
         * {
+
             box-sizing: border-box;
+
         }
 
 
@@ -1848,8 +2080,11 @@ function openSpecimenDetail(
         body {
 
             width: 100%;
+
             height: 100%;
+
             margin: 0;
+
             padding: 0;
 
         }
@@ -1874,6 +2109,10 @@ function openSpecimenDetail(
 
         }
 
+
+        /* ============================================================
+           ヘッダー
+           ============================================================ */
 
         .detail-header {
 
@@ -1905,6 +2144,10 @@ function openSpecimenDetail(
         }
 
 
+        /* ============================================================
+           メイン
+           ============================================================ */
+
         .detail-main {
 
             width: 100%;
@@ -1926,6 +2169,10 @@ function openSpecimenDetail(
 
         }
 
+
+        /* ============================================================
+           詳細カード
+           ============================================================ */
 
         .detail-card {
 
@@ -1960,6 +2207,10 @@ function openSpecimenDetail(
 
         }
 
+
+        /* ============================================================
+           左：画像
+           ============================================================ */
 
         .image-panel {
 
@@ -2010,6 +2261,10 @@ function openSpecimenDetail(
         }
 
 
+        /* ============================================================
+           右：詳細データ
+           ============================================================ */
+
         .data-panel {
 
             padding: 25px 30px;
@@ -2029,6 +2284,10 @@ function openSpecimenDetail(
         }
 
 
+        /* ============================================================
+           標本番号
+           ============================================================ */
+
         .specimen-number {
 
             color: #777;
@@ -2043,6 +2302,10 @@ function openSpecimenDetail(
 
         }
 
+
+        /* ============================================================
+           和名
+           ============================================================ */
 
         .common-name {
 
@@ -2065,6 +2328,10 @@ function openSpecimenDetail(
 
         }
 
+
+        /* ============================================================
+           学名
+           ============================================================ */
 
         .scientific-name {
 
@@ -2089,6 +2356,10 @@ function openSpecimenDetail(
 
         }
 
+
+        /* ============================================================
+           分類
+           ============================================================ */
 
         .classification {
 
@@ -2117,6 +2388,10 @@ function openSpecimenDetail(
         }
 
 
+        /* ============================================================
+           詳細データ表
+           ============================================================ */
+
         .data-table {
 
             width: 100%;
@@ -2138,6 +2413,7 @@ function openSpecimenDetail(
 
 
         .data-table th,
+
         .data-table td {
 
             border-bottom:
@@ -2168,7 +2444,13 @@ function openSpecimenDetail(
         }
 
 
+        /* ============================================================
+           備考
+           ============================================================ */
+
         .notes {
+
+            display: block;
 
             margin-top: 10px;
 
@@ -2204,6 +2486,10 @@ function openSpecimenDetail(
         }
 
 
+        /* ============================================================
+           公開データ注意書き
+           ============================================================ */
+
         .notice {
 
             margin-top: 8px;
@@ -2225,6 +2511,10 @@ function openSpecimenDetail(
 
         }
 
+
+        /* ============================================================
+           高さが低い画面
+           ============================================================ */
 
         @media (
             max-height: 700px
@@ -2303,6 +2593,7 @@ function openSpecimenDetail(
 
 
             .data-table th,
+
             .data-table td {
 
                 padding: 4px 5px;
@@ -2327,6 +2618,10 @@ function openSpecimenDetail(
 
         }
 
+
+        /* ============================================================
+           非常に低い画面
+           ============================================================ */
 
         @media (
             max-height: 550px
@@ -2425,6 +2720,7 @@ function openSpecimenDetail(
 
 
             .data-table th,
+
             .data-table td {
 
                 padding: 2px 4px;
@@ -2457,6 +2753,10 @@ function openSpecimenDetail(
 
         }
 
+
+        /* ============================================================
+           スマートフォン詳細画面
+           ============================================================ */
 
         @media (
             max-width: 800px
@@ -2521,11 +2821,14 @@ function openSpecimenDetail(
 
             .notes {
 
+                display: block;
+
                 overflow: visible;
 
             }
 
         }
+
 
     </style>
 
@@ -2534,6 +2837,10 @@ function openSpecimenDetail(
 
 <body>
 
+
+    <!-- ============================================================
+         ヘッダー
+         ============================================================ -->
 
     <header class="detail-header">
 
@@ -2546,12 +2853,22 @@ function openSpecimenDetail(
     </header>
 
 
+    <!-- ============================================================
+         メイン
+         ============================================================ -->
+
     <main class="detail-main">
+
 
         <div class="detail-card">
 
 
+            <!-- =====================================================
+                 左：画像
+                 ===================================================== -->
+
             <div class="image-panel">
+
 
                 ${
                     image
@@ -2568,6 +2885,8 @@ function openSpecimenDetail(
                             specimen.common_name ||
                             "化石標本"
                         )}"
+
+                        decoding="async"
 
                     >
 
@@ -2587,11 +2906,18 @@ function openSpecimenDetail(
 
                 }
 
+
             </div>
 
 
+            <!-- =====================================================
+                 右：詳細情報
+                 ===================================================== -->
+
             <div class="data-panel">
 
+
+                <!-- 標本番号 -->
 
                 <div class="specimen-number">
 
@@ -2605,6 +2931,8 @@ function openSpecimenDetail(
                 </div>
 
 
+                <!-- 和名 -->
+
                 <div class="common-name">
 
                     ${escapeHtml(
@@ -2614,6 +2942,8 @@ function openSpecimenDetail(
 
                 </div>
 
+
+                <!-- 学名 -->
 
                 ${
                     specimen.scientific_name
@@ -2638,6 +2968,8 @@ function openSpecimenDetail(
                 }
 
 
+                <!-- 分類 -->
+
                 ${
                     specimen.classification
 
@@ -2661,6 +2993,10 @@ function openSpecimenDetail(
                 }
 
 
+                <!-- =================================================
+                     公開データ
+                     ================================================= -->
+
                 <table class="data-table">
 
 
@@ -2674,7 +3010,9 @@ function openSpecimenDetail(
                         <tr>
 
                             <th>
+
                                 地層
+
                             </th>
 
                             <td>
@@ -2705,7 +3043,9 @@ function openSpecimenDetail(
                         <tr>
 
                             <th>
+
                                 時代
+
                             </th>
 
                             <td>
@@ -2736,7 +3076,9 @@ function openSpecimenDetail(
                         <tr>
 
                             <th>
+
                                 採集日
+
                             </th>
 
                             <td>
@@ -2767,7 +3109,9 @@ function openSpecimenDetail(
                         <tr>
 
                             <th>
+
                                 地点ID
+
                             </th>
 
                             <td>
@@ -2790,6 +3134,13 @@ function openSpecimenDetail(
 
                 </table>
 
+
+                <!-- =================================================
+                     ★ 備考
+                     
+                     ここでのみ表示する。
+                     一覧画面には表示しない。
+                     ================================================= -->
 
                 ${
                     specimen.notes
@@ -2820,6 +3171,10 @@ function openSpecimenDetail(
                 }
 
 
+                <!-- =================================================
+                     公開情報に関する注意
+                     ================================================= -->
+
                 <div class="notice">
 
                     公開用データのみを表示しています。
@@ -2831,7 +3186,9 @@ function openSpecimenDetail(
 
             </div>
 
+
         </div>
+
 
     </main>
 
@@ -2842,6 +3199,10 @@ function openSpecimenDetail(
 
     `;
 
+
+    // ================================================================
+    // 別タブを開く
+    // ================================================================
 
     const newWindow =
         window.open(
@@ -2909,6 +3270,14 @@ function formatDate(
     }
 
 
+    /*
+       ISO形式
+
+       2025-05-20T10:30:00
+       ↓
+       2025-05-20
+    */
+
     if (
         text.includes("T")
     ) {
@@ -2919,6 +3288,14 @@ function formatDate(
     }
 
 
+    /*
+       スペース区切り
+
+       2025-05-20 10:30:00
+       ↓
+       2025-05-20
+    */
+
     if (
         text.includes(" ")
     ) {
@@ -2928,6 +3305,14 @@ function formatDate(
 
     }
 
+
+    /*
+       日本語形式
+
+       2025年5月20日
+       ↓
+       2025/05/20
+    */
 
     const japaneseDate =
         text.match(
@@ -3089,6 +3474,7 @@ function showImageError(
     image
 ) {
 
+
     const errorDiv =
         document.createElement(
             "div"
@@ -3103,9 +3489,15 @@ function showImageError(
         "画像を読み込めませんでした";
 
 
-    image.parentElement.replaceWith(
-        errorDiv
-    );
+    if (
+        image.parentElement
+    ) {
+
+        image.parentElement.replaceWith(
+            errorDiv
+        );
+
+    }
 
 }
 
