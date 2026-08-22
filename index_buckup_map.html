@@ -1,0 +1,4976 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>
+        鵡川高校 化石デジタルライブラリー
+    </title>
+
+
+    <!-- ============================================================
+         Leaflet
+         ============================================================ -->
+
+    <link
+        rel="stylesheet"
+        href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    >
+
+
+    <style>
+
+        /* ============================================================
+           基本設定
+           ============================================================ */
+
+        * {
+            box-sizing: border-box;
+        }
+
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+
+        body {
+
+            margin: 0;
+
+            font-family:
+                -apple-system,
+                BlinkMacSystemFont,
+                "Segoe UI",
+                "Yu Gothic",
+                "Hiragino Kaku Gothic ProN",
+                Meiryo,
+                sans-serif;
+
+            background-color: #f5f5f5;
+
+            color: #333;
+
+        }
+
+
+        /* ============================================================
+           ヘッダー
+           ============================================================ */
+
+        header {
+
+            background-color: #333;
+
+            color: white;
+
+            text-align: center;
+
+            padding: 20px;
+
+        }
+
+
+        header h1 {
+
+            margin: 0;
+
+            font-size: 28px;
+
+        }
+
+
+        header p {
+
+            margin: 8px 0 0;
+
+            font-size: 14px;
+
+        }
+
+
+        /* ============================================================
+           Aboutリンク
+           ============================================================ */
+
+        .about-link {
+
+            display: inline-block;
+
+            margin-top: 12px;
+
+            padding: 7px 14px;
+
+            border:
+                1px solid
+                rgba(255,255,255,0.6);
+
+            border-radius: 5px;
+
+            color: white;
+
+            text-decoration: none;
+
+            font-size: 13px;
+
+            transition:
+                background-color 0.2s;
+
+        }
+
+
+        .about-link:hover {
+
+            background-color:
+                rgba(255,255,255,0.15);
+
+        }
+
+
+        /* ============================================================
+           メイン
+           ============================================================ */
+
+        .container {
+
+            max-width: 1200px;
+
+            margin: 30px auto;
+
+            padding: 0 20px;
+
+        }
+
+
+        /* ============================================================
+           検索
+           ============================================================ */
+
+        .search-box {
+
+            background-color: white;
+
+            padding: 20px;
+
+            border-radius: 10px;
+
+            margin-bottom: 25px;
+
+            box-shadow:
+                0 2px 8px
+                rgba(
+                    0,
+                    0,
+                    0,
+                    0.08
+                );
+
+        }
+
+
+        .search-box input {
+
+            width: 100%;
+
+            padding: 12px;
+
+            font-size: 16px;
+
+            border:
+                1px solid #ccc;
+
+            border-radius: 6px;
+
+        }
+
+
+        /* ============================================================
+           地図
+           ============================================================ */
+
+        .map-container {
+
+            background-color: white;
+
+            padding: 20px;
+
+            border-radius: 10px;
+
+            margin-bottom: 25px;
+
+            box-shadow:
+                0 2px 8px
+                rgba(
+                    0,
+                    0,
+                    0,
+                    0.08
+                );
+
+        }
+
+
+        .map-title {
+
+            font-size: 20px;
+
+            font-weight: bold;
+
+            margin-bottom: 12px;
+
+        }
+
+
+        #map {
+
+            width: 100%;
+
+            height: 450px;
+
+            border-radius: 8px;
+
+        }
+
+
+        .map-note {
+
+            margin-top: 10px;
+
+            font-size: 12px;
+
+            color: #777;
+
+            line-height: 1.6;
+
+        }
+
+
+        /* ============================================================
+           フィルター
+           ============================================================ */
+
+        .filter-box {
+
+            display: none;
+
+            background-color: white;
+
+            padding: 15px 20px;
+
+            border-radius: 10px;
+
+            margin-bottom: 20px;
+
+            box-shadow:
+                0 2px 8px
+                rgba(
+                    0,
+                    0,
+                    0,
+                    0.08
+                );
+
+        }
+
+
+        .filter-box.active {
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: space-between;
+
+            gap: 15px;
+
+        }
+
+
+        .filter-title {
+
+            line-height: 1.5;
+
+        }
+
+
+        .filter-title strong {
+
+            font-size: 18px;
+
+        }
+
+
+        .clear-filter-button {
+
+            border: none;
+
+            background-color: #555;
+
+            color: white;
+
+            padding: 8px 14px;
+
+            border-radius: 5px;
+
+            cursor: pointer;
+
+            white-space: nowrap;
+
+        }
+
+
+        .clear-filter-button:hover {
+
+            background-color: #333;
+
+        }
+
+
+        /* ============================================================
+           件数
+           ============================================================ */
+
+        #result-count {
+
+            margin-bottom: 15px;
+
+            color: #666;
+
+            font-size: 14px;
+
+        }
+
+
+        /* ============================================================
+           標本一覧
+           ============================================================ */
+
+        #specimen-list {
+
+            display: grid;
+
+            grid-template-columns:
+                repeat(
+                    auto-fill,
+                    minmax(280px, 1fr)
+                );
+
+            gap: 20px;
+
+        }
+
+
+        /* ============================================================
+           標本カード
+           ============================================================ */
+
+        .specimen-card {
+
+            background-color: white;
+
+            border-radius: 10px;
+
+            overflow: hidden;
+
+            box-shadow:
+                0 2px 8px
+                rgba(
+                    0,
+                    0,
+                    0,
+                    0.08
+                );
+
+            transition:
+                transform 0.2s,
+                box-shadow 0.2s;
+
+            scroll-margin-top: 20px;
+
+        }
+
+
+        .specimen-card:hover {
+
+            transform:
+                translateY(-3px);
+
+            box-shadow:
+                0 5px 15px
+                rgba(
+                    0,
+                    0,
+                    0,
+                    0.15
+                );
+
+        }
+
+
+        /* ============================================================
+           画像リンク
+           ============================================================ */
+
+        .image-link {
+
+            display: block;
+
+            cursor: pointer;
+
+            text-decoration: none;
+
+        }
+
+
+        /* ============================================================
+           サムネイル
+           ============================================================ */
+
+        .specimen-image {
+
+            display: block;
+
+            width: 100%;
+
+            height: 220px;
+
+            object-fit: cover;
+
+            background-color: #eee;
+
+        }
+
+
+        .image-link:hover
+        .specimen-image {
+
+            opacity: 0.88;
+
+        }
+
+
+        .image-caption {
+
+            padding: 7px 12px;
+
+            text-align: center;
+
+            background-color: #fafafa;
+
+            color: #777;
+
+            font-size: 11px;
+
+        }
+
+
+        .image-error {
+
+            width: 100%;
+
+            height: 220px;
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: center;
+
+            background-color: #eee;
+
+            color: #777;
+
+        }
+
+
+        /* ============================================================
+           カード本文
+           ============================================================ */
+
+        .specimen-content {
+
+            padding: 18px;
+
+        }
+
+
+        .specimen-id {
+
+            color: #777;
+
+            font-size: 13px;
+
+            margin-bottom: 8px;
+
+        }
+
+
+        .common-name {
+
+            font-size: 22px;
+
+            font-weight: bold;
+
+            margin-bottom: 5px;
+
+        }
+
+
+        .scientific-name {
+
+            font-size: 15px;
+
+            font-style: italic;
+
+            color: #666;
+
+            margin-bottom: 15px;
+
+        }
+
+
+        .classification {
+
+            display: inline-block;
+
+            background-color: #eee;
+
+            padding: 4px 8px;
+
+            border-radius: 4px;
+
+            font-size: 12px;
+
+            margin-bottom: 15px;
+
+        }
+
+
+        .specimen-info {
+
+            border-top:
+                1px solid #eee;
+
+            padding-top: 12px;
+
+            font-size: 14px;
+
+        }
+
+
+        .info-row {
+
+            display: flex;
+
+            margin-bottom: 8px;
+
+            line-height: 1.5;
+
+        }
+
+
+        .info-label {
+
+            width: 80px;
+
+            min-width: 80px;
+
+            font-weight: bold;
+
+            color: #555;
+
+        }
+
+
+        .info-value {
+
+            flex: 1;
+
+            word-break: break-word;
+
+        }
+
+
+        /* ============================================================
+           備考
+           
+           一覧画面では非表示。
+           詳細画面のみ表示する。
+           ============================================================ */
+
+        .notes {
+
+            display: none;
+
+        }
+
+
+        .site-info {
+
+            margin-top: 15px;
+
+            padding: 12px;
+
+            background-color: #f7f7f7;
+
+            border-radius: 6px;
+
+            font-size: 13px;
+
+        }
+
+
+        .site-title {
+
+            font-weight: bold;
+
+            margin-bottom: 5px;
+
+        }
+
+
+        /* ============================================================
+           地図ポップアップ
+           ============================================================ */
+
+        .map-popup {
+
+            line-height: 1.6;
+
+        }
+
+
+        .map-popup-title {
+
+            font-size: 15px;
+
+            font-weight: bold;
+
+            margin-bottom: 5px;
+
+        }
+
+
+        .map-popup-button {
+
+            border: none;
+
+            background-color: #333;
+
+            color: white;
+
+            padding: 7px 12px;
+
+            border-radius: 5px;
+
+            cursor: pointer;
+
+            margin-top: 8px;
+
+        }
+
+
+        .map-popup-button:hover {
+
+            background-color: #555;
+
+        }
+
+
+        /* ============================================================
+           メッセージ
+           ============================================================ */
+
+        .message {
+
+            text-align: center;
+
+            padding: 50px 20px;
+
+            color: #777;
+
+        }
+
+
+        /* ============================================================
+           フッター
+           ============================================================ */
+
+        footer {
+
+            margin-top: 50px;
+
+            padding: 25px;
+
+            text-align: center;
+
+            background-color: #333;
+
+            color: white;
+
+            font-size: 13px;
+
+        }
+
+
+        /* ============================================================
+           ============================================================
+           詳細画面
+           ============================================================
+           ============================================================ */
+
+        .detail-header {
+
+            height: 58px;
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: center;
+
+            background-color: #333;
+
+            color: white;
+
+            padding: 0 20px;
+
+        }
+
+
+        .detail-header h1 {
+
+            margin: 0;
+
+            font-size: 20px;
+
+            text-align: center;
+
+        }
+
+
+        .detail-main {
+
+            width: 100%;
+
+            height:
+                calc(
+                    100vh - 58px
+                );
+
+            padding: 15px;
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: center;
+
+            overflow: hidden;
+
+        }
+
+
+        .detail-card {
+
+            width: 100%;
+
+            max-width: 1250px;
+
+            height:
+                calc(
+                    100vh - 88px
+                );
+
+            background-color: white;
+
+            border-radius: 12px;
+
+            overflow: hidden;
+
+            display: grid;
+
+            grid-template-columns:
+                55% 45%;
+
+            box-shadow:
+                0 4px 20px
+                rgba(
+                    0,
+                    0,
+                    0,
+                    0.15
+                );
+
+        }
+
+
+        /* ============================================================
+           詳細画像
+           ============================================================ */
+
+        .image-panel {
+
+            background-color: #111;
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: center;
+
+            padding: 20px;
+
+            min-width: 0;
+
+            min-height: 0;
+
+            overflow: hidden;
+
+            position: relative;
+
+        }
+
+
+        .image-panel img {
+
+            display: block;
+
+            width: 100%;
+
+            height: 100%;
+
+            max-width: 100%;
+
+            max-height: 100%;
+
+            object-fit: contain;
+
+            cursor: zoom-in;
+
+        }
+
+
+        .no-image {
+
+            color: white;
+
+            text-align: center;
+
+            font-size: 16px;
+
+        }
+
+
+        /* ============================================================
+           複数画像切り替え
+           ============================================================ */
+
+        .image-counter {
+
+            position: absolute;
+
+            top: 12px;
+
+            right: 12px;
+
+            padding: 5px 9px;
+
+            background:
+                rgba(
+                    0,
+                    0,
+                    0,
+                    0.65
+                );
+
+            color: white;
+
+            border-radius: 5px;
+
+            font-size: 12px;
+
+            z-index: 5;
+
+        }
+
+
+        .image-navigation {
+
+            position: absolute;
+
+            left: 0;
+
+            right: 0;
+
+            bottom: 15px;
+
+            display: flex;
+
+            justify-content: center;
+
+            gap: 10px;
+
+            z-index: 5;
+
+        }
+
+
+        .image-navigation button {
+
+            border: none;
+
+            background:
+                rgba(
+                    0,
+                    0,
+                    0,
+                    0.7
+                );
+
+            color: white;
+
+            padding: 9px 15px;
+
+            border-radius: 5px;
+
+            cursor: pointer;
+
+            font-size: 13px;
+
+        }
+
+
+        .image-navigation button:hover {
+
+            background:
+                rgba(
+                    0,
+                    0,
+                    0,
+                    0.9
+                );
+
+        }
+
+
+        .image-navigation button:disabled {
+
+            opacity: 0.35;
+
+            cursor: default;
+
+        }
+
+
+        /* ============================================================
+           画像拡大画面
+           ============================================================ */
+
+        .image-modal {
+
+            display: none;
+
+            position: fixed;
+
+            z-index: 9999;
+
+            left: 0;
+
+            top: 0;
+
+            width: 100%;
+
+            height: 100%;
+
+            background:
+                rgba(
+                    0,
+                    0,
+                    0,
+                    0.92
+                );
+
+            align-items: center;
+
+            justify-content: center;
+
+            padding: 30px;
+
+        }
+
+
+        .image-modal.active {
+
+            display: flex;
+
+        }
+
+
+        .image-modal img {
+
+            max-width: 95vw;
+
+            max-height: 95vh;
+
+            object-fit: contain;
+
+        }
+
+
+        .image-modal-close {
+
+            position: absolute;
+
+            top: 15px;
+
+            right: 20px;
+
+            color: white;
+
+            font-size: 35px;
+
+            line-height: 1;
+
+            cursor: pointer;
+
+            z-index: 10;
+
+        }
+
+
+        .image-modal-caption {
+
+            position: absolute;
+
+            bottom: 15px;
+
+            left: 0;
+
+            right: 0;
+
+            text-align: center;
+
+            color: white;
+
+            font-size: 12px;
+
+        }
+
+
+        /* ============================================================
+           詳細データ
+           ============================================================ */
+
+        .data-panel {
+
+            padding: 25px 30px;
+
+            min-width: 0;
+
+            min-height: 0;
+
+            overflow: hidden;
+
+            display: flex;
+
+            flex-direction: column;
+
+            justify-content: center;
+
+        }
+
+
+        .specimen-number {
+
+            color: #777;
+
+            font-size: 13px;
+
+            line-height: 1.3;
+
+            margin-bottom: 5px;
+
+            flex-shrink: 0;
+
+        }
+
+
+        .detail-common-name {
+
+            font-size:
+                clamp(
+                    22px,
+                    3vw,
+                    34px
+                );
+
+            font-weight: bold;
+
+            line-height: 1.25;
+
+            margin-bottom: 4px;
+
+            word-break: break-word;
+
+            flex-shrink: 0;
+
+        }
+
+
+        .detail-scientific-name {
+
+            font-size:
+                clamp(
+                    14px,
+                    1.6vw,
+                    18px
+                );
+
+            font-style: italic;
+
+            color: #666;
+
+            line-height: 1.3;
+
+            margin-bottom: 8px;
+
+            word-break: break-word;
+
+            flex-shrink: 0;
+
+        }
+
+
+        .detail-classification {
+
+            display: inline-block;
+
+            align-self: flex-start;
+
+            background-color: #eee;
+
+            padding: 4px 8px;
+
+            border-radius: 4px;
+
+            font-size: 12px;
+
+            line-height: 1.3;
+
+            margin-bottom: 10px;
+
+            max-width: 100%;
+
+            word-break: break-word;
+
+            flex-shrink: 0;
+
+        }
+
+
+        .data-table {
+
+            width: 100%;
+
+            border-collapse: collapse;
+
+            table-layout: fixed;
+
+            font-size:
+                clamp(
+                    12px,
+                    1.4vw,
+                    14px
+                );
+
+            flex-shrink: 0;
+
+        }
+
+
+        .data-table th,
+        .data-table td {
+
+            border-bottom:
+                1px solid #ddd;
+
+            padding:
+                6px 7px;
+
+            text-align: left;
+
+            vertical-align: top;
+
+            line-height: 1.35;
+
+            word-break: break-word;
+
+        }
+
+
+        .data-table th {
+
+            width: 75px;
+
+            color: #555;
+
+            background-color: #fafafa;
+
+        }
+
+
+        /* ============================================================
+           詳細画面の備考
+           ============================================================ */
+
+        .detail-notes {
+
+            display: block;
+
+            margin-top: 10px;
+
+            padding-top: 10px;
+
+            border-top:
+                1px solid #ddd;
+
+            font-size:
+                clamp(
+                    11px,
+                    1.3vw,
+                    13px
+                );
+
+            line-height: 1.45;
+
+            word-break: break-word;
+
+            overflow: hidden;
+
+            flex-shrink: 1;
+
+        }
+
+
+        .notes-title {
+
+            font-weight: bold;
+
+            margin-bottom: 3px;
+
+        }
+
+
+        /* ============================================================
+           公開データ注意
+           ============================================================ */
+
+        .notice {
+
+            margin-top: 8px;
+
+            padding:
+                6px 8px;
+
+            background-color: #f5f5f5;
+
+            border-radius: 4px;
+
+            font-size: 9px;
+
+            color: #777;
+
+            line-height: 1.35;
+
+            flex-shrink: 0;
+
+        }
+
+
+        /* ============================================================
+           PC：カード本文
+           ============================================================ */
+
+        .desktop-only-info {
+
+            display: block;
+
+        }
+
+
+        /* ============================================================
+           スマートフォン用
+           
+           一覧では
+           ・画像
+           ・標本ID
+           ・学名
+           ・和名
+           ・分類
+           
+           のみ表示。
+           ============================================================ */
+
+        .mobile-only-info {
+
+            display: none;
+
+        }
+
+
+        /* ============================================================
+           高さが低い画面
+           ============================================================ */
+
+        @media (
+            max-height: 700px
+        ) {
+
+            .detail-header {
+
+                height: 48px;
+
+            }
+
+
+            .detail-header h1 {
+
+                font-size: 16px;
+
+            }
+
+
+            .detail-main {
+
+                height:
+                    calc(
+                        100vh - 48px
+                    );
+
+                padding: 8px;
+
+            }
+
+
+            .detail-card {
+
+                height:
+                    calc(
+                        100vh - 64px
+                    );
+
+            }
+
+
+            .image-panel {
+
+                padding: 10px;
+
+            }
+
+
+            .data-panel {
+
+                padding:
+                    12px 18px;
+
+            }
+
+
+            .detail-common-name {
+
+                font-size: 23px;
+
+            }
+
+
+            .detail-scientific-name {
+
+                font-size: 13px;
+
+            }
+
+
+            .data-table {
+
+                font-size: 11px;
+
+            }
+
+
+            .data-table th,
+            .data-table td {
+
+                padding: 4px 5px;
+
+            }
+
+
+            .detail-notes {
+
+                font-size: 11px;
+
+                line-height: 1.3;
+
+            }
+
+
+            .notice {
+
+                font-size: 8px;
+
+            }
+
+        }
+
+
+        /* ============================================================
+           非常に低い画面
+           ============================================================ */
+
+        @media (
+            max-height: 550px
+        ) {
+
+            .detail-header {
+
+                height: 40px;
+
+            }
+
+
+            .detail-header h1 {
+
+                font-size: 14px;
+
+            }
+
+
+            .detail-main {
+
+                height:
+                    calc(
+                        100vh - 40px
+                    );
+
+                padding: 5px;
+
+            }
+
+
+            .detail-card {
+
+                height:
+                    calc(
+                        100vh - 50px
+                    );
+
+            }
+
+
+            .image-panel {
+
+                padding: 5px;
+
+            }
+
+
+            .data-panel {
+
+                padding:
+                    8px 12px;
+
+            }
+
+
+            .specimen-number {
+
+                font-size: 10px;
+
+            }
+
+
+            .detail-common-name {
+
+                font-size: 19px;
+
+            }
+
+
+            .detail-scientific-name {
+
+                font-size: 11px;
+
+                margin-bottom: 4px;
+
+            }
+
+
+            .detail-classification {
+
+                font-size: 9px;
+
+                padding: 2px 5px;
+
+                margin-bottom: 5px;
+
+            }
+
+
+            .data-table {
+
+                font-size: 9px;
+
+            }
+
+
+            .data-table th,
+            .data-table td {
+
+                padding: 2px 4px;
+
+            }
+
+
+            .detail-notes {
+
+                margin-top: 5px;
+
+                padding-top: 5px;
+
+                font-size: 9px;
+
+                line-height: 1.2;
+
+            }
+
+
+            .notice {
+
+                margin-top: 4px;
+
+                padding: 3px 5px;
+
+                font-size: 7px;
+
+            }
+
+        }
+
+
+        /* ============================================================
+           スマートフォン
+           ============================================================ */
+
+        @media (
+            max-width: 800px
+        ) {
+
+            header {
+
+                padding: 16px 12px;
+
+            }
+
+
+            header h1 {
+
+                font-size: 22px;
+
+            }
+
+
+            .container {
+
+                padding: 0 12px;
+
+                margin-top: 20px;
+
+            }
+
+
+            #specimen-list {
+
+                grid-template-columns: 1fr;
+
+            }
+
+
+            #map {
+
+                height: 350px;
+
+            }
+
+
+            .filter-box.active {
+
+                flex-direction: column;
+
+                align-items: flex-start;
+
+            }
+
+
+            .clear-filter-button {
+
+                width: 100%;
+
+            }
+
+
+            /* --------------------------------------------------------
+               スマートフォン一覧
+               -------------------------------------------------------- */
+
+            .specimen-card {
+
+                display: grid;
+
+                grid-template-columns:
+                    130px 1fr;
+
+                min-height: 150px;
+
+            }
+
+
+            .image-link {
+
+                grid-row: 1;
+
+                grid-column: 1;
+
+                height: 150px;
+
+            }
+
+
+            .specimen-image {
+
+                width: 130px;
+
+                height: 150px;
+
+                object-fit: cover;
+
+            }
+
+
+            .image-caption {
+
+                display: none;
+
+            }
+
+
+            .specimen-content {
+
+                grid-row: 1;
+
+                grid-column: 2;
+
+                padding: 12px;
+
+            }
+
+
+            /* PC用詳細情報をスマートフォンでは非表示 */
+
+            .desktop-only-info {
+
+                display: none;
+
+            }
+
+
+            /* スマートフォン用5項目 */
+
+            .mobile-only-info {
+
+                display: block;
+
+            }
+
+
+            .mobile-only-info
+            .specimen-id {
+
+                margin-bottom: 5px;
+
+                font-size: 11px;
+
+            }
+
+
+            .mobile-only-info
+            .common-name {
+
+                font-size: 18px;
+
+                margin-bottom: 4px;
+
+                line-height: 1.25;
+
+            }
+
+
+            .mobile-only-info
+            .scientific-name {
+
+                font-size: 12px;
+
+                margin-bottom: 8px;
+
+            }
+
+
+            .mobile-only-info
+            .classification {
+
+                font-size: 10px;
+
+                margin-bottom: 0;
+
+            }
+
+
+            /* --------------------------------------------------------
+               詳細画面
+               -------------------------------------------------------- */
+
+            body.detail-page {
+
+                overflow: auto;
+
+            }
+
+
+            .detail-main {
+
+                height: auto;
+
+                min-height:
+                    calc(
+                        100vh - 58px
+                    );
+
+                overflow: visible;
+
+                padding: 10px;
+
+                align-items: flex-start;
+
+            }
+
+
+            .detail-card {
+
+                height: auto;
+
+                min-height: 0;
+
+                grid-template-columns:
+                    1fr;
+
+                overflow: visible;
+
+            }
+
+
+            .image-panel {
+
+                height: 42vh;
+
+                min-height: 230px;
+
+            }
+
+
+            .data-panel {
+
+                padding: 20px;
+
+                overflow: visible;
+
+            }
+
+
+            .detail-notes {
+
+                overflow: visible;
+
+            }
+
+        }
+
+
+        /* ============================================================
+           小型スマートフォン
+           ============================================================ */
+
+        @media (
+            max-width: 480px
+        ) {
+
+            .specimen-card {
+
+                grid-template-columns:
+                    110px 1fr;
+
+            }
+
+
+            .image-link {
+
+                height: 130px;
+
+            }
+
+
+            .specimen-image {
+
+                width: 110px;
+
+                height: 130px;
+
+            }
+
+
+            .specimen-content {
+
+                padding: 10px;
+
+            }
+
+
+            .mobile-only-info
+            .common-name {
+
+                font-size: 16px;
+
+            }
+
+
+            .mobile-only-info
+            .scientific-name {
+
+                font-size: 11px;
+
+            }
+
+
+            .mobile-only-info
+            .classification {
+
+                font-size: 9px;
+
+            }
+
+        }
+
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+<!-- ================================================================
+     ヘッダー
+     ================================================================ -->
+
+<header>
+
+    <h1>
+        鵡川高校 化石デジタルライブラリー
+    </h1>
+
+    <p>
+        北海道むかわ地域の化石標本データベース
+    </p>
+
+
+    <!-- About -->
+
+    <a
+        href="about/"
+        class="about-link"
+    >
+
+        このデータベースについて
+
+    </a>
+
+</header>
+
+
+<!-- ================================================================
+     メイン
+     ================================================================ -->
+
+<main class="container">
+
+
+    <!-- ============================================================
+         検索
+         ============================================================ -->
+
+    <section class="search-box">
+
+        <input
+            type="text"
+            id="search-input"
+            placeholder="標本番号・和名・学名・分類・地層名・時代などで検索"
+        >
+
+    </section>
+
+
+    <!-- ============================================================
+         地図
+         ============================================================ -->
+
+    <section class="map-container">
+
+        <div class="map-title">
+
+            化石採集地点
+
+        </div>
+
+
+        <div id="map"></div>
+
+
+        <div class="map-note">
+
+            ※ 地図上には公開用に加工した地点のみを表示しています。
+
+            <br>
+
+            ※ 地点をクリックすると、その地点の標本を表示できます。
+
+        </div>
+
+    </section>
+
+
+    <!-- ============================================================
+         地点フィルター
+         ============================================================ -->
+
+    <section
+        id="filter-box"
+        class="filter-box"
+    >
+
+        <div
+            id="filter-title"
+            class="filter-title"
+        >
+
+        </div>
+
+
+        <button
+            id="clear-filter-button"
+            class="clear-filter-button"
+            type="button"
+        >
+
+            すべての標本を見る
+
+        </button>
+
+    </section>
+
+
+    <!-- ============================================================
+         件数
+         ============================================================ -->
+
+    <div id="result-count">
+
+        読み込み中……
+
+    </div>
+
+
+    <!-- ============================================================
+         標本一覧
+         ============================================================ -->
+
+    <div id="specimen-list">
+
+        <div class="message">
+
+            標本データを読み込んでいます……
+
+        </div>
+
+    </div>
+
+
+</main>
+
+
+<!-- ================================================================
+     フッター
+     ================================================================ -->
+
+<footer>
+
+    鵡川高校 化石デジタルライブラリー
+
+</footer>
+
+
+<!-- ================================================================
+     Leaflet
+     ================================================================ -->
+
+<script
+    src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+></script>
+
+
+<script>
+
+
+// ==================================================================
+// グローバル変数
+// ==================================================================
+
+let specimens = [];
+
+let localities = [];
+
+let map = null;
+
+let currentSiteId = null;
+
+
+// ==================================================================
+// 詳細画面用
+// ==================================================================
+
+let currentDetailImages = [];
+
+let currentDetailImageIndex = 0;
+
+
+// ==================================================================
+// 地図初期化
+// ==================================================================
+
+function initializeMap() {
+
+    map =
+        L.map(
+            "map"
+        ).setView(
+            [42.58, 142.13],
+            10
+        );
+
+
+    L.tileLayer(
+        "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+        {
+
+            maxZoom: 19,
+
+            attribution:
+                '&copy; OpenStreetMap contributors'
+
+        }
+    ).addTo(map);
+
+}
+
+
+// ==================================================================
+// 地図に地点を表示
+// ==================================================================
+
+function displayLocalitiesOnMap() {
+
+    if (!map) {
+
+        return;
+
+    }
+
+
+    const markers = [];
+
+
+    localities.forEach(
+        locality => {
+
+            const latitude =
+                Number(
+                    locality.latitude
+                );
+
+
+            const longitude =
+                Number(
+                    locality.longitude
+                );
+
+
+            if (
+                !Number.isFinite(latitude) ||
+                !Number.isFinite(longitude)
+            ) {
+
+                return;
+
+            }
+
+
+            const siteSpecimens =
+                specimens.filter(
+                    specimen =>
+                        String(
+                            specimen.site_id
+                        ) ===
+                        String(
+                            locality.site_id
+                        )
+                );
+
+
+            const specimenCount =
+                siteSpecimens.length;
+
+
+            const marker =
+                L.marker(
+                    [
+                        latitude,
+                        longitude
+                    ]
+                ).addTo(map);
+
+
+            marker.bindPopup(`
+
+                <div class="map-popup">
+
+                    <div class="map-popup-title">
+
+                        採集地点
+
+                    </div>
+
+
+                    <div>
+
+                        地点ID：
+
+                        ${escapeHtml(
+                            locality.site_id || ""
+                        )}
+
+                    </div>
+
+
+                    <div>
+
+                        標本数：
+
+                        ${specimenCount}件
+
+                    </div>
+
+
+                    <button
+
+                        class="map-popup-button"
+
+                        onclick="
+                            filterBySite(
+                                '${escapeAttribute(
+                                    locality.site_id
+                                )}'
+                            )
+                        "
+
+                    >
+
+                        この地点の標本を見る
+
+                    </button>
+
+                </div>
+
+            `);
+
+
+            markers.push(
+                marker
+            );
+
+        }
+    );
+
+
+    if (
+        markers.length > 0
+    ) {
+
+        const group =
+            L.featureGroup(
+                markers
+            );
+
+
+        map.fitBounds(
+            group.getBounds(),
+            {
+
+                padding: [
+                    30,
+                    30
+                ]
+
+            }
+        );
+
+    }
+
+}
+
+
+// ==================================================================
+// 地点IDで絞り込み
+// ==================================================================
+
+function filterBySite(
+    siteId
+) {
+
+    currentSiteId =
+        String(
+            siteId
+        );
+
+
+    document.getElementById(
+        "search-input"
+    ).value = "";
+
+
+    const filtered =
+        specimens.filter(
+            specimen =>
+                String(
+                    specimen.site_id
+                ) ===
+                String(
+                    siteId
+                )
+        );
+
+
+    const filterBox =
+        document.getElementById(
+            "filter-box"
+        );
+
+
+    const filterTitle =
+        document.getElementById(
+            "filter-title"
+        );
+
+
+    filterBox.classList.add(
+        "active"
+    );
+
+
+    filterTitle.innerHTML = `
+
+        地点ID：
+
+        <strong>
+
+            ${escapeHtml(
+                siteId
+            )}
+
+        </strong>
+
+        の標本
+
+        <br>
+
+        ${filtered.length}件
+
+    `;
+
+
+    displaySpecimens(
+        filtered
+    );
+
+
+    setTimeout(
+        function () {
+
+            document.getElementById(
+                "result-count"
+            ).scrollIntoView({
+
+                behavior: "smooth",
+
+                block: "start"
+
+            });
+
+        },
+        100
+    );
+
+}
+
+
+// ==================================================================
+// 地点フィルター解除
+// ==================================================================
+
+function clearSiteFilter() {
+
+    currentSiteId = null;
+
+
+    document.getElementById(
+        "filter-box"
+    ).classList.remove(
+        "active"
+    );
+
+
+    document.getElementById(
+        "search-input"
+    ).value = "";
+
+
+    displaySpecimens(
+        specimens
+    );
+
+}
+
+
+// ==================================================================
+// JSON読み込み
+// ==================================================================
+
+async function loadData() {
+
+    try {
+
+        initializeMap();
+
+
+        const specimenResponse =
+            await fetch(
+                "public_data/specimens.json"
+            );
+
+
+        if (
+            !specimenResponse.ok
+        ) {
+
+            throw new Error(
+                "specimens.jsonを読み込めませんでした。"
+            );
+
+        }
+
+
+        specimens =
+            await specimenResponse.json();
+
+
+        const localityResponse =
+            await fetch(
+                "public_data/localities_public.json"
+            );
+
+
+        if (
+            !localityResponse.ok
+        ) {
+
+            throw new Error(
+                "localities_public.jsonを読み込めませんでした。"
+            );
+
+        }
+
+
+        localities =
+            await localityResponse.json();
+
+
+        displayLocalitiesOnMap();
+
+
+        displaySpecimens(
+            specimens
+        );
+
+    }
+    catch (error) {
+
+        console.error(
+            error
+        );
+
+
+        document.getElementById(
+            "specimen-list"
+        ).innerHTML = `
+
+            <div class="message">
+
+                データを読み込めませんでした。
+
+                <br><br>
+
+                ${escapeHtml(
+                    error.message
+                )}
+
+            </div>
+
+        `;
+
+
+        document.getElementById(
+            "result-count"
+        ).textContent =
+            "データ読み込みエラー";
+
+    }
+
+}
+
+
+// ==================================================================
+// 複数画像を取得
+//
+// 新形式：
+// specimen.images
+//
+// 旧形式：
+// specimen.image
+//
+// の両方に対応。
+// ==================================================================
+
+function getSpecimenImages(
+    specimen
+) {
+
+    let images = [];
+
+
+    // --------------------------------------------------------------
+    // 新形式
+    // --------------------------------------------------------------
+
+    if (
+        Array.isArray(
+            specimen.images
+        )
+    ) {
+
+        images =
+            specimen.images
+                .filter(
+                    image =>
+                        image !== null &&
+                        image !== undefined &&
+                        String(image).trim() !== ""
+                )
+                .map(
+                    image =>
+                        String(image).trim()
+                );
+
+    }
+
+
+    // --------------------------------------------------------------
+    // 旧形式
+    // --------------------------------------------------------------
+
+    if (
+        images.length === 0 &&
+        specimen.image
+    ) {
+
+        const image =
+            String(
+                specimen.image
+            ).trim();
+
+
+        if (
+            image !== ""
+        ) {
+
+            images.push(
+                image
+            );
+
+        }
+
+    }
+
+
+    return images;
+
+}
+
+
+// ==================================================================
+// サムネイル取得
+// ==================================================================
+
+function getThumbnail(
+    specimen
+) {
+
+    // --------------------------------------------------------------
+    // JSONにthumbnailがあれば使用
+    // --------------------------------------------------------------
+
+    if (
+        specimen.thumbnail &&
+        String(
+            specimen.thumbnail
+        ).trim() !== ""
+    ) {
+
+        return String(
+            specimen.thumbnail
+        ).trim();
+
+    }
+
+
+    // --------------------------------------------------------------
+    // thumbnailがない場合
+    //
+    // 最初の画像のパスから
+    // images/
+    //
+    // を
+    //
+    // images/thumbs/
+    //
+    // に置換
+    // --------------------------------------------------------------
+
+    const images =
+        getSpecimenImages(
+            specimen
+        );
+
+
+    if (
+        images.length === 0
+    ) {
+
+        return "";
+
+    }
+
+
+    const firstImage =
+        images[0];
+
+
+    if (
+        firstImage.startsWith(
+            "images/"
+        )
+    ) {
+
+        return firstImage.replace(
+            /^images\//,
+            "images/thumbs/"
+        );
+
+    }
+
+
+    return firstImage;
+
+}
+
+
+// ==================================================================
+// 標本一覧
+// ==================================================================
+
+function displaySpecimens(
+    data
+) {
+
+    const list =
+        document.getElementById(
+            "specimen-list"
+        );
+
+
+    const count =
+        document.getElementById(
+            "result-count"
+        );
+
+
+    count.textContent =
+        `${data.length}件の標本`;
+
+
+    if (
+        data.length === 0
+    ) {
+
+        list.innerHTML = `
+
+            <div class="message">
+
+                該当する標本がありません。
+
+            </div>
+
+        `;
+
+        return;
+
+    }
+
+
+    list.innerHTML =
+        data
+            .map(
+                specimen =>
+                    createSpecimenCard(
+                        specimen
+                    )
+            )
+            .join("");
+
+}
+
+
+// ==================================================================
+// 標本カード
+// ==================================================================
+
+function createSpecimenCard(
+    specimen
+) {
+
+    const images =
+        getSpecimenImages(
+            specimen
+        );
+
+
+    const thumbnail =
+        getThumbnail(
+            specimen
+        );
+
+
+    let imageHtml = "";
+
+
+    if (
+        thumbnail !== ""
+    ) {
+
+        imageHtml = `
+
+            <a
+
+                class="image-link"
+
+                href="javascript:void(0);"
+
+                onclick='
+                    openSpecimenDetail(
+                        ${JSON.stringify(
+                            specimen
+                        )}
+                    )
+                '
+
+            >
+
+                <img
+
+                    class="specimen-image"
+
+                    src="${escapeAttribute(
+                        thumbnail
+                    )}"
+
+                    alt="${escapeAttribute(
+                        specimen.common_name ||
+                        "化石標本"
+                    )}"
+
+                    loading="lazy"
+
+                    decoding="async"
+
+                    onerror="
+                        showImageError(this)
+                    "
+
+                >
+
+
+                <div class="image-caption">
+
+                    ${
+                        images.length > 1
+                        ?
+                        `${images.length}枚の画像`
+                        :
+                        "画像をクリックすると詳細表示"
+                    }
+
+                </div>
+
+            </a>
+
+        `;
+
+    }
+    else {
+
+        imageHtml = `
+
+            <div class="image-error">
+
+                画像なし
+
+            </div>
+
+        `;
+
+    }
+
+
+    const collectionDate =
+        formatDate(
+            specimen.collection_date
+        );
+
+
+    return `
+
+        <article
+
+            class="specimen-card"
+
+            id="specimen-${escapeAttribute(
+                specimen.specimen_id
+            )}"
+
+        >
+
+
+            ${imageHtml}
+
+
+            <div class="specimen-content">
+
+
+                <!-- =================================================
+                     スマートフォン表示
+                     ================================================= -->
+
+                <div class="mobile-only-info">
+
+
+                    <div class="specimen-id">
+
+                        標本番号：
+
+                        ${escapeHtml(
+                            specimen.specimen_id || ""
+                        )}
+
+                    </div>
+
+
+                    <div class="common-name">
+
+                        ${escapeHtml(
+                            specimen.common_name ||
+                            "名称不明"
+                        )}
+
+                    </div>
+
+
+                    ${
+                        specimen.scientific_name
+
+                        ?
+
+                        `
+
+                        <div class="scientific-name">
+
+                            ${escapeHtml(
+                                specimen.scientific_name
+                            )}
+
+                        </div>
+
+                        `
+
+                        :
+
+                        ""
+                    }
+
+
+                    ${
+                        specimen.classification
+
+                        ?
+
+                        `
+
+                        <div class="classification">
+
+                            ${escapeHtml(
+                                specimen.classification
+                            )}
+
+                        </div>
+
+                        `
+
+                        :
+
+                        ""
+                    }
+
+
+                </div>
+
+
+                <!-- =================================================
+                     PC表示
+                     ================================================= -->
+
+                <div class="desktop-only-info">
+
+
+                    <div class="specimen-id">
+
+                        標本番号：
+
+                        ${escapeHtml(
+                            specimen.specimen_id || ""
+                        )}
+
+                    </div>
+
+
+                    <div class="common-name">
+
+                        ${escapeHtml(
+                            specimen.common_name ||
+                            "名称不明"
+                        )}
+
+                    </div>
+
+
+                    ${
+                        specimen.scientific_name
+
+                        ?
+
+                        `
+
+                        <div class="scientific-name">
+
+                            ${escapeHtml(
+                                specimen.scientific_name
+                            )}
+
+                        </div>
+
+                        `
+
+                        :
+
+                        ""
+                    }
+
+
+                    ${
+                        specimen.classification
+
+                        ?
+
+                        `
+
+                        <div class="classification">
+
+                            ${escapeHtml(
+                                specimen.classification
+                            )}
+
+                        </div>
+
+                        `
+
+                        :
+
+                        ""
+                    }
+
+
+                    <div class="specimen-info">
+
+
+                        ${
+                            specimen.formation
+
+                            ?
+
+                            `
+
+                            <div class="info-row">
+
+                                <div class="info-label">
+
+                                    地層
+
+                                </div>
+
+                                <div class="info-value">
+
+                                    ${escapeHtml(
+                                        specimen.formation
+                                    )}
+
+                                </div>
+
+                            </div>
+
+                            `
+
+                            :
+
+                            ""
+                        }
+
+
+                        ${
+                            specimen.age
+
+                            ?
+
+                            `
+
+                            <div class="info-row">
+
+                                <div class="info-label">
+
+                                    時代
+
+                                </div>
+
+                                <div class="info-value">
+
+                                    ${escapeHtml(
+                                        specimen.age
+                                    )}
+
+                                </div>
+
+                            </div>
+
+                            `
+
+                            :
+
+                            ""
+                        }
+
+
+                        ${
+                            collectionDate
+
+                            ?
+
+                            `
+
+                            <div class="info-row">
+
+                                <div class="info-label">
+
+                                    採集日
+
+                                </div>
+
+                                <div class="info-value">
+
+                                    ${escapeHtml(
+                                        collectionDate
+                                    )}
+
+                                </div>
+
+                            </div>
+
+                            `
+
+                            :
+
+                            ""
+                        }
+
+
+                    </div>
+
+
+                    ${
+                        specimen.site_id
+
+                        ?
+
+                        `
+
+                        <div class="site-info">
+
+                            <div class="site-title">
+
+                                採集地点
+
+                            </div>
+
+                            <div>
+
+                                地点ID：
+
+                                ${escapeHtml(
+                                    specimen.site_id
+                                )}
+
+                            </div>
+
+                        </div>
+
+                        `
+
+                        :
+
+                        ""
+                    }
+
+
+                </div>
+
+
+            </div>
+
+
+        </article>
+
+    `;
+
+}
+
+
+// ==================================================================
+// 詳細画面
+//
+// ・複数画像対応
+// ・元画像表示
+// ・画像切り替え
+// ・クリックで拡大
+// ・備考表示
+// ==================================================================
+
+function openSpecimenDetail(
+    specimen
+) {
+
+    currentDetailImages =
+        getSpecimenImages(
+            specimen
+        );
+
+
+    currentDetailImageIndex = 0;
+
+
+    const newWindow =
+        window.open(
+            "",
+            "_blank"
+        );
+
+
+    if (
+        !newWindow
+    ) {
+
+        alert(
+            "新しいタブを開けませんでした。ブラウザのポップアップ設定を確認してください。"
+        );
+
+        return;
+
+    }
+
+
+    const collectionDate =
+        formatDate(
+            specimen.collection_date
+        );
+
+
+    const initialImage =
+        currentDetailImages.length > 0
+        ?
+        currentDetailImages[0]
+        :
+        "";
+
+
+    const detailHtml = `
+
+<!DOCTYPE html>
+
+<html lang="ja">
+
+<head>
+
+    <meta charset="UTF-8">
+
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+
+    <title>
+
+        ${escapeHtml(
+            specimen.common_name ||
+            specimen.specimen_id ||
+            "化石標本"
+        )}
+
+        -
+
+        鵡川高校 化石デジタルライブラリー
+
+    </title>
+
+
+    <style>
+
+
+        * {
+
+            box-sizing: border-box;
+
+        }
+
+
+        html,
+        body {
+
+            width: 100%;
+
+            height: 100%;
+
+            margin: 0;
+
+            padding: 0;
+
+        }
+
+
+        body {
+
+            background-color: #f2f2f2;
+
+            color: #333;
+
+            font-family:
+
+                -apple-system,
+                BlinkMacSystemFont,
+                "Segoe UI",
+                "Yu Gothic",
+                Meiryo,
+                sans-serif;
+
+            overflow: hidden;
+
+        }
+
+
+        /* ==========================================================
+           ヘッダー
+           ========================================================== */
+
+        .detail-header {
+
+            height: 58px;
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: center;
+
+            background-color: #333;
+
+            color: white;
+
+            padding: 0 20px;
+
+        }
+
+
+        .detail-header h1 {
+
+            margin: 0;
+
+            font-size: 20px;
+
+            text-align: center;
+
+        }
+
+
+        /* ==========================================================
+           メイン
+           ========================================================== */
+
+        .detail-main {
+
+            width: 100%;
+
+            height:
+                calc(
+                    100vh - 58px
+                );
+
+            padding: 15px;
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: center;
+
+            overflow: hidden;
+
+        }
+
+
+        /* ==========================================================
+           カード
+           ========================================================== */
+
+        .detail-card {
+
+            width: 100%;
+
+            max-width: 1250px;
+
+            height:
+                calc(
+                    100vh - 88px
+                );
+
+            background-color: white;
+
+            border-radius: 12px;
+
+            overflow: hidden;
+
+            display: grid;
+
+            grid-template-columns:
+                55% 45%;
+
+            box-shadow:
+                0 4px 20px
+                rgba(
+                    0,
+                    0,
+                    0,
+                    0.15
+                );
+
+        }
+
+
+        /* ==========================================================
+           左：画像
+           ========================================================== */
+
+        .image-panel {
+
+            background-color: #111;
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: center;
+
+            padding: 20px;
+
+            min-width: 0;
+
+            min-height: 0;
+
+            overflow: hidden;
+
+            position: relative;
+
+        }
+
+
+        .image-panel img {
+
+            display: block;
+
+            width: 100%;
+
+            height: 100%;
+
+            max-width: 100%;
+
+            max-height: 100%;
+
+            object-fit: contain;
+
+            cursor: zoom-in;
+
+        }
+
+
+        .no-image {
+
+            color: white;
+
+            text-align: center;
+
+            font-size: 16px;
+
+        }
+
+
+        /* ==========================================================
+           画像カウンター
+           ========================================================== */
+
+        .image-counter {
+
+            position: absolute;
+
+            top: 12px;
+
+            right: 12px;
+
+            padding: 5px 9px;
+
+            background:
+                rgba(
+                    0,
+                    0,
+                    0,
+                    0.65
+                );
+
+            color: white;
+
+            border-radius: 5px;
+
+            font-size: 12px;
+
+        }
+
+
+        /* ==========================================================
+           画像切り替え
+           ========================================================== */
+
+        .image-navigation {
+
+            position: absolute;
+
+            left: 0;
+
+            right: 0;
+
+            bottom: 15px;
+
+            display: flex;
+
+            justify-content: center;
+
+            gap: 10px;
+
+        }
+
+
+        .image-navigation button {
+
+            border: none;
+
+            background:
+                rgba(
+                    0,
+                    0,
+                    0,
+                    0.75
+                );
+
+            color: white;
+
+            padding: 9px 16px;
+
+            border-radius: 5px;
+
+            cursor: pointer;
+
+        }
+
+
+        .image-navigation button:hover {
+
+            background:
+                rgba(
+                    0,
+                    0,
+                    0,
+                    0.95
+                );
+
+        }
+
+
+        .image-navigation button:disabled {
+
+            opacity: 0.3;
+
+            cursor: default;
+
+        }
+
+
+        /* ==========================================================
+           右：データ
+           ========================================================== */
+
+        .data-panel {
+
+            padding: 25px 30px;
+
+            min-width: 0;
+
+            min-height: 0;
+
+            overflow: hidden;
+
+            display: flex;
+
+            flex-direction: column;
+
+            justify-content: center;
+
+        }
+
+
+        .specimen-number {
+
+            color: #777;
+
+            font-size: 13px;
+
+            margin-bottom: 5px;
+
+        }
+
+
+        .common-name {
+
+            font-size:
+                clamp(
+                    22px,
+                    3vw,
+                    34px
+                );
+
+            font-weight: bold;
+
+            line-height: 1.25;
+
+            margin-bottom: 4px;
+
+            word-break: break-word;
+
+        }
+
+
+        .scientific-name {
+
+            font-size:
+                clamp(
+                    14px,
+                    1.6vw,
+                    18px
+                );
+
+            font-style: italic;
+
+            color: #666;
+
+            line-height: 1.3;
+
+            margin-bottom: 8px;
+
+            word-break: break-word;
+
+        }
+
+
+        .classification {
+
+            display: inline-block;
+
+            align-self: flex-start;
+
+            background-color: #eee;
+
+            padding: 4px 8px;
+
+            border-radius: 4px;
+
+            font-size: 12px;
+
+            margin-bottom: 10px;
+
+        }
+
+
+        /* ==========================================================
+           表
+           ========================================================== */
+
+        .data-table {
+
+            width: 100%;
+
+            border-collapse: collapse;
+
+            table-layout: fixed;
+
+            font-size:
+                clamp(
+                    12px,
+                    1.4vw,
+                    14px
+                );
+
+        }
+
+
+        .data-table th,
+        .data-table td {
+
+            border-bottom:
+                1px solid #ddd;
+
+            padding:
+                6px 7px;
+
+            text-align: left;
+
+            vertical-align: top;
+
+            line-height: 1.35;
+
+            word-break: break-word;
+
+        }
+
+
+        .data-table th {
+
+            width: 75px;
+
+            color: #555;
+
+            background-color: #fafafa;
+
+        }
+
+
+        /* ==========================================================
+           備考
+           ========================================================== */
+
+        .notes {
+
+            margin-top: 10px;
+
+            padding-top: 10px;
+
+            border-top:
+                1px solid #ddd;
+
+            font-size:
+                clamp(
+                    11px,
+                    1.3vw,
+                    13px
+                );
+
+            line-height: 1.45;
+
+            word-break: break-word;
+
+        }
+
+
+        .notes-title {
+
+            font-weight: bold;
+
+            margin-bottom: 3px;
+
+        }
+
+
+        /* ==========================================================
+           注意書き
+           ========================================================== */
+
+        .notice {
+
+            margin-top: 8px;
+
+            padding:
+                6px 8px;
+
+            background-color: #f5f5f5;
+
+            border-radius: 4px;
+
+            font-size: 9px;
+
+            color: #777;
+
+            line-height: 1.35;
+
+        }
+
+
+        /* ==========================================================
+           画像拡大モーダル
+           ========================================================== */
+
+        .zoom-modal {
+
+            display: none;
+
+            position: fixed;
+
+            inset: 0;
+
+            z-index: 9999;
+
+            background:
+                rgba(
+                    0,
+                    0,
+                    0,
+                    0.94
+                );
+
+            align-items: center;
+
+            justify-content: center;
+
+            padding: 25px;
+
+        }
+
+
+        .zoom-modal.active {
+
+            display: flex;
+
+        }
+
+
+        .zoom-modal img {
+
+            max-width: 96vw;
+
+            max-height: 94vh;
+
+            object-fit: contain;
+
+        }
+
+
+        .zoom-close {
+
+            position: absolute;
+
+            top: 12px;
+
+            right: 20px;
+
+            color: white;
+
+            font-size: 38px;
+
+            cursor: pointer;
+
+            line-height: 1;
+
+        }
+
+
+        .zoom-caption {
+
+            position: absolute;
+
+            bottom: 12px;
+
+            left: 0;
+
+            right: 0;
+
+            text-align: center;
+
+            color: white;
+
+            font-size: 12px;
+
+        }
+
+
+        /* ==========================================================
+           高さが低い画面
+           ========================================================== */
+
+        @media (
+            max-height: 700px
+        ) {
+
+            .detail-header {
+
+                height: 48px;
+
+            }
+
+
+            .detail-header h1 {
+
+                font-size: 16px;
+
+            }
+
+
+            .detail-main {
+
+                height:
+                    calc(
+                        100vh - 48px
+                    );
+
+                padding: 8px;
+
+            }
+
+
+            .detail-card {
+
+                height:
+                    calc(
+                        100vh - 64px
+                    );
+
+            }
+
+
+            .image-panel {
+
+                padding: 10px;
+
+            }
+
+
+            .data-panel {
+
+                padding:
+                    12px 18px;
+
+            }
+
+
+            .common-name {
+
+                font-size: 23px;
+
+            }
+
+
+            .scientific-name {
+
+                font-size: 13px;
+
+            }
+
+
+            .data-table {
+
+                font-size: 11px;
+
+            }
+
+
+            .data-table th,
+            .data-table td {
+
+                padding: 4px 5px;
+
+            }
+
+
+            .notes {
+
+                font-size: 11px;
+
+                line-height: 1.3;
+
+            }
+
+        }
+
+
+        /* ==========================================================
+           スマートフォン
+           ========================================================== */
+
+        @media (
+            max-width: 800px
+        ) {
+
+            body {
+
+                overflow: auto;
+
+            }
+
+
+            .detail-main {
+
+                height: auto;
+
+                min-height:
+                    calc(
+                        100vh - 58px
+                    );
+
+                overflow: visible;
+
+                padding: 10px;
+
+                align-items: flex-start;
+
+            }
+
+
+            .detail-card {
+
+                height: auto;
+
+                min-height: 0;
+
+                grid-template-columns:
+                    1fr;
+
+                overflow: visible;
+
+            }
+
+
+            .image-panel {
+
+                height: 42vh;
+
+                min-height: 230px;
+
+            }
+
+
+            .data-panel {
+
+                padding: 20px;
+
+                overflow: visible;
+
+            }
+
+
+            .notes {
+
+                overflow: visible;
+
+            }
+
+        }
+
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+    <!-- ============================================================
+         ヘッダー
+         ============================================================ -->
+
+    <header class="detail-header">
+
+        <h1>
+
+            鵡川高校 化石デジタルライブラリー
+
+        </h1>
+
+    </header>
+
+
+    <!-- ============================================================
+         メイン
+         ============================================================ -->
+
+    <main class="detail-main">
+
+
+        <div class="detail-card">
+
+
+            <!-- =====================================================
+                 画像
+                 ===================================================== -->
+
+            <div class="image-panel">
+
+
+                ${
+                    initialImage
+
+                    ?
+
+                    `
+
+                    <img
+
+                        id="detail-image"
+
+                        src="${escapeAttribute(
+                            initialImage
+                        )}"
+
+                        alt="${escapeAttribute(
+                            specimen.common_name ||
+                            "化石標本"
+                        )}"
+
+                        onclick="
+                            openZoom();
+                        "
+
+                    >
+
+                    `
+
+                    :
+
+                    `
+
+                    <div class="no-image">
+
+                        画像は登録されていません。
+
+                    </div>
+
+                    `
+
+                }
+
+
+                ${
+                    currentDetailImages.length > 1
+
+                    ?
+
+                    `
+
+                    <div
+                        id="image-counter"
+                        class="image-counter"
+                    >
+
+                        1 /
+                        ${currentDetailImages.length}
+
+                    </div>
+
+
+                    <div class="image-navigation">
+
+                        <button
+                            id="prev-button"
+                            onclick="
+                                changeDetailImage(-1)
+                            "
+                            disabled
+                        >
+
+                            ◀ 前
+
+                        </button>
+
+
+                        <button
+                            id="next-button"
+                            onclick="
+                                changeDetailImage(1)
+                            "
+                        >
+
+                            次 ▶
+
+                        </button>
+
+                    </div>
+
+                    `
+
+                    :
+
+                    ""
+
+                }
+
+
+            </div>
+
+
+            <!-- =====================================================
+                 詳細データ
+                 ===================================================== -->
+
+            <div class="data-panel">
+
+
+                <div class="specimen-number">
+
+                    標本番号：
+
+                    ${escapeHtml(
+                        specimen.specimen_id ||
+                        ""
+                    )}
+
+                </div>
+
+
+                <div class="common-name">
+
+                    ${escapeHtml(
+                        specimen.common_name ||
+                        "名称不明"
+                    )}
+
+                </div>
+
+
+                ${
+                    specimen.scientific_name
+
+                    ?
+
+                    `
+
+                    <div class="scientific-name">
+
+                        ${escapeHtml(
+                            specimen.scientific_name
+                        )}
+
+                    </div>
+
+                    `
+
+                    :
+
+                    ""
+
+                }
+
+
+                ${
+                    specimen.classification
+
+                    ?
+
+                    `
+
+                    <div class="classification">
+
+                        ${escapeHtml(
+                            specimen.classification
+                        )}
+
+                    </div>
+
+                    `
+
+                    :
+
+                    ""
+
+                }
+
+
+                <table class="data-table">
+
+
+                    ${
+                        specimen.formation
+
+                        ?
+
+                        `
+
+                        <tr>
+
+                            <th>
+
+                                地層
+
+                            </th>
+
+                            <td>
+
+                                ${escapeHtml(
+                                    specimen.formation
+                                )}
+
+                            </td>
+
+                        </tr>
+
+                        `
+
+                        :
+
+                        ""
+
+                    }
+
+
+                    ${
+                        specimen.age
+
+                        ?
+
+                        `
+
+                        <tr>
+
+                            <th>
+
+                                時代
+
+                            </th>
+
+                            <td>
+
+                                ${escapeHtml(
+                                    specimen.age
+                                )}
+
+                            </td>
+
+                        </tr>
+
+                        `
+
+                        :
+
+                        ""
+
+                    }
+
+
+                    ${
+                        collectionDate
+
+                        ?
+
+                        `
+
+                        <tr>
+
+                            <th>
+
+                                採集日
+
+                            </th>
+
+                            <td>
+
+                                ${escapeHtml(
+                                    collectionDate
+                                )}
+
+                            </td>
+
+                        </tr>
+
+                        `
+
+                        :
+
+                        ""
+
+                    }
+
+
+                    ${
+                        specimen.site_id
+
+                        ?
+
+                        `
+
+                        <tr>
+
+                            <th>
+
+                                地点ID
+
+                            </th>
+
+                            <td>
+
+                                ${escapeHtml(
+                                    specimen.site_id
+                                )}
+
+                            </td>
+
+                        </tr>
+
+                        `
+
+                        :
+
+                        ""
+
+                    }
+
+
+                </table>
+
+
+                ${
+                    specimen.notes
+
+                    ?
+
+                    `
+
+                    <div class="notes">
+
+                        <div class="notes-title">
+
+                            備考
+
+                        </div>
+
+                        ${escapeHtml(
+                            specimen.notes
+                        )}
+
+                    </div>
+
+                    `
+
+                    :
+
+                    ""
+
+                }
+
+
+                <div class="notice">
+
+                    公開用データのみを表示しています。
+
+                    詳細な採集産地・採集者・採集位置ID・
+
+                    正確な採集座標は公開していません。
+
+                </div>
+
+
+            </div>
+
+
+        </div>
+
+
+    </main>
+
+
+    <!-- ============================================================
+         画像拡大
+         ============================================================ -->
+
+    <div
+        id="zoom-modal"
+        class="zoom-modal"
+        onclick="
+            closeZoom()
+        "
+    >
+
+        <div
+            class="zoom-close"
+            onclick="
+                event.stopPropagation();
+                closeZoom();
+            "
+        >
+
+            ×
+
+        </div>
+
+
+        <img
+            id="zoom-image"
+            src="${escapeAttribute(
+                initialImage
+            )}"
+            alt="拡大画像"
+        >
+
+
+        <div
+            id="zoom-caption"
+            class="zoom-caption"
+        >
+
+            クリックで閉じる
+
+        </div>
+
+    </div>
+
+
+    <script>
+
+
+        // ==========================================================
+        // 詳細画面の画像配列
+        // ==========================================================
+
+        const detailImages =
+            ${JSON.stringify(
+                currentDetailImages
+            )};
+
+
+        let detailImageIndex = 0;
+
+
+        // ==========================================================
+        // 詳細画像変更
+        // ==========================================================
+
+        function changeDetailImage(
+            direction
+        ) {
+
+            if (
+                detailImages.length <= 1
+            ) {
+
+                return;
+
+            }
+
+
+            detailImageIndex += direction;
+
+
+            if (
+                detailImageIndex < 0
+            ) {
+
+                detailImageIndex =
+                    detailImages.length - 1;
+
+            }
+
+
+            if (
+                detailImageIndex >=
+                detailImages.length
+            ) {
+
+                detailImageIndex = 0;
+
+            }
+
+
+            const image =
+                document.getElementById(
+                    "detail-image"
+                );
+
+
+            if (image) {
+
+                image.src =
+                    detailImages[
+                        detailImageIndex
+                    ];
+
+            }
+
+
+            const counter =
+                document.getElementById(
+                    "image-counter"
+                );
+
+
+            if (counter) {
+
+                counter.textContent =
+                    `${detailImageIndex + 1} / ${detailImages.length}`;
+
+            }
+
+
+            const prev =
+                document.getElementById(
+                    "prev-button"
+                );
+
+
+            const next =
+                document.getElementById(
+                    "next-button"
+                );
+
+
+            if (prev) {
+
+                prev.disabled = false;
+
+            }
+
+
+            if (next) {
+
+                next.disabled = false;
+
+            }
+
+        }
+
+
+        // ==========================================================
+        // 拡大表示
+        // ==========================================================
+
+        function openZoom() {
+
+            const image =
+                document.getElementById(
+                    "detail-image"
+                );
+
+
+            if (!image) {
+
+                return;
+
+            }
+
+
+            const modal =
+                document.getElementById(
+                    "zoom-modal"
+                );
+
+
+            const zoomImage =
+                document.getElementById(
+                    "zoom-image"
+                );
+
+
+            zoomImage.src =
+                image.src;
+
+
+            modal.classList.add(
+                "active"
+            );
+
+        }
+
+
+        // ==========================================================
+        // 拡大表示を閉じる
+        // ==========================================================
+
+        function closeZoom() {
+
+            const modal =
+                document.getElementById(
+                    "zoom-modal"
+                );
+
+
+            modal.classList.remove(
+                "active"
+            );
+
+        }
+
+
+        // ==========================================================
+        // Escキーで閉じる
+        // ==========================================================
+
+        document.addEventListener(
+            "keydown",
+            function(event) {
+
+                if (
+                    event.key === "Escape"
+                ) {
+
+                    closeZoom();
+
+                }
+
+
+                if (
+                    event.key === "ArrowLeft"
+                ) {
+
+                    changeDetailImage(-1);
+
+                }
+
+
+                if (
+                    event.key === "ArrowRight"
+                ) {
+
+                    changeDetailImage(1);
+
+                }
+
+            }
+        );
+
+
+    </script>
+
+
+</body>
+
+</html>
+
+    `;
+
+
+    newWindow.document.open();
+
+
+    newWindow.document.write(
+        detailHtml
+    );
+
+
+    newWindow.document.close();
+
+}
+
+
+// ==================================================================
+// 採集日から時刻を削除
+// ==================================================================
+
+function formatDate(
+    value
+) {
+
+    if (
+        value === null ||
+        value === undefined
+    ) {
+
+        return "";
+
+    }
+
+
+    let text =
+        String(
+            value
+        ).trim();
+
+
+    if (
+        text === ""
+    ) {
+
+        return "";
+
+    }
+
+
+    if (
+        text.includes("T")
+    ) {
+
+        text =
+            text.split("T")[0];
+
+    }
+
+
+    if (
+        text.includes(" ")
+    ) {
+
+        text =
+            text.split(" ")[0];
+
+    }
+
+
+    const japaneseDate =
+        text.match(
+            /^(\d{4})年(\d{1,2})月(\d{1,2})日/
+        );
+
+
+    if (
+        japaneseDate
+    ) {
+
+        return (
+
+            japaneseDate[1]
+            +
+            "/"
+            +
+            japaneseDate[2].padStart(
+                2,
+                "0"
+            )
+            +
+            "/"
+            +
+            japaneseDate[3].padStart(
+                2,
+                "0"
+            )
+
+        );
+
+    }
+
+
+    return text;
+
+}
+
+
+// ==================================================================
+// 検索
+// ==================================================================
+
+document.getElementById(
+    "search-input"
+).addEventListener(
+    "input",
+    function () {
+
+
+        const keyword =
+            this.value
+                .trim()
+                .toLowerCase();
+
+
+        if (
+            keyword === ""
+        ) {
+
+            if (
+                currentSiteId
+            ) {
+
+                filterBySite(
+                    currentSiteId
+                );
+
+            }
+            else {
+
+                displaySpecimens(
+                    specimens
+                );
+
+            }
+
+
+            return;
+
+        }
+
+
+        const filtered =
+            specimens.filter(
+                specimen => {
+
+
+                    const searchableText = [
+
+                        specimen.specimen_id,
+
+                        specimen.classification,
+
+                        specimen.scientific_name,
+
+                        specimen.common_name,
+
+                        specimen.formation,
+
+                        specimen.age,
+
+                        specimen.notes,
+
+                        specimen.site_id
+
+                    ]
+                    .join(" ")
+                    .toLowerCase();
+
+
+                    return searchableText.includes(
+                        keyword
+                    );
+
+                }
+            );
+
+
+        currentSiteId = null;
+
+
+        document.getElementById(
+            "filter-box"
+        ).classList.remove(
+            "active"
+        );
+
+
+        displaySpecimens(
+            filtered
+        );
+
+    }
+);
+
+
+// ==================================================================
+// 全標本表示
+// ==================================================================
+
+document.getElementById(
+    "clear-filter-button"
+).addEventListener(
+    "click",
+    function () {
+
+        clearSiteFilter();
+
+    }
+);
+
+
+// ==================================================================
+// 画像読み込みエラー
+// ==================================================================
+
+function showImageError(
+    image
+) {
+
+    const errorDiv =
+        document.createElement(
+            "div"
+        );
+
+
+    errorDiv.className =
+        "image-error";
+
+
+    errorDiv.textContent =
+        "画像を読み込めませんでした";
+
+
+    image.parentElement.replaceWith(
+        errorDiv
+    );
+
+}
+
+
+// ==================================================================
+// HTMLエスケープ
+// ==================================================================
+
+function escapeHtml(
+    value
+) {
+
+    if (
+        value === null ||
+        value === undefined
+    ) {
+
+        return "";
+
+    }
+
+
+    return String(
+        value
+    )
+
+        .replace(
+            /&/g,
+            "&amp;"
+        )
+
+        .replace(
+            /</g,
+            "&lt;"
+        )
+
+        .replace(
+            />/g,
+            "&gt;"
+        )
+
+        .replace(
+            /"/g,
+            "&quot;"
+        )
+
+        .replace(
+            /'/g,
+            "&#039;"
+        );
+
+}
+
+
+// ==================================================================
+// 属性用エスケープ
+// ==================================================================
+
+function escapeAttribute(
+    value
+) {
+
+    return escapeHtml(
+        value
+    );
+
+}
+
+
+// ==================================================================
+// 起動
+// ==================================================================
+
+loadData();
+
+
+</script>
+
+
+</body>
+
+</html>
