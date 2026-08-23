@@ -10,11 +10,15 @@
 <title>鵡川高校 化石デジタルライブラリー</title>
 
 <link
-rel="stylesheet"
-href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    rel="stylesheet"
+    href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
 >
 
 <style>
+
+/* =========================================================
+   BASIC
+   ========================================================= */
 
 * {
     box-sizing: border-box;
@@ -33,6 +37,7 @@ body {
         BlinkMacSystemFont,
         "Segoe UI",
         "Yu Gothic",
+        "Hiragino Kaku Gothic ProN",
         Meiryo,
         sans-serif;
 
@@ -87,9 +92,13 @@ nav {
 
     justify-content: center;
 
+    align-items: center;
+
     gap: 25px;
 
     padding: 10px;
+
+    flex-wrap: wrap;
 
 }
 
@@ -126,7 +135,7 @@ nav a:hover {
 
 
 /* =========================================================
-   ABOUT
+   ABOUT SUMMARY
    ========================================================= */
 
 .about-box {
@@ -153,6 +162,30 @@ nav a:hover {
 .about-box p {
 
     line-height: 1.8;
+
+}
+
+.about-link {
+
+    display: inline-block;
+
+    margin-top: 10px;
+
+    padding: 10px 18px;
+
+    background: #333;
+
+    color: white;
+
+    text-decoration: none;
+
+    border-radius: 6px;
+
+}
+
+.about-link:hover {
+
+    background: #555;
 
 }
 
@@ -990,11 +1023,6 @@ footer {
 
     }
 
-    /*
-       スマートフォンでは
-       ID・学名・和名・分類のみ
-    */
-
     .mobile-hide {
 
         display: none;
@@ -1091,8 +1119,8 @@ footer {
 採集地点
 </a>
 
-<a href="#about">
-このデータベースについて
+<a href="about/index.html">
+データベースについて
 </a>
 
 </nav>
@@ -1102,12 +1130,12 @@ footer {
 
 
 <!-- =========================================================
-     ABOUT
+     ABOUT SUMMARY
      ========================================================= -->
 
 <section
-id="about"
-class="about-box"
+    id="about"
+    class="about-box"
 >
 
 <h2>
@@ -1116,38 +1144,42 @@ class="about-box"
 
 <p>
 
-本データベースは、鵡川高校恐竜研究同好会が収集・整理した
-化石標本について、画像や分類情報などを公開するものです。
+本データベースでは、鵡川高校恐竜研究同好会が収集・整理している
+化石標本について、標本画像や分類情報などを検索・閲覧できます。
 
 </p>
 
 <p>
 
-標本の学習・研究・地域資料としての活用を目的としており、
-公開にあたっては個人情報および詳細な採集地点情報を
-公開しないよう配慮しています。
+標本の詳細な研究目的、データベースの構築方法、
+公開データの考え方、教育・研究での活用については、
+専用の「データベースについて」ページで詳しく解説しています。
 
 </p>
 
-<p>
-
-画像および標本情報の利用については、
-学校・関係機関等の定める条件に従ってください。
-
-</p>
+<a
+    class="about-link"
+    href="about/index.html"
+>
+データベースについて詳しく見る
+</a>
 
 </section>
 
 
+<!-- =========================================================
+     DATABASE SEARCH
+     ========================================================= -->
+
 <section
-id="database"
-class="search-box"
+    id="database"
+    class="search-box"
 >
 
 <input
-type="text"
-id="search-input"
-placeholder="標本番号・和名・学名・分類・地層名などで検索"
+    type="text"
+    id="search-input"
+    placeholder="標本番号・和名・学名・分類・地層名・時代などで検索"
 >
 
 
@@ -1193,8 +1225,8 @@ placeholder="標本番号・和名・学名・分類・地層名などで検索"
 <div class="stat-card">
 
 <div
-id="stat-specimens"
-class="stat-number"
+    id="stat-specimens"
+    class="stat-number"
 >
 -
 </div>
@@ -1209,8 +1241,8 @@ class="stat-number"
 <div class="stat-card">
 
 <div
-id="stat-classifications"
-class="stat-number"
+    id="stat-classifications"
+    class="stat-number"
 >
 -
 </div>
@@ -1225,8 +1257,8 @@ class="stat-number"
 <div class="stat-card">
 
 <div
-id="stat-localities"
-class="stat-number"
+    id="stat-localities"
+    class="stat-number"
 >
 -
 </div>
@@ -1245,8 +1277,8 @@ class="stat-number"
      ========================================================= -->
 
 <section
-id="map-section"
-class="map-container"
+    id="map-section"
+    class="map-container"
 >
 
 <div class="map-title">
@@ -1258,8 +1290,10 @@ class="map-container"
 <div class="map-note">
 
 ※ 地図上には公開用に加工した地点のみを表示しています。
+
 <br>
-※ 地点をクリックすると、その地点の標本を表示できます。
+
+※ 地点をクリックすると、その地点に対応する標本を表示できます。
 
 </div>
 
@@ -1271,16 +1305,16 @@ class="map-container"
      ========================================================= -->
 
 <section
-id="filter-box"
-class="filter-box"
+    id="filter-box"
+    class="filter-box"
 >
 
 <div id="filter-title"></div>
 
 <button
-id="clear-filter-button"
-class="clear-filter-button"
-type="button"
+    id="clear-filter-button"
+    class="clear-filter-button"
+    type="button"
 >
 すべての標本を見る
 </button>
@@ -1317,30 +1351,31 @@ type="button"
      ========================================================= -->
 
 <div
-id="detail-overlay"
-class="detail-overlay"
+    id="detail-overlay"
+    class="detail-overlay"
 >
 
 <div class="detail-window">
 
 <button
-class="close-detail"
-onclick="closeDetail()"
+    class="close-detail"
+    onclick="closeDetail()"
+    aria-label="詳細を閉じる"
 >
 ×
 </button>
 
 
 <div
-id="detail-image-panel"
-class="detail-image-panel"
+    id="detail-image-panel"
+    class="detail-image-panel"
 >
 </div>
 
 
 <div
-id="detail-data-panel"
-class="detail-data-panel"
+    id="detail-data-panel"
+    class="detail-data-panel"
 >
 </div>
 
@@ -1354,37 +1389,36 @@ class="detail-data-panel"
      ========================================================= -->
 
 <div
-id="zoom-overlay"
-class="zoom-overlay"
-onclick="closeZoom()"
+    id="zoom-overlay"
+    class="zoom-overlay"
+    onclick="closeZoom()"
 >
 
 <div
-class="close-zoom"
+    class="close-zoom"
 >
 ×
 </div>
 
 <img
-id="zoom-image"
-src=""
-alt=""
+    id="zoom-image"
+    src=""
+    alt=""
 >
 
 </div>
 
 
 <script
-src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+    src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
 ></script>
 
 
 <script>
 
-
-// ================================================================
-// GLOBAL
-// ================================================================
+/* ================================================================
+   GLOBAL
+   ================================================================ */
 
 let specimens = [];
 
@@ -1395,9 +1429,9 @@ let map = null;
 let currentSiteId = null;
 
 
-// ================================================================
-// MAP
-// ================================================================
+/* ================================================================
+   MAP
+   ================================================================ */
 
 function initializeMap() {
 
@@ -1422,9 +1456,9 @@ function initializeMap() {
 }
 
 
-// ================================================================
-// MAP MARKERS
-// ================================================================
+/* ================================================================
+   MAP MARKERS
+   ================================================================ */
 
 function displayLocalitiesOnMap() {
 
@@ -1515,7 +1549,7 @@ function displayLocalitiesOnMap() {
             L.featureGroup(markers)
             .getBounds(),
             {
-                padding: [30,30]
+                padding: [30, 30]
             }
         );
 
@@ -1524,9 +1558,9 @@ function displayLocalitiesOnMap() {
 }
 
 
-// ================================================================
-// SITE FILTER
-// ================================================================
+/* ================================================================
+   SITE FILTER
+   ================================================================ */
 
 function filterBySite(siteId) {
 
@@ -1584,28 +1618,36 @@ function filterBySite(siteId) {
 }
 
 
+/* ================================================================
+   CLEAR SITE FILTER
+   ================================================================ */
+
 function clearSiteFilter() {
 
     currentSiteId = null;
+
 
     document.getElementById(
         "filter-box"
     ).classList.remove("active");
 
+
     document.getElementById(
         "search-input"
     ).value = "";
 
+
     resetDropdownFilters();
+
 
     displaySpecimens(specimens);
 
 }
 
 
-// ================================================================
-// LOAD DATA
-// ================================================================
+/* ================================================================
+   LOAD DATA
+   ================================================================ */
 
 async function loadData() {
 
@@ -1660,13 +1702,13 @@ async function loadData() {
 
         displaySpecimens(specimens);
 
-
         openSpecimenFromURL();
 
     }
     catch(error) {
 
         console.error(error);
+
 
         document.getElementById(
             "specimen-list"
@@ -1691,9 +1733,9 @@ async function loadData() {
 }
 
 
-// ================================================================
-// STATISTICS
-// ================================================================
+/* ================================================================
+   STATISTICS
+   ================================================================ */
 
 function updateStatistics() {
 
@@ -1743,9 +1785,9 @@ function updateStatistics() {
 }
 
 
-// ================================================================
-// FILTER OPTIONS
-// ================================================================
+/* ================================================================
+   FILTER OPTIONS
+   ================================================================ */
 
 function createFilterOptions() {
 
@@ -1797,7 +1839,7 @@ function createOptions(
             .filter(Boolean)
         )]
         .sort(
-            (a,b) =>
+            (a, b) =>
                 a.localeCompare(
                     b,
                     "ja"
@@ -1812,6 +1854,7 @@ function createOptions(
                 "option"
             );
 
+
         option.value = value;
 
         option.textContent = value;
@@ -1823,13 +1866,14 @@ function createOptions(
 }
 
 
-// ================================================================
-// APPLY FILTERS
-// ================================================================
+/* ================================================================
+   APPLY FILTERS
+   ================================================================ */
 
 function applyFilters() {
 
     currentSiteId = null;
+
 
     document.getElementById(
         "filter-box"
@@ -1922,9 +1966,9 @@ function applyFilters() {
 }
 
 
-// ================================================================
-// DISPLAY SPECIMENS
-// ================================================================
+/* ================================================================
+   DISPLAY SPECIMENS
+   ================================================================ */
 
 function displaySpecimens(data) {
 
@@ -1965,9 +2009,9 @@ function displaySpecimens(data) {
 }
 
 
-// ================================================================
-// GET IMAGE DATA
-// ================================================================
+/* ================================================================
+   GET IMAGE DATA
+   ================================================================ */
 
 function getImages(specimen) {
 
@@ -2025,6 +2069,7 @@ function getImages(specimen) {
 
                 original:
                     specimen.image
+
             }
 
         ];
@@ -2037,9 +2082,9 @@ function getImages(specimen) {
 }
 
 
-// ================================================================
-// CARD
-// ================================================================
+/* ================================================================
+   SPECIMEN CARD
+   ================================================================ */
 
 function createSpecimenCard(specimen) {
 
@@ -2084,9 +2129,11 @@ function createSpecimenCard(specimen) {
 
                 <div class="image-caption">
 
-                    ${images.length > 1
-                        ? `${images.length}枚の画像`
-                        : "画像をクリックして詳細表示"}
+                    ${
+                        images.length > 1
+                            ? `${images.length}枚の画像`
+                            : "画像をクリックして詳細表示"
+                    }
 
                 </div>
 
@@ -2133,7 +2180,7 @@ function createSpecimenCard(specimen) {
 
                     ${escapeHtml(
                         specimen.common_name ||
-                        "名称不明"
+                        "名称未設定"
                     )}
 
                 </div>
@@ -2166,13 +2213,11 @@ function createSpecimenCard(specimen) {
 
                     ${escapeHtml(
                         specimen.classification ||
-                        "分類不明"
+                        "分類未設定"
                     )}
 
                 </div>
 
-
-                <!-- PCのみ表示 -->
 
                 <div class="specimen-info mobile-hide">
 
@@ -2283,9 +2328,9 @@ function createSpecimenCard(specimen) {
 }
 
 
-// ================================================================
-// DETAIL
-// ================================================================
+/* ================================================================
+   DETAIL
+   ================================================================ */
 
 function openSpecimenDetailById(
     specimenId
@@ -2380,14 +2425,14 @@ function openSpecimenDetail(
             <div class="gallery">
 
                 ${images.map(
-                    (image,index) => `
+                    (image, index) => `
 
                     <img
                         class="gallery-thumb"
                         src="${escapeAttribute(
                             image.thumb
                         )}"
-                        alt="画像${index + 1}"
+                        alt="画像 ${index + 1}"
                         onclick="
                             changeDetailImage(
                                 '${escapeAttribute(
@@ -2397,7 +2442,7 @@ function openSpecimenDetail(
                         "
                     >
 
-                `
+                    `
                 ).join("")}
 
             </div>
@@ -2413,7 +2458,7 @@ function openSpecimenDetail(
 
             ${escapeHtml(
                 specimen.common_name ||
-                "名称不明"
+                "名称未設定"
             )}
 
         </h2>
@@ -2633,7 +2678,7 @@ function openSpecimenDetail(
         >
 
             公開用データのみを表示しています。
-            詳細な採集地点情報・採集者情報等は
+            詳細な採集地点情報、採集者等の非公開情報は
             公開していません。
 
         </p>
@@ -2650,13 +2695,6 @@ function openSpecimenDetail(
         "hidden";
 
 
-    /*
-       URLを更新
-
-       例：
-       ?id=MDR260516-01
-    */
-
     history.pushState(
         null,
         "",
@@ -2668,6 +2706,10 @@ function openSpecimenDetail(
 
 }
 
+
+/* ================================================================
+   CLOSE DETAIL
+   ================================================================ */
 
 function closeDetail() {
 
@@ -2689,6 +2731,10 @@ function closeDetail() {
 }
 
 
+/* ================================================================
+   CHANGE DETAIL IMAGE
+   ================================================================ */
+
 function changeDetailImage(
     image
 ) {
@@ -2708,9 +2754,9 @@ function changeDetailImage(
 }
 
 
-// ================================================================
-// IMAGE ZOOM
-// ================================================================
+/* ================================================================
+   IMAGE ZOOM
+   ================================================================ */
 
 function openZoom(
     src,
@@ -2743,9 +2789,9 @@ function closeZoom() {
 }
 
 
-// ================================================================
-// URLから標本を開く
-// ================================================================
+/* ================================================================
+   OPEN SPECIMEN FROM URL
+   ================================================================ */
 
 function openSpecimenFromURL() {
 
@@ -2790,9 +2836,9 @@ function openSpecimenFromURL() {
 }
 
 
-// ================================================================
-// DATE
-// ================================================================
+/* ================================================================
+   DATE
+   ================================================================ */
 
 function formatDate(value) {
 
@@ -2834,9 +2880,65 @@ function formatDate(value) {
     }
 
 
+    /* YYYY-MM-DD */
+
+    const isoDate =
+        text.match(
+            /^(\d{4})-(\d{1,2})-(\d{1,2})$/
+        );
+
+
+    if (isoDate) {
+
+        return (
+
+            isoDate[1]
+            +
+            "/"
+            +
+            isoDate[2].padStart(2, "0")
+            +
+            "/"
+            +
+            isoDate[3].padStart(2, "0")
+
+        );
+
+    }
+
+
+    /* YYYY/MM/DD */
+
+    const slashDate =
+        text.match(
+            /^(\d{4})\/(\d{1,2})\/(\d{1,2})$/
+        );
+
+
+    if (slashDate) {
+
+        return (
+
+            slashDate[1]
+            +
+            "/"
+            +
+            slashDate[2].padStart(2, "0")
+            +
+            "/"
+            +
+            slashDate[3].padStart(2, "0")
+
+        );
+
+    }
+
+
+    /* YYYY年MM月DD日 */
+
     const japaneseDate =
         text.match(
-            /^(\d{4})年(\d{1,2})月(\d{1,2})日/
+            /^(\d{4})年(\d{1,2})月(\d{1,2})日$/
         );
 
 
@@ -2848,17 +2950,11 @@ function formatDate(value) {
             +
             "/"
             +
-            japaneseDate[2].padStart(
-                2,
-                "0"
-            )
+            japaneseDate[2].padStart(2, "0")
             +
             "/"
             +
-            japaneseDate[3].padStart(
-                2,
-                "0"
-            )
+            japaneseDate[3].padStart(2, "0")
 
         );
 
@@ -2870,9 +2966,9 @@ function formatDate(value) {
 }
 
 
-// ================================================================
-// RESET FILTER
-// ================================================================
+/* ================================================================
+   RESET FILTER
+   ================================================================ */
 
 function resetDropdownFilters() {
 
@@ -2880,9 +2976,11 @@ function resetDropdownFilters() {
         "classification-filter"
     ).value = "";
 
+
     document.getElementById(
         "formation-filter"
     ).value = "";
+
 
     document.getElementById(
         "age-filter"
@@ -2891,9 +2989,9 @@ function resetDropdownFilters() {
 }
 
 
-// ================================================================
-// SEARCH EVENTS
-// ================================================================
+/* ================================================================
+   SEARCH EVENTS
+   ================================================================ */
 
 document.getElementById(
     "search-input"
@@ -2940,9 +3038,9 @@ document.getElementById(
 );
 
 
-// ================================================================
-// KEYBOARD
-// ================================================================
+/* ================================================================
+   KEYBOARD
+   ================================================================ */
 
 document.addEventListener(
     "keydown",
@@ -2962,9 +3060,9 @@ document.addEventListener(
 );
 
 
-// ================================================================
-// HTML ESCAPE
-// ================================================================
+/* ================================================================
+   HTML ESCAPE
+   ================================================================ */
 
 function escapeHtml(value) {
 
@@ -3015,9 +3113,9 @@ function escapeAttribute(value) {
 }
 
 
-// ================================================================
-// START
-// ================================================================
+/* ================================================================
+   START
+   ================================================================ */
 
 loadData();
 
