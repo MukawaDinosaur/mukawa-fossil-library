@@ -6,16 +6,13 @@
     "common_name": "パキデスモセラスの一種？",
     "formation": "中部蝦夷層群",
     "age": "約9000万年前",
-    "collection_date": "2025-06-28 00:00:00",
-    "notes": "同好会の活動史において最大のアンモナイト化石。むかわ町役場太田晶主幹とともに佐主橋下川岸で、露出した巨大なノジュール（全長約60㎝）を発見。暑い日差しが降り注ぐ中、３時間かけノジュールを壊し、ついに全貌が明らかになる。酸化していないきれいな琥珀色の殻表面がまぶしく輝いていた。その後、大人二人がかりで川を渡り、橋を上り、なんとか車に積み込み現在に至る。",
-    "image": "images/thumbs/MDR250628-01.jpg",
+    "collection_date": "2025-06-28",
+    "note": "同好会の活動史において最大のアンモナイト化石。むかわ町役場太田晶主幹とともに佐主橋下川岸で、露出した巨大なノジュール（全長約60㎝）を発見。暑い日差しが降り注ぐ中、３時間かけノジュールを壊し、ついに全貌が明らかになる。酸化していないきれいな琥珀色の殻表面がまぶしく輝いていた。その後、大人二人がかりで川を渡り、橋を上り、なんとか車に積み込み現在に至る。",
+    "site_id": "A001",
+    "image": "images/MDR250628-01/MDR250628-01.jpg",
     "images": [
-      "images/thumbs/MDR250628-01.jpg"
-    ],
-    "original_images": [
-      "images/MDR250628-01.jpg"
-    ],
-    "site_id": "A001"
+      "images/MDR250628-01/MDR250628-01.jpg"
+    ]
   },
   {
     "specimen_id": "MDR260516-01",
@@ -24,16 +21,13 @@
     "common_name": "未同定",
     "formation": "中部蝦夷層群",
     "age": "約9000万年前",
-    "collection_date": "2026-05-16 00:00:00",
-    "notes": "高橋先生が初めて採ったアンモナイト。河原に落ちていた石を「なんか変だぞ？」と思い、中を確認するため思い切り叩き割った石そのものが大きなアンモナイトだったことは、ここだけの話。作田同行会員が慌てて破片を回収し復元した。",
-    "image": "images/thumbs/MDR260516-01.jpg",
+    "collection_date": "2026-05-16",
+    "note": "高橋先生が初めて採ったアンモナイト。河原に落ちていた石を「なんか変だぞ？」と思い、中を確認するため思い切り叩き割った石そのものが大きなアンモナイトだったことは、ここだけの話。作田同行会員が慌てて破片を回収し復元した。",
+    "site_id": "A002",
+    "image": "images/MDR260516-01/MDR260516-01.jpg",
     "images": [
-      "images/thumbs/MDR260516-01.jpg"
-    ],
-    "original_images": [
-      "images/MDR260516-01.jpg"
-    ],
-    "site_id": "A002"
+      "images/MDR260516-01/MDR260516-01.jpg"
+    ]
   },
   {
     "specimen_id": "MDR260516-02",
@@ -42,16 +36,13 @@
     "common_name": "未同定",
     "formation": "中部蝦夷層群",
     "age": "約9000万年前",
-    "collection_date": "2026-05-16 00:00:00",
-    "notes": "川辺に落ちている不完全なアンモナイトを採集。風化が進み、種同定までは至らない可能性が高いが、なかなかの大きさのアンモナイトだった。",
-    "image": "images/thumbs/MDR260516-02.jpg",
+    "collection_date": "2026-05-16",
+    "note": "川辺に落ちている不完全なアンモナイトを採集。風化が進み、種同定までは至らない可能性が高いが、なかなかの大きさのアンモナイトだった。",
+    "site_id": "A002",
+    "image": "images/MDR260516-02/MDR260516-02.jpg",
     "images": [
-      "images/thumbs/MDR260516-02.jpg"
-    ],
-    "original_images": [
-      "images/MDR260516-02.jpg"
-    ],
-    "site_id": "A002"
+      "images/MDR260516-02/MDR260516-02.jpg"
+    ]
   },
   {
     "specimen_id": "MDR260530-01",
@@ -60,16 +51,13 @@
     "common_name": "未同定",
     "formation": "中部蝦夷層群",
     "age": "約9000万年前",
-    "collection_date": "2026-05-30 00:00:00",
-    "notes": "顧問阿部が４年の歳月を経て、ついに発掘したアンモナイト。サイズは小さめだが、１個体を見つけたことに喜びを抑えきれなかった。同ノジュールにはイノセラムスも混在していた。なお、同好会員に報告したところ、ノジュール裏側に痕跡としてあった異常巻きのほうが価値はあったらしい。おそらくぶっ壊してしまった。",
-    "image": "images/thumbs/MDR260530-01.jpg",
+    "collection_date": "2026-05-30",
+    "note": "顧問阿部が４年の歳月を経て、ついに発掘したアンモナイト。サイズは小さめだが、１個体を見つけたことに喜びを抑えきれなかった。同ノジュールにはイノセラムスも混在していた。なお、同好会員に報告したところ、ノジュール裏側に痕跡としてあった異常巻きのほうが価値はあったらしい。おそらくぶっ壊してしまった。",
+    "site_id": "A003",
+    "image": "images/MDR260530-01/MDR260530-01.jpg",
     "images": [
-      "images/thumbs/MDR260530-01.jpg"
-    ],
-    "original_images": [
-      "images/MDR260530-01.jpg"
-    ],
-    "site_id": "A003"
+      "images/MDR260530-01/MDR260530-01.jpg"
+    ]
   },
   {
     "specimen_id": "MDR260530-02",
@@ -78,16 +66,13 @@
     "common_name": "未同定",
     "formation": "中部蝦夷層群",
     "age": "約9000万年前",
-    "collection_date": "2026-05-30 00:00:00",
-    "notes": "化石が含まれていると思われるノジュール。ノジュールとは、地層（泥岩や砂岩など）の中で、化石や有機物を核として周囲の鉱物成分（炭酸カルシウムなど）が固まってできた、丸みを帯びた硬い岩塊のことである。ノジュール中では風化の影響を受けにくく、状態の良い化石が見つかることがある。北海道で化石を発掘したい人は、まずノジュールを探せるようになることが重要になってくると言えよう（顧問阿部は見分けがつくようになるまで４年もかかってしまった）",
-    "image": "images/thumbs/MDR260530-02.jpg",
+    "collection_date": "2026-05-30",
+    "note": "化石が含まれていると思われるノジュール。ノジュールとは、地層（泥岩や砂岩など）の中で、化石や有機物を核として周囲の鉱物成分（炭酸カルシウムなど）が固まってできた、丸みを帯びた硬い岩塊のことである。ノジュール中では風化の影響を受けにくく、状態の良い化石が見つかることがある。北海道で化石を発掘したい人は、まずノジュールを探せるようになることが重要になってくると言えよう（顧問阿部は見分けがつくようになるまで４年もかかってしまった）",
+    "site_id": "A003",
+    "image": "images/MDR260530-02/MDR260530-02.jpg",
     "images": [
-      "images/thumbs/MDR260530-02.jpg"
-    ],
-    "original_images": [
-      "images/MDR260530-02.jpg"
-    ],
-    "site_id": "A003"
+      "images/MDR260530-02/MDR260530-02.jpg"
+    ]
   },
   {
     "specimen_id": "MDR260530-03",
@@ -96,16 +81,13 @@
     "common_name": "未同定",
     "formation": "中部蝦夷層群",
     "age": "約9000万年前",
-    "collection_date": "2026-05-30 00:00:00",
-    "notes": "",
-    "image": "images/thumbs/MDR260530-03.jpg",
+    "collection_date": "2026-05-30",
+    "note": "",
+    "site_id": "A003",
+    "image": "images/MDR260530-03/MDR260530-03.jpg",
     "images": [
-      "images/thumbs/MDR260530-03.jpg"
-    ],
-    "original_images": [
-      "images/MDR260530-03.jpg"
-    ],
-    "site_id": "A003"
+      "images/MDR260530-03/MDR260530-03.jpg"
+    ]
   },
   {
     "specimen_id": "MDR260530-04",
@@ -114,16 +96,13 @@
     "common_name": "イノセラムスの一種",
     "formation": "中部蝦夷層群",
     "age": "約9000万年前",
-    "collection_date": "2026-05-30 00:00:00",
-    "notes": "顧問阿部が初めて発掘したアンモナイトと共産したイノセラムス。３個体含まれていた。",
-    "image": "images/thumbs/MDR260530-04.jpg",
+    "collection_date": "2026-05-30",
+    "note": "顧問阿部が初めて発掘したアンモナイトと共産したイノセラムス。３個体含まれていた。",
+    "site_id": "A003",
+    "image": "images/MDR260530-04/MDR260530-04.jpg",
     "images": [
-      "images/thumbs/MDR260530-04.jpg"
-    ],
-    "original_images": [
-      "images/MDR260530-04.jpg"
-    ],
-    "site_id": "A003"
+      "images/MDR260530-04/MDR260530-04.jpg"
+    ]
   },
   {
     "specimen_id": "MDR260530-05",
@@ -132,16 +111,13 @@
     "common_name": "未同定",
     "formation": "中部蝦夷層群",
     "age": "約9000万年前",
-    "collection_date": "2026-05-30 00:00:00",
-    "notes": "",
-    "image": "images/thumbs/MDR260530-05.jpg",
+    "collection_date": "2026-05-30",
+    "note": "",
+    "site_id": "A003",
+    "image": "images/MDR260530-05/MDR260530-05.jpg",
     "images": [
-      "images/thumbs/MDR260530-05.jpg"
-    ],
-    "original_images": [
-      "images/MDR260530-05.jpg"
-    ],
-    "site_id": "A003"
+      "images/MDR260530-05/MDR260530-05.jpg"
+    ]
   },
   {
     "specimen_id": "MDR260530-06",
@@ -150,16 +126,13 @@
     "common_name": "イノセラムスの一種",
     "formation": "中部蝦夷層群",
     "age": "約9000万年前",
-    "collection_date": "2026-05-30 00:00:00",
-    "notes": "",
-    "image": "images/thumbs/MDR260530-06.jpg",
+    "collection_date": "2026-05-30",
+    "note": "",
+    "site_id": "A003",
+    "image": "images/MDR260530-06/MDR260530-06.jpg",
     "images": [
-      "images/thumbs/MDR260530-06.jpg"
-    ],
-    "original_images": [
-      "images/MDR260530-06.jpg"
-    ],
-    "site_id": "A003"
+      "images/MDR260530-06/MDR260530-06.jpg"
+    ]
   },
   {
     "specimen_id": "MDR260530-07",
@@ -168,16 +141,13 @@
     "common_name": "未同定",
     "formation": "中部蝦夷層群",
     "age": "約9000万年前",
-    "collection_date": "2026-05-30 00:00:00",
-    "notes": "",
-    "image": "images/thumbs/MDR260530-07.jpg",
+    "collection_date": "2026-05-30",
+    "note": "",
+    "site_id": "A003",
+    "image": "images/MDR260530-07/MDR260530-07.jpg",
     "images": [
-      "images/thumbs/MDR260530-07.jpg"
-    ],
-    "original_images": [
-      "images/MDR260530-07.jpg"
-    ],
-    "site_id": "A003"
+      "images/MDR260530-07/MDR260530-07.jpg"
+    ]
   },
   {
     "specimen_id": "MDR260530-08",
@@ -186,16 +156,13 @@
     "common_name": "イノセラムスの一種",
     "formation": "中部蝦夷層群",
     "age": "約9000万年前",
-    "collection_date": "2026-05-30 00:00:00",
-    "notes": "",
-    "image": "images/thumbs/MDR260530-08.jpg",
+    "collection_date": "2026-05-30",
+    "note": "",
+    "site_id": "A003",
+    "image": "images/MDR260530-08/MDR260530-08.jpg",
     "images": [
-      "images/thumbs/MDR260530-08.jpg"
-    ],
-    "original_images": [
-      "images/MDR260530-08.jpg"
-    ],
-    "site_id": "A003"
+      "images/MDR260530-08/MDR260530-08.jpg"
+    ]
   },
   {
     "specimen_id": "MDR260530-09",
@@ -204,16 +171,13 @@
     "common_name": "イノセラムスの一種",
     "formation": "中部蝦夷層群",
     "age": "約9000万年前",
-    "collection_date": "2026-05-30 00:00:00",
-    "notes": "イノセラムスの1部",
-    "image": "images/thumbs/MDR260530-09.jpg",
+    "collection_date": "2026-05-30",
+    "note": "イノセラムスの1部",
+    "site_id": "A003",
+    "image": "images/MDR260530-09/MDR260530-09.jpg",
     "images": [
-      "images/thumbs/MDR260530-09.jpg"
-    ],
-    "original_images": [
-      "images/MDR260530-09.jpg"
-    ],
-    "site_id": "A003"
+      "images/MDR260530-09/MDR260530-09.jpg"
+    ]
   },
   {
     "specimen_id": "MDR260614-01",
@@ -222,16 +186,13 @@
     "common_name": "ポリプチコセラスの一種",
     "formation": "中部蝦夷層群",
     "age": "約9000万年前",
-    "collection_date": "2026-06-14 00:00:00",
-    "notes": "前回の発掘から調子が上がり、ノジュールの見極めが少し得意になってきたときに発見したポリプチコセラスの一種。異常巻を見つけることができてまたしても喜びが抑えきれない顧問阿部であった。",
-    "image": "images/thumbs/MDR260614-01.jpg",
+    "collection_date": "2026-06-14",
+    "note": "前回の発掘から調子が上がり、ノジュールの見極めが少し得意になってきたときに発見したポリプチコセラスの一種。異常巻を見つけることができてまたしても喜びが抑えきれない顧問阿部であった。",
+    "site_id": "A003",
+    "image": "images/MDR260614-01/MDR260614-01.jpg",
     "images": [
-      "images/thumbs/MDR260614-01.jpg"
-    ],
-    "original_images": [
-      "images/MDR260614-01.jpg"
-    ],
-    "site_id": "A003"
+      "images/MDR260614-01/MDR260614-01.jpg"
+    ]
   },
   {
     "specimen_id": "MDR260620-01",
@@ -240,16 +201,13 @@
     "common_name": "未同定",
     "formation": "中部蝦夷層群",
     "age": "約9000万年前",
-    "collection_date": "2026-06-20 00:00:00",
-    "notes": "砂防ダムまで歩いた際、巨大なノジュールが割られた痕跡。注意深く探していくと、ノジュールそのものに巨大アンモナイトの破片を発見。更に探すと内側の巻も見つかり、全体の半分程度のアンモナイトが見つかった。",
-    "image": "images/thumbs/MDR260620-01.jpg",
+    "collection_date": "2026-06-20",
+    "note": "砂防ダムまで歩いた際、巨大なノジュールが割られた痕跡。注意深く探していくと、ノジュールそのものに巨大アンモナイトの破片を発見。更に探すと内側の巻も見つかり、全体の半分程度のアンモナイトが見つかった。",
+    "site_id": "A004",
+    "image": "images/MDR260620-01/MDR260620-01.jpg",
     "images": [
-      "images/thumbs/MDR260620-01.jpg"
-    ],
-    "original_images": [
-      "images/MDR260620-01.jpg"
-    ],
-    "site_id": "A004"
+      "images/MDR260620-01/MDR260620-01.jpg"
+    ]
   },
   {
     "specimen_id": "MDR260620-02",
@@ -258,16 +216,13 @@
     "common_name": "ポリプチコセラスの一種",
     "formation": "中部蝦夷層群",
     "age": "約9000万年前",
-    "collection_date": "2026-06-20 00:00:00",
-    "notes": "空ノジュールが多く見つかる中、マッカシマップ沢上流まで歩いた際に川岸に割られたノジュールを見つけ、その中から発見したアンモナイト。",
-    "image": "images/thumbs/MDR260620-02.jpg",
+    "collection_date": "2026-06-20",
+    "note": "空ノジュールが多く見つかる中、マッカシマップ沢上流まで歩いた際に川岸に割られたノジュールを見つけ、その中から発見したアンモナイト。",
+    "site_id": "A002",
+    "image": "images/MDR260620-02/MDR260620-02.jpg",
     "images": [
-      "images/thumbs/MDR260620-02.jpg"
-    ],
-    "original_images": [
-      "images/MDR260620-02.jpg"
-    ],
-    "site_id": "A002"
+      "images/MDR260620-02/MDR260620-02.jpg"
+    ]
   },
   {
     "specimen_id": "MDR260620-03",
@@ -276,16 +231,13 @@
     "common_name": "ポリプチコセラスの一種",
     "formation": "中部蝦夷層群",
     "age": "約9000万年前",
-    "collection_date": "2026-06-20 00:00:00",
-    "notes": "空ノジュールが多く見つかる中、マッカシマップ沢上流まで歩いた際に川岸に割られたノジュールを見つけ、その中から発見したアンモナイト。",
-    "image": "images/thumbs/MDR260620-03.jpg",
+    "collection_date": "2026-06-20",
+    "note": "空ノジュールが多く見つかる中、マッカシマップ沢上流まで歩いた際に川岸に割られたノジュールを見つけ、その中から発見したアンモナイト。",
+    "site_id": "A002",
+    "image": "images/MDR260620-03/MDR260620-03.jpg",
     "images": [
-      "images/thumbs/MDR260620-03.jpg"
-    ],
-    "original_images": [
-      "images/MDR260620-03.jpg"
-    ],
-    "site_id": "A002"
+      "images/MDR260620-03/MDR260620-03.jpg"
+    ]
   },
   {
     "specimen_id": "MDR260620-04",
@@ -294,16 +246,13 @@
     "common_name": "ツリリテスの一種",
     "formation": "中部蝦夷層群",
     "age": "約9000万年前",
-    "collection_date": "2026-06-20 00:00:00",
-    "notes": "川内君と見つけたツリリテス。砂防ダムまで歩いた際に見つけた化石で、ついでに私が初めて見つけた化石。",
-    "image": "images/thumbs/MDR260620-04.jpg",
+    "collection_date": "2026-06-20",
+    "note": "川内君と見つけたツリリテス。砂防ダムまで歩いた際に見つけた化石で、ついでに私が初めて見つけた化石。",
+    "site_id": "A002",
+    "image": "images/MDR260620-04/MDR260620-04.jpg",
     "images": [
-      "images/thumbs/MDR260620-04.jpg"
-    ],
-    "original_images": [
-      "images/MDR260620-04.jpg"
-    ],
-    "site_id": "A002"
+      "images/MDR260620-04/MDR260620-04.jpg"
+    ]
   },
   {
     "specimen_id": "MDR260620-05",
@@ -312,16 +261,13 @@
     "common_name": "ツリリテスの一種",
     "formation": "中部蝦夷層群",
     "age": "約9000万年前",
-    "collection_date": "2026-06-20 00:00:00",
-    "notes": "MDR260620-04の破片ノジュールより別固体と思われる化石を発見！",
-    "image": "images/thumbs/MDR260620-05.jpg",
+    "collection_date": "2026-06-20",
+    "note": "MDR260620-04の破片ノジュールより別固体と思われる化石を発見！",
+    "site_id": "A002",
+    "image": "images/MDR260620-05/MDR260620-05.jpg",
     "images": [
-      "images/thumbs/MDR260620-05.jpg"
-    ],
-    "original_images": [
-      "images/MDR260620-05.jpg"
-    ],
-    "site_id": "A002"
+      "images/MDR260620-05/MDR260620-05.jpg"
+    ]
   },
   {
     "specimen_id": "MDR260620-06",
@@ -330,16 +276,13 @@
     "common_name": "イノセラムスの一種",
     "formation": "中部蝦夷層群",
     "age": "約9000万年前",
-    "collection_date": "2026-06-20 00:00:00",
-    "notes": "一部イノセラムス",
-    "image": "images/thumbs/MDR260620-06.jpg",
+    "collection_date": "2026-06-20",
+    "note": "一部イノセラムス",
+    "site_id": "A005",
+    "image": "images/MDR260620-06/MDR260620-06.jpg",
     "images": [
-      "images/thumbs/MDR260620-06.jpg"
-    ],
-    "original_images": [
-      "images/MDR260620-06.jpg"
-    ],
-    "site_id": "A005"
+      "images/MDR260620-06/MDR260620-06.jpg"
+    ]
   },
   {
     "specimen_id": "MDR260620-07",
@@ -348,15 +291,12 @@
     "common_name": "パキディスカスの一種？",
     "formation": "中部蝦夷層群",
     "age": "約9000万年前",
-    "collection_date": "2026-06-20 00:00:00",
-    "notes": "ノジュールの中から拳大以上の大きなパキディスカスと思われるアンモナイト発見！完美！",
-    "image": "images/thumbs/MDR260620-07.jpg",
+    "collection_date": "2026-06-20",
+    "note": "ノジュールの中から拳大以上の大きなパキディスカスと思われるアンモナイト発見！完美！",
+    "site_id": "A005",
+    "image": "images/MDR260620-07/MDR260620-07.jpg",
     "images": [
-      "images/thumbs/MDR260620-07.jpg"
-    ],
-    "original_images": [
-      "images/MDR260620-07.jpg"
-    ],
-    "site_id": "A005"
+      "images/MDR260620-07/MDR260620-07.jpg"
+    ]
   }
 ]
