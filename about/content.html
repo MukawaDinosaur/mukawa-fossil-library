@@ -1,685 +1,78 @@
 <!DOCTYPE html>
 <html lang="ja">
-
 <head>
-
     <meta charset="UTF-8">
-
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0"
-    >
-
-    <title>
-        このデータベースについて -
-        鵡川高校 化石デジタルライブラリー
-    </title>
-
-
-    <style>
-
-        * {
-            box-sizing: border-box;
-        }
-
-
-        html {
-            scroll-behavior: smooth;
-        }
-
-
-        body {
-
-            margin: 0;
-
-            font-family:
-                -apple-system,
-                BlinkMacSystemFont,
-                "Segoe UI",
-                "Yu Gothic",
-                "Hiragino Kaku Gothic ProN",
-                Meiryo,
-                sans-serif;
-
-            background-color: #f5f5f5;
-
-            color: #333;
-
-            line-height: 1.8;
-
-        }
-
-
-        /* ============================================================
-           ヘッダー
-           ============================================================ */
-
-        header {
-
-            background-color: #333;
-
-            color: white;
-
-            text-align: center;
-
-            padding: 30px 20px;
-
-        }
-
-
-        header h1 {
-
-            margin: 0;
-
-            font-size: 27px;
-
-        }
-
-
-        header p {
-
-            margin: 8px 0 18px;
-
-            font-size: 14px;
-
-        }
-
-
-        .back-link {
-
-            display: inline-block;
-
-            padding: 8px 16px;
-
-            border:
-                1px solid
-                rgba(255, 255, 255, 0.75);
-
-            border-radius: 6px;
-
-            color: white;
-
-            text-decoration: none;
-
-            font-size: 13px;
-
-            transition:
-                background-color 0.2s,
-                color 0.2s;
-
-        }
-
-
-        .back-link:hover {
-
-            background-color: white;
-
-            color: #333;
-
-        }
-
-
-        /* ============================================================
-           メイン
-           ============================================================ */
-
-        .container {
-
-            max-width: 950px;
-
-            margin: 32px auto;
-
-            padding: 0 20px;
-
-        }
-
-
-        /* ============================================================
-           目次
-           ============================================================ */
-
-        .toc {
-
-            background-color: white;
-
-            margin-bottom: 25px;
-
-            padding: 25px 30px;
-
-            border-radius: 10px;
-
-            box-shadow:
-                0 2px 8px
-                rgba(0, 0, 0, 0.08);
-
-        }
-
-
-        .toc h2 {
-
-            margin:
-                0 0 12px;
-
-            font-size: 20px;
-
-        }
-
-
-        .toc ul {
-
-            margin: 0;
-
-            padding-left: 22px;
-
-            columns: 2;
-
-        }
-
-
-        .toc li {
-
-            margin-bottom: 6px;
-
-        }
-
-
-        .toc a {
-
-            color: #333;
-
-            text-decoration: none;
-
-        }
-
-
-        .toc a:hover {
-
-            text-decoration: underline;
-
-        }
-
-
-        /* ============================================================
-           セクション
-           ============================================================ */
-
-        .about-section {
-
-            background-color: white;
-
-            margin-bottom: 25px;
-
-            padding: 32px;
-
-            border-radius: 10px;
-
-            box-shadow:
-                0 2px 8px
-                rgba(0, 0, 0, 0.08);
-
-            scroll-margin-top: 20px;
-
-        }
-
-
-        .about-section h2 {
-
-            margin-top: 0;
-
-            margin-bottom: 18px;
-
-            padding-bottom: 10px;
-
-            border-bottom:
-                2px solid #333;
-
-            font-size: 22px;
-
-        }
-
-
-        .about-section h3 {
-
-            margin-top: 26px;
-
-            margin-bottom: 8px;
-
-            font-size: 18px;
-
-        }
-
-
-        .about-section p {
-
-            margin:
-                0 0 16px;
-
-        }
-
-
-        .about-section p:last-child {
-
-            margin-bottom: 0;
-
-        }
-
-
-        /* ============================================================
-           リスト
-           ============================================================ */
-
-        .data-list {
-
-            margin:
-                15px 0 0;
-
-            padding-left: 25px;
-
-        }
-
-
-        .data-list li {
-
-            margin-bottom: 8px;
-
-        }
-
-
-        /* ============================================================
-           特徴カード
-           ============================================================ */
-
-        .feature-grid {
-
-            display: grid;
-
-            grid-template-columns:
-                repeat(
-                    2,
-                    minmax(0, 1fr)
-                );
-
-            gap: 15px;
-
-            margin-top: 20px;
-
-        }
-
-
-        .feature-card {
-
-            padding: 18px;
-
-            background-color: #f5f5f5;
-
-            border-radius: 8px;
-
-            border:
-                1px solid #e5e5e5;
-
-        }
-
-
-        .feature-card h3 {
-
-            margin:
-                0 0 7px;
-
-            font-size: 17px;
-
-        }
-
-
-        .feature-card p {
-
-            margin: 0;
-
-            font-size: 14px;
-
-            line-height: 1.7;
-
-        }
-
-
-        /* ============================================================
-           情報テーブル
-           ============================================================ */
-
-        .info-table {
-
-            width: 100%;
-
-            border-collapse: collapse;
-
-            margin-top: 15px;
-
-        }
-
-
-        .info-table th,
-        .info-table td {
-
-            padding:
-                10px 12px;
-
-            border:
-                1px solid #ddd;
-
-            text-align: left;
-
-            vertical-align: top;
-
-        }
-
-
-        .info-table th {
-
-            width: 30%;
-
-            background-color: #f5f5f5;
-
-            font-weight: 600;
-
-        }
-
-
-        /* ============================================================
-           注意事項
-           ============================================================ */
-
-        .notice-box {
-
-            padding: 18px;
-
-            background-color: #f5f5f5;
-
-            border-left:
-                4px solid #555;
-
-            border-radius: 5px;
-
-            margin-top: 18px;
-
-        }
-
-
-        .notice-box strong {
-
-            display: block;
-
-            margin-bottom: 6px;
-
-        }
-
-
-        /* ============================================================
-           更新フロー
-           ============================================================ */
-
-        .flow {
-
-            margin-top: 20px;
-
-        }
-
-
-        .flow-step {
-
-            padding: 16px 18px;
-
-            margin-bottom: 10px;
-
-            background-color: #f5f5f5;
-
-            border-radius: 8px;
-
-            border-left:
-                4px solid #333;
-
-        }
-
-
-        .flow-step strong {
-
-            display: block;
-
-            margin-bottom: 4px;
-
-        }
-
-
-        /* ============================================================
-           ページ内リンク
-           ============================================================ */
-
-        .section-link {
-
-            display: inline-block;
-
-            margin-top: 12px;
-
-            color: #333;
-
-            font-size: 14px;
-
-            text-decoration: underline;
-
-        }
-
-
-        /* ============================================================
-           戻るボタン
-           ============================================================ */
-
-        .home-button {
-
-            display: inline-block;
-
-            background-color: #333;
-
-            color: white;
-
-            text-decoration: none;
-
-            padding:
-                11px 20px;
-
-            border-radius: 6px;
-
-            margin-top: 12px;
-
-            transition:
-                background-color 0.2s;
-
-        }
-
-
-        .home-button:hover {
-
-            background-color: #555;
-
-        }
-
-
-        /* ============================================================
-           フッター
-           ============================================================ */
-
-        footer {
-
-            margin-top: 50px;
-
-            padding:
-                28px 20px;
-
-            text-align: center;
-
-            background-color: #333;
-
-            color: white;
-
-            font-size: 13px;
-
-        }
-
-
-        /* ============================================================
-           スマートフォン
-           ============================================================ */
-
-        @media (
-            max-width: 600px
-        ) {
-
-            header {
-
-                padding:
-                    22px 15px;
-
-            }
-
-
-            header h1 {
-
-                font-size: 21px;
-
-            }
-
-
-            header p {
-
-                font-size: 12px;
-
-            }
-
-
-            .container {
-
-                margin-top: 20px;
-
-                padding:
-                    0 12px;
-
-            }
-
-
-            .toc {
-
-                padding: 20px;
-
-            }
-
-
-            .toc ul {
-
-                columns: 1;
-
-            }
-
-
-            .about-section {
-
-                padding: 22px;
-
-                margin-bottom: 18px;
-
-            }
-
-
-            .about-section h2 {
-
-                font-size: 20px;
-
-            }
-
-
-            .about-section h3 {
-
-                font-size: 17px;
-
-            }
-
-
-            .feature-grid {
-
-                grid-template-columns: 1fr;
-
-            }
-
-
-            .info-table th,
-            .info-table td {
-
-                padding:
-                    8px 9px;
-
-                font-size: 13px;
-
-            }
-
-
-            .info-table th {
-
-                width: 35%;
-
-            }
-
-
-            .back-link {
-
-                font-size: 12px;
-
-                padding:
-                    7px 12px;
-
-            }
-
-
-            .home-button {
-
-                width: 100%;
-
-                text-align: center;
-
-            }
-
-        }
-
-    </style>
-
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>化石デジタルライブラリー 説明文管理</title>
 </head>
-
-
 <body>
 
+<!--
+    ============================================================
+    鵡川高校 化石デジタルライブラリー
+    説明文の共通管理ファイル
 
-<!-- ================================================================
-     ヘッダー
-     ================================================================ -->
+    このファイルだけを編集して説明文を変更してください。
 
-<header>
+    AUTO_ABOUT_TOP_START ～ AUTO_ABOUT_TOP_END
+        → index.html の「このデータベースについて」へ反映
 
-    <h1>
-        鵡川高校 化石デジタルライブラリー
-    </h1>
+    AUTO_ABOUT_DETAIL_START ～ AUTO_ABOUT_DETAIL_END
+        → about/index.html の詳細説明ページへ反映
 
-    <p>
-        北海道むかわ地域の化石標本データベース
-    </p>
-
-
-    <a
-        href="../"
-        class="back-link"
-    >
-        化石デジタルライブラリーへ戻る
-    </a>
-
-</header>
+    HTML全体を編集する必要はありません。
+    説明文を変更した後は update_all.bat を実行してください。
+    ============================================================
+-->
 
 
+<!-- ============================================================
+     トップページ用説明文
+     ============================================================ -->
 
-<main class="container">
+<!-- AUTO_ABOUT_TOP_START -->
+
+<p>
+    「鵡川高校 化石デジタルライブラリー」は、
+    北海道むかわ地域を中心として収集・整理している
+    化石標本の情報をデジタル化し、
+    Web上から閲覧できるようにした
+    化石標本データベースです。
+</p>
+
+<p>
+    標本番号を基準として、
+    分類、学名、和名、地層、地質時代、
+    採集日、標本画像、備考などの情報を
+    標本ごとに関連付けて管理しています。
+</p>
+
+<p>
+    また、標本情報を地図上の公開地点と関連付けることで、
+    「どのような化石が、どのような地層から、
+    どの地域で見つかっているのか」を考えながら
+    標本を閲覧できる構成としています。
+</p>
+
+<p>
+    本データベースは、単に化石の写真を保存するためだけのものではなく、
+    実物標本を観察する活動と、
+    デジタル上で標本情報を検索・比較する活動を
+    組み合わせるための学習基盤として整備しています。
+</p>
+
+<p>
+    詳しい目的、掲載情報、地図・採集地点、
+    データ管理、更新方法、教育・研究への活用などについては、
+    「このデータベースについて」の詳細ページで説明しています。
+</p>
+
+<!-- AUTO_ABOUT_TOP_END -->
+
+
+<!-- ============================================================
+     詳細ページ用説明文
+     ============================================================ -->
 
 <!-- AUTO_ABOUT_DETAIL_START -->
 
@@ -1193,25 +586,5 @@
 
 <!-- AUTO_ABOUT_DETAIL_END -->
 
-</main>
-
-
-
-<!-- ================================================================
-     フッター
-     ================================================================ -->
-
-<footer>
-
-    鵡川高校 化石デジタルライブラリー
-
-    <br>
-
-    このデータベースについて
-
-</footer>
-
-
 </body>
-
 </html>
