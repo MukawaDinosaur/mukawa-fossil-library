@@ -1,67 +1,39 @@
+```python
 import pandas as pd
 from pathlib import Path
 from PIL import Image
 import json
-import shutil
+import subprocess
 import sys
+import os
 
 
 # ================================================================
 # 鵡川高校 化石デジタルライブラリー
+#
 # update_all.py
 #
-# ================================================================
-# このプログラムで行う処理
+# Excel・画像を追加した後、
+# このファイルを実行するだけで
 #
-# ① specimens.xlsx 読み込み
-# ② localities_open.xlsx 読み込み
-# ③ 標本番号チェック
-# ④ 地点IDチェック
-# ⑤ 画像チェック
-# ⑥ 元画像からサムネイルを自動生成
-# ⑦ specimens.json 作成
-# ⑧ localities_public.json 作成
+# ① データチェック
+# ② 公開JSON生成
+# ③ サムネイル生成
+# ④ Gitへ登録
+# ⑤ GitHubへpush
 #
-# ================================================================
-#
-# フォルダ構成
-#
-# 鵡川高校＿化石デジタルライブラリー/
-#
-# ├─ update_all.py
-# ├─ specimens.xlsx
-# ├─ localities_open.xlsx
-# │
-# ├─ images/
-# │   ├─ MDR260516-01.jpg
-# │   ├─ MDR260516-02.jpg
-# │   └─ thumbs/
-# │       ├─ MDR260516-01.jpg
-# │       └─ MDR260516-02.jpg
-# │
-# └─ public_data/
-#     ├─ specimens.json
-#     └─ localities_public.json
+# まで自動実行する。
 #
 # ================================================================
 
 
-print()
-print("============================================================")
-print(" 鵡川高校 化石デジタルライブラリー")
-print(" データ更新プログラム")
-print(" update_all.py")
-print("============================================================")
-print()
-
-
 # ================================================================
-# 1. ファイル・フォルダ設定
+# 基本設定
 # ================================================================
 
-SPECIMENS_FILE = Path("specimens.xlsx")
+SPECIMENS_FILE = "specimens.xlsx"
 
-LOCALITIES_FILE = Path("localities_open.xlsx")
+LOCALITIES_FILE = "localities_open.xlsx"
 
 IMAGE_FOLDER = Path("images")
 
@@ -74,15 +46,195 @@ OUTPUT_FOLDER = Path("public_data")
 # サムネイル設定
 # ================================================================
 
-# サムネイルの長辺
-THUMB_MAX_SIZE = 1200
+THUMB_MAX_SIZE = (1200, 1200)
 
-# JPEG品質
-THUMB_QUALITY = 88
+THUMB_QUALITY = 85
 
 
 # ================================================================
-# Excel列名
+# Git設定
+# ================================================================
+
+GIT_REMOTE = "origin"
+
+GIT_BRANCH = "main"
+
+
+# ================================================================
+# 表示
+# ================================================================
+
+def print_title(text):
+
+    print()
+    print("=" * 60)
+    print(text)
+    print("=" * 60)
+    print()
+
+
+def print_ok(text):
+
+    print("  OK：", text)
+
+
+def print_error(text):
+
+    print("  ERROR：", text)
+
+
+def print_info(text):
+
+    print("  INFO：", text)
+
+
+# ================================================================
+# Gitコマンド実行
+# ================================================================
+
+def run_git_command(args):
+
+    try:
+
+        result = subprocess.run(
+            args,
+            capture_output=True,
+            text=True,
+            encoding="utf-8",
+            errors="replace"
+        )
+
+    except FileNotFoundError:
+
+        print_error(
+            "Gitが見つかりません。"
+        )
+
+        print()
+
+        print(
+            "Git for Windowsがインストールされているか確認してください。"
+        )
+
+        return False, ""
+
+    if result.stdout:
+
+        print(result.stdout)
+
+    if result.stderr:
+
+        print(result.stderr)
+
+    if result.returncode != 0:
+
+        return False, result.stdout + result.stderr
+
+    return True, result.stdout + result.stderr
+
+
+# ================================================================
+# Gitリポジトリ確認
+# ================================================================
+
+def check_git_repository():
+
+    print_title("【Git】Gitリポジトリを確認しています")
+
+    success, output = run_git_command(
+        [
+            "git",
+            "rev-parse",
+            "--is-inside-work-tree"
+        ]
+    )
+
+    if not success:
+
+        print_error(
+            "このフォルダはGitリポジトリではありません。"
+        )
+
+        return False
+
+    print_ok(
+        "Gitリポジトリを確認しました。"
+    )
+
+    return True
+
+
+# ================================================================
+# Excel読み込み
+# ================================================================
+
+def load_excel():
+
+    print_title("【1】Excelを読み込んでいます")
+
+    try:
+
+        specimens = pd.read_excel(
+            SPECIMENS_FILE,
+            dtype=str
+        ).fillna("")
+
+        localities = pd.read_excel(
+            LOCALITIES_FILE,
+            dtype=str
+        ).fillna("")
+
+    except FileNotFoundError:
+
+        print_error(
+            "必要なExcelファイルが見つかりません。"
+        )
+
+        print()
+
+        print(
+            "必要なファイル："
+        )
+
+        print(
+            "  -",
+            SPECIMENS_FILE
+        )
+
+        print(
+            "  -",
+            LOCALITIES_FILE
+        )
+
+        return None, None
+
+    except Exception as error:
+
+        print_error(
+            f"Excel読み込み中にエラーが発生しました：{error}"
+        )
+
+        return None, None
+
+    print_ok(
+        "Excel読み込み完了"
+    )
+
+    print(
+        "  標本数：",
+        len(specimens)
+    )
+
+    print(
+        "  採集位置数：",
+        len(localities)
+    )
+
+    return specimens, localities
+
+
+# ================================================================
+# 列名
 # ================================================================
 
 SPECIMEN_ID = "標本Ｎｏ.（MDR〇〇）"
@@ -99,449 +251,171 @@ LONGITUDE = "公開用東経"
 
 
 # ================================================================
-# 2. 必要ファイル確認
+# 必要列チェック
 # ================================================================
 
-print("【1】必要ファイルを確認しています。")
-print()
+def check_columns(
+    specimens,
+    localities
+):
 
+    print_title("【2】Excelの列名を確認しています")
 
-required_files = [
+    specimen_required_columns = [
 
-    SPECIMENS_FILE,
+        SPECIMEN_ID,
 
-    LOCALITIES_FILE
+        "分　　類",
 
-]
+        "学　　名",
 
+        "和　　名",
 
-file_errors = []
+        "地　層　名",
 
+        "時　　代",
 
-for file_path in required_files:
+        "採　集　日",
 
-    if not file_path.exists():
+        "備考",
 
-        file_errors.append(
-            f"{file_path} がありません"
-        )
+        IMAGE,
 
+        SITE_ID,
 
-if len(file_errors) > 0:
+        SPECIMEN_POINT_ID
 
-    print("ERROR：必要なファイルがありません。")
-    print()
-
-    for error in file_errors:
-
-        print(" -", error)
-
-    print()
-
-    print("処理を中止します。")
-
-    sys.exit(1)
-
-
-print("  OK：必要ファイルを確認しました。")
-print()
-
-
-# ================================================================
-# 3. Excel読み込み
-# ================================================================
-
-print("【2】Excelを読み込んでいます。")
-print()
-
-
-try:
-
-    specimens = pd.read_excel(
-
-        SPECIMENS_FILE,
-
-        dtype=str
-
-    ).fillna("")
-
-
-    localities = pd.read_excel(
-
-        LOCALITIES_FILE,
-
-        dtype=str
-
-    ).fillna("")
-
-
-except Exception as error:
-
-    print("ERROR：Excelの読み込みに失敗しました。")
-    print()
-    print(error)
-    print()
-
-    sys.exit(1)
-
-
-print(
-    "  OK：Excel読み込み完了"
-)
-
-print(
-    "  標本数：",
-    len(specimens)
-)
-
-print(
-    "  採集位置数：",
-    len(localities)
-)
-
-print()
-
-
-# ================================================================
-# 4. 必要列確認
-# ================================================================
-
-print("【3】Excelの列名を確認しています。")
-print()
-
-
-specimen_required_columns = [
-
-    SPECIMEN_ID,
-
-    "分　　類",
-
-    "学　　名",
-
-    "和　　名",
-
-    "地　層　名",
-
-    "時　　代",
-
-    "採　集　日",
-
-    "備考",
-
-    IMAGE,
-
-    SITE_ID,
-
-    SPECIMEN_POINT_ID
-
-]
-
-
-locality_required_columns = [
-
-    SITE_ID,
-
-    "採集位置ID",
-
-    "産　　地",
-
-    "地　層　名",
-
-    "時　　代",
-
-    LATITUDE,
-
-    LONGITUDE
-
-]
-
-
-missing_specimen_columns = [
-
-    column
-
-    for column in specimen_required_columns
-
-    if column not in specimens.columns
-
-]
-
-
-missing_locality_columns = [
-
-    column
-
-    for column in locality_required_columns
-
-    if column not in localities.columns
-
-]
-
-
-column_errors = []
-
-
-for column in missing_specimen_columns:
-
-    column_errors.append(
-
-        f"specimens.xlsx：{column} がありません"
-
-    )
-
-
-for column in missing_locality_columns:
-
-    column_errors.append(
-
-        f"localities_open.xlsx：{column} がありません"
-
-    )
-
-
-if len(column_errors) == 0:
-
-    print(
-        "  OK：必要な列はすべて存在します。"
-    )
-
-else:
-
-    print(
-        "  ERROR：必要な列がありません。"
-    )
-
-    for error in column_errors:
-
-        print(
-            "   -",
-            error
-        )
-
-    print()
-
-    print(
-        "処理を中止します。"
-    )
-
-    sys.exit(1)
-
-
-print()
-
-
-# ================================================================
-# 5. 標本番号チェック
-# ================================================================
-
-print("【4】標本番号をチェックしています。")
-print()
-
-
-duplicate_ids = specimens[
-
-    specimens[
-        SPECIMEN_ID
-    ].duplicated(
-        keep=False
-    )
-
-]
-
-
-empty_specimen_ids = specimens[
-
-    specimens[
-        SPECIMEN_ID
-    ].str.strip() == ""
-
-]
-
-
-if len(duplicate_ids) == 0:
-
-    print(
-        "  OK：標本番号に重複はありません。"
-    )
-
-else:
-
-    print(
-        "  ERROR：標本番号が重複しています。"
-    )
-
-    for value in duplicate_ids[
-        SPECIMEN_ID
-    ].unique():
-
-        print(
-            "   -",
-            value
-        )
-
-
-if len(empty_specimen_ids) == 0:
-
-    print(
-        "  OK：標本番号の空欄はありません。"
-    )
-
-else:
-
-    print(
-        "  ERROR：標本番号に空欄があります。"
-    )
-
-
-print()
-
-
-# ================================================================
-# 6. 地点IDチェック
-# ================================================================
-
-print("【5】地点IDをチェックしています。")
-print()
-
-
-locality_site_ids = set(
-
-    localities[
-        SITE_ID
     ]
-    .astype(str)
-    .str.strip()
 
-)
+    locality_required_columns = [
 
+        SITE_ID,
 
-site_id_errors = []
+        "採集位置ID",
 
+        "産　　地",
 
-for _, row in specimens.iterrows():
+        "地　層　名",
 
-    specimen_id = str(
-        row[SPECIMEN_ID]
-    ).strip()
+        "時　　代",
 
+        LATITUDE,
 
-    site_id = str(
-        row[SITE_ID]
-    ).strip()
+        LONGITUDE
 
-
-    if site_id == "":
-
-        site_id_errors.append(
-
-            f"{specimen_id}：地点IDが空欄"
-
-        )
-
-    elif site_id not in locality_site_ids:
-
-        site_id_errors.append(
-
-            f"{specimen_id}："
-            f"{site_id} がlocalities_open.xlsxにありません"
-
-        )
-
-
-if len(site_id_errors) == 0:
-
-    print(
-        "  OK：すべての標本が地点IDと対応しています。"
-    )
-
-else:
-
-    print(
-        "  ERROR：地点IDに対応エラーがあります。"
-    )
-
-    for error in site_id_errors:
-
-        print(
-            "   -",
-            error
-        )
-
-
-print()
-
-
-# ================================================================
-# 7. 地点ID構造確認
-# ================================================================
-
-print("【6】地点IDの構造を確認しています。")
-print()
-
-
-site_counts = (
-
-    localities[
-        SITE_ID
     ]
-    .astype(str)
-    .str.strip()
-    .value_counts()
 
-)
+    errors = []
 
+    for column in specimen_required_columns:
 
-duplicate_sites = site_counts[
-    site_counts > 1
-]
+        if column not in specimens.columns:
 
+            errors.append(
+                f"specimens.xlsx：{column} がありません"
+            )
 
-if len(duplicate_sites) == 0:
+    for column in locality_required_columns:
 
-    print(
-        "  OK：各地点IDは1件ずつです。"
+        if column not in localities.columns:
+
+            errors.append(
+                f"localities_open.xlsx：{column} がありません"
+            )
+
+    if errors:
+
+        for error in errors:
+
+            print_error(error)
+
+        return errors
+
+    print_ok(
+        "必要な列はすべて存在します。"
     )
 
-else:
+    return []
 
-    print(
-        "  INFO：複数の採集位置を持つ地点があります。"
-    )
 
-    print(
-        "  これは正常なデータとして処理します。"
-    )
+# ================================================================
+# 標本番号チェック
+# ================================================================
 
-    for site_id, count in duplicate_sites.items():
+def check_specimen_ids(specimens):
 
-        print(
-            f"   - {site_id}：{count}件"
+    print_title("【3】標本番号をチェックしています")
+
+    errors = []
+
+    duplicate_ids = specimens[
+        specimens[SPECIMEN_ID].duplicated(
+            keep=False
+        )
+    ]
+
+    empty_ids = specimens[
+        specimens[SPECIMEN_ID]
+        .astype(str)
+        .str.strip()
+        == ""
+    ]
+
+    if len(duplicate_ids) > 0:
+
+        for value in duplicate_ids[
+            SPECIMEN_ID
+        ].unique():
+
+            errors.append(
+                f"標本番号重複：{value}"
+            )
+
+    if len(empty_ids) > 0:
+
+        for _, row in empty_ids.iterrows():
+
+            errors.append(
+                "標本番号が空欄です。"
+            )
+
+    if errors:
+
+        for error in errors:
+
+            print_error(error)
+
+    else:
+
+        print_ok(
+            "標本番号に問題ありません。"
         )
 
-
-print()
+    return errors
 
 
 # ================================================================
-# 8. 画像ファイルチェック
+# 地点IDチェック
 # ================================================================
 
-print("【7】画像ファイルをチェックしています。")
-print()
+def check_site_ids(
+    specimens,
+    localities
+):
 
+    print_title("【4】地点IDをチェックしています")
 
-image_errors = []
+    errors = []
 
-image_paths = []
+    locality_site_ids = set(
 
+        localities[
+            SITE_ID
+        ]
+        .astype(str)
+        .str.strip()
 
-if not IMAGE_FOLDER.exists():
-
-    image_errors.append(
-        "imagesフォルダがありません。"
     )
-
-else:
 
     for _, row in specimens.iterrows():
 
@@ -549,1283 +423,1161 @@ else:
             row[SPECIMEN_ID]
         ).strip()
 
-
-        image_text = str(
-            row[IMAGE]
+        site_id = str(
+            row[SITE_ID]
         ).strip()
 
+        if site_id == "":
 
-        # --------------------------------------------------------
-        # 複数画像対応
-        #
-        # Excelには
-        #
-        # MDR260516-01.jpg
-        #
-        # または
-        #
-        # MDR260516-01.jpg;MDR260516-01_2.jpg
-        #
-        # のように記載可能。
-        #
-        # --------------------------------------------------------
+            errors.append(
+                f"{specimen_id}：地点IDが空欄"
+            )
 
-        if image_text == "":
+        elif site_id not in locality_site_ids:
 
-            image_errors.append(
+            errors.append(
+                f"{specimen_id}："
+                f"{site_id} がlocalities_open.xlsxにありません"
+            )
 
+    if errors:
+
+        for error in errors:
+
+            print_error(error)
+
+    else:
+
+        print_ok(
+            "すべての標本が地点IDと対応しています。"
+        )
+
+    return errors
+
+
+# ================================================================
+# 複数画像の取得
+#
+# Excelの「画像データ」欄に
+#
+# MDR260516-01-01.jpg
+# MDR260516-01-02.jpg
+# MDR260516-01-03.jpg
+#
+# のように「,」で複数指定できる。
+#
+# または
+#
+# MDR260516-01-01.jpg;MDR260516-01-02.jpg
+#
+# にも対応。
+# ================================================================
+
+def get_image_names(value):
+
+    if value is None:
+
+        return []
+
+    text = str(value).strip()
+
+    if text == "":
+
+        return []
+
+    text = text.replace(
+        "；",
+        ";"
+    )
+
+    text = text.replace(
+        "、",
+        ","
+    )
+
+    text = text.replace(
+        "\n",
+        ","
+    )
+
+    text = text.replace(
+        "\r",
+        ","
+    )
+
+    names = []
+
+    for part in text.replace(
+        ";",
+        ","
+    ).split(","):
+
+        name = part.strip()
+
+        if name:
+
+            names.append(name)
+
+    return names
+
+
+# ================================================================
+# 画像チェック
+# ================================================================
+
+def check_images(specimens):
+
+    print_title("【5】画像ファイルをチェックしています")
+
+    errors = []
+
+    if not IMAGE_FOLDER.exists():
+
+        errors.append(
+            "imagesフォルダがありません。"
+        )
+
+        return errors
+
+    for _, row in specimens.iterrows():
+
+        specimen_id = str(
+            row[SPECIMEN_ID]
+        ).strip()
+
+        image_names = get_image_names(
+            row[IMAGE]
+        )
+
+        if len(image_names) == 0:
+
+            errors.append(
                 f"{specimen_id}：画像名が空欄"
-
             )
 
             continue
 
-
-        image_names = [
-
-            name.strip()
-
-            for name in image_text.split(";")
-
-            if name.strip() != ""
-
-        ]
-
-
-        specimen_image_paths = []
-
-
         for image_name in image_names:
 
             image_path = (
-
                 IMAGE_FOLDER /
-
                 image_name
-
             )
-
 
             if not image_path.exists():
 
-                image_errors.append(
-
+                errors.append(
                     f"{specimen_id}："
                     f"{image_name} がありません"
-
                 )
 
-            else:
+    if errors:
 
-                specimen_image_paths.append(
-                    image_path
-                )
+        for error in errors:
+
+            print_error(error)
+
+    else:
+
+        print_ok(
+            "画像ファイルをすべて確認しました。"
+        )
+
+    return errors
 
 
-        image_paths.append(
+# ================================================================
+# 座標チェック
+# ================================================================
 
+def check_coordinates(localities):
+
+    print_title("【6】公開用座標をチェックしています")
+
+    errors = []
+
+    site_coordinates = {}
+
+    for _, row in localities.iterrows():
+
+        site_id = str(
+            row[SITE_ID]
+        ).strip()
+
+        latitude_text = str(
+            row[LATITUDE]
+        ).strip()
+
+        longitude_text = str(
+            row[LONGITUDE]
+        ).strip()
+
+        if latitude_text == "":
+
+            errors.append(
+                f"{site_id}：公開用北緯が空欄"
+            )
+
+            continue
+
+        if longitude_text == "":
+
+            errors.append(
+                f"{site_id}：公開用東経が空欄"
+            )
+
+            continue
+
+        try:
+
+            latitude = float(
+                latitude_text
+            )
+
+            longitude = float(
+                longitude_text
+            )
+
+        except ValueError:
+
+            errors.append(
+                f"{site_id}：座標が数値ではありません"
+            )
+
+            continue
+
+        if not (
+            40 <= latitude <= 46
+        ):
+
+            errors.append(
+                f"{site_id}："
+                f"北緯 {latitude} は要確認"
+            )
+
+        if not (
+            139 <= longitude <= 146
+        ):
+
+            errors.append(
+                f"{site_id}："
+                f"東経 {longitude} は要確認"
+            )
+
+        if site_id not in site_coordinates:
+
+            site_coordinates[site_id] = []
+
+        site_coordinates[
+            site_id
+        ].append(
             (
-                specimen_id,
-                specimen_image_paths
+                latitude,
+                longitude
+            )
+        )
+
+    if errors:
+
+        for error in errors:
+
+            print_error(error)
+
+    else:
+
+        print_ok(
+            "公開用座標を確認しました。"
+        )
+
+    return errors, site_coordinates
+
+
+# ================================================================
+# サムネイル生成
+# ================================================================
+
+def create_thumbnails():
+
+    print_title("【7】サムネイルを作成しています")
+
+    if not IMAGE_FOLDER.exists():
+
+        print_error(
+            "imagesフォルダがありません。"
+        )
+
+        return False
+
+    THUMB_FOLDER.mkdir(
+        parents=True,
+        exist_ok=True
+    )
+
+    image_extensions = {
+
+        ".jpg",
+        ".jpeg",
+        ".png",
+        ".webp"
+
+    }
+
+    image_files = []
+
+    for path in IMAGE_FOLDER.rglob("*"):
+
+        if not path.is_file():
+
+            continue
+
+        if THUMB_FOLDER in path.parents:
+
+            continue
+
+        if path.suffix.lower() not in image_extensions:
+
+            continue
+
+        image_files.append(path)
+
+    created = 0
+
+    skipped = 0
+
+    errors = 0
+
+    for image_path in image_files:
+
+        try:
+
+            relative_path = image_path.relative_to(
+                IMAGE_FOLDER
             )
 
-        )
-
-
-if len(image_errors) == 0:
-
-    print(
-        "  OK：画像ファイルを確認しました。"
-    )
-
-else:
-
-    print(
-        "  ERROR：画像に問題があります。"
-    )
-
-    for error in image_errors:
-
-        print(
-            "   -",
-            error
-        )
-
-
-print()
-
-
-# ================================================================
-# 9. 公開用座標チェック
-# ================================================================
-
-print("【8】公開用座標をチェックしています。")
-print()
-
-
-coordinate_errors = []
-
-
-site_coordinates = {}
-
-
-for _, row in localities.iterrows():
-
-    site_id = str(
-        row[SITE_ID]
-    ).strip()
-
-
-    latitude_text = str(
-        row[LATITUDE]
-    ).strip()
-
-
-    longitude_text = str(
-        row[LONGITUDE]
-    ).strip()
-
-
-    if latitude_text == "":
-
-        coordinate_errors.append(
-
-            f"{site_id}：公開用北緯が空欄"
-
-        )
-
-        continue
-
-
-    try:
-
-        latitude = float(
-            latitude_text
-        )
-
-    except ValueError:
-
-        coordinate_errors.append(
-
-            f"{site_id}："
-            f"公開用北緯が数値ではありません"
-
-        )
-
-        continue
-
-
-    if longitude_text == "":
-
-        coordinate_errors.append(
-
-            f"{site_id}：公開用東経が空欄"
-
-        )
-
-        continue
-
-
-    try:
-
-        longitude = float(
-            longitude_text
-        )
-
-    except ValueError:
-
-        coordinate_errors.append(
-
-            f"{site_id}："
-            f"公開用東経が数値ではありません"
-
-        )
-
-        continue
-
-
-    if not (
-        40 <= latitude <= 46
-    ):
-
-        coordinate_errors.append(
-
-            f"{site_id}："
-            f"北緯 {latitude} は要確認"
-
-        )
-
-
-    if not (
-        139 <= longitude <= 146
-    ):
-
-        coordinate_errors.append(
-
-            f"{site_id}："
-            f"東経 {longitude} は要確認"
-
-        )
-
-
-    if site_id not in site_coordinates:
-
-        site_coordinates[site_id] = []
-
-
-    site_coordinates[
-        site_id
-    ].append(
-
-        (
-            latitude,
-            longitude
-        )
-
-    )
-
-
-if len(coordinate_errors) == 0:
-
-    print(
-        "  OK：公開用座標を確認しました。"
-    )
-
-else:
-
-    print(
-        "  ERROR：座標に問題があります。"
-    )
-
-    for error in coordinate_errors:
-
-        print(
-            "   -",
-            error
-        )
-
-
-print()
-
-
-# ================================================================
-# 10. エラー総合判定
-# ================================================================
-
-total_errors = (
-
-    len(column_errors)
-
-    +
-
-    len(duplicate_ids)
-
-    +
-
-    len(empty_specimen_ids)
-
-    +
-
-    len(site_id_errors)
-
-    +
-
-    len(image_errors)
-
-    +
-
-    len(coordinate_errors)
-
-)
-
-
-print("========================================")
-print(" データチェック結果")
-print("========================================")
-print()
-
-
-print(
-    "必要列エラー：",
-    len(column_errors),
-    "件"
-)
-
-
-print(
-    "標本番号重複：",
-    len(duplicate_ids),
-    "件"
-)
-
-
-print(
-    "標本番号空欄：",
-    len(empty_specimen_ids),
-    "件"
-)
-
-
-print(
-    "地点ID対応エラー：",
-    len(site_id_errors),
-    "件"
-)
-
-
-print(
-    "画像エラー：",
-    len(image_errors),
-    "件"
-)
-
-
-print(
-    "座標エラー：",
-    len(coordinate_errors),
-    "件"
-)
-
-
-print()
-
-
-if total_errors > 0:
-
-    print(
-        "★★★ データに確認事項があります ★★★"
-    )
-
-    print()
-
-    print(
-        "安全のため、"
-        "JSON作成・サムネイル作成は行いません。"
-    )
-
-    print()
-
-    print(
-        "エラーを修正してから"
-        "もう一度 update_all.py を実行してください。"
-    )
-
-    sys.exit(1)
-
-
-print(
-    "★★★ データチェック正常 ★★★"
-)
-
-print()
-
-
-# ================================================================
-# 11. 出力フォルダ作成
-# ================================================================
-
-print("【9】出力フォルダを準備しています。")
-print()
-
-
-OUTPUT_FOLDER.mkdir(
-    exist_ok=True
-)
-
-
-THUMB_FOLDER.mkdir(
-    exist_ok=True
-)
-
-
-print(
-    "  OK：public_data/ を確認しました。"
-)
-
-
-print(
-    "  OK：images/thumbs/ を確認しました。"
-)
-
-print()
-
-
-# ================================================================
-# 12. サムネイル作成
-# ================================================================
-
-print("【10】サムネイルを作成しています。")
-print()
-
-
-thumbnail_errors = []
-
-thumbnail_created = 0
-
-thumbnail_skipped = 0
-
-
-# ---------------------------------------------------------------
-# 対象画像をimagesフォルダから取得
-#
-# thumbsフォルダ自身は除外する。
-# ---------------------------------------------------------------
-
-supported_extensions = {
-
-    ".jpg",
-    ".jpeg",
-    ".png",
-    ".webp"
-
-}
-
-
-source_images = [
-
-    path
-
-    for path in IMAGE_FOLDER.iterdir()
-
-    if path.is_file()
-
-    and path.suffix.lower()
-    in supported_extensions
-
-]
-
-
-print(
-    "  対象画像：",
-    len(source_images),
-    "枚"
-)
-
-print()
-
-
-for source_path in source_images:
-
-    try:
-
-        thumbnail_path = (
-
-            THUMB_FOLDER /
-
-            source_path.name
-
-        )
-
-
-        # --------------------------------------------------------
-        # すでに同じ画像からサムネイルが存在する場合
-        #
-        # 元画像の更新日時より新しければスキップ
-        # --------------------------------------------------------
-
-        if thumbnail_path.exists():
-
-            source_mtime = (
-                source_path.stat().st_mtime
+            thumb_path = (
+                THUMB_FOLDER /
+                relative_path
             )
 
-            thumb_mtime = (
-                thumbnail_path.stat().st_mtime
+            thumb_path.parent.mkdir(
+                parents=True,
+                exist_ok=True
             )
 
+            if (
+                thumb_path.exists()
+                and
+                thumb_path.stat().st_mtime
+                >=
+                image_path.stat().st_mtime
+            ):
 
-            if thumb_mtime >= source_mtime:
-
-                thumbnail_skipped += 1
+                skipped += 1
 
                 continue
 
+            with Image.open(
+                image_path
+            ) as image:
 
-        # --------------------------------------------------------
-        # 画像を開く
-        # --------------------------------------------------------
-
-        with Image.open(
-            source_path
-        ) as img:
-
-            # ----------------------------------------------------
-            # EXIF回転を反映
-            # ----------------------------------------------------
-
-            try:
-
-                from PIL import ImageOps
-
-                img = ImageOps.exif_transpose(
-                    img
+                image.thumbnail(
+                    THUMB_MAX_SIZE,
+                    Image.Resampling.LANCZOS
                 )
 
-            except Exception:
+                if image.mode in (
+                    "RGBA",
+                    "P"
+                ):
 
-                pass
-
-
-            # ----------------------------------------------------
-            # RGBへ変換
-            #
-            # JPEG保存時のエラー防止
-            # ----------------------------------------------------
-
-            if img.mode not in (
-                "RGB",
-                "L"
-            ):
-
-                if "A" in img.getbands():
-
-                    background = Image.new(
-                        "RGB",
-                        img.size,
-                        "white"
-                    )
-
-                    background.paste(
-                        img,
-                        mask=img.getchannel("A")
-                    )
-
-                    img = background
-
-                else:
-
-                    img = img.convert(
+                    image = image.convert(
                         "RGB"
                     )
 
+                image.save(
+                    thumb_path,
+                    quality=THUMB_QUALITY,
+                    optimize=True
+                )
 
-            else:
+            created += 1
 
-                if img.mode == "L":
-
-                    img = img.convert(
-                        "RGB"
-                    )
-
-
-            # ----------------------------------------------------
-            # 長辺をTHUMB_MAX_SIZE以下にする
-            # ----------------------------------------------------
-
-            img.thumbnail(
-
-                (
-                    THUMB_MAX_SIZE,
-                    THUMB_MAX_SIZE
-                ),
-
-                Image.Resampling.LANCZOS
-
+            print(
+                "  作成：",
+                thumb_path
             )
 
+        except Exception as error:
 
-            # ----------------------------------------------------
-            # 保存
-            # ----------------------------------------------------
+            errors += 1
 
-            # PNGはPNGとして保存
-            if source_path.suffix.lower() == ".png":
-
-                img.save(
-
-                    thumbnail_path,
-
-                    "PNG",
-
-                    optimize=True
-
-                )
-
-            else:
-
-                # JPEGとして保存
-                #
-                # 元画像の拡張子がjpg/jpegの場合
-                # 同じ拡張子で保存する。
-                #
-                img.save(
-
-                    thumbnail_path,
-
-                    "JPEG",
-
-                    quality=THUMB_QUALITY,
-
-                    optimize=True
-
-                )
-
-
-        thumbnail_created += 1
-
-
-        print(
-            "  作成：",
-            thumbnail_path
-        )
-
-
-    except Exception as error:
-
-        thumbnail_errors.append(
-
-            f"{source_path.name}：{error}"
-
-        )
-
-
-if len(thumbnail_errors) > 0:
+            print_error(
+                f"{image_path}：{error}"
+            )
 
     print()
 
     print(
-        "ERROR：サムネイル作成中に問題が発生しました。"
+        "  新規・更新：",
+        created,
+        "件"
     )
-
-    for error in thumbnail_errors:
-
-        print(
-            "   -",
-            error
-        )
-
-    print()
 
     print(
-        "安全のため、JSON作成を中止します。"
+        "  変更なし：",
+        skipped,
+        "件"
     )
 
-    sys.exit(1)
+    print(
+        "  エラー：",
+        errors,
+        "件"
+    )
 
-
-print()
-
-print(
-    "  新規・更新：",
-    thumbnail_created,
-    "枚"
-)
-
-
-print(
-    "  変更なし：",
-    thumbnail_skipped,
-    "枚"
-)
-
-
-print()
+    return errors == 0
 
 
 # ================================================================
-# 13. specimens.json
+# 公開JSON生成
 # ================================================================
 
-print("【11】specimens.jsonを作成しています。")
-print()
+def create_public_json(
+    specimens,
+    localities,
+    site_coordinates
+):
 
+    print_title("【8】公開用JSONを作成しています")
 
-specimen_data = []
+    OUTPUT_FOLDER.mkdir(
+        parents=True,
+        exist_ok=True
+    )
 
+    specimen_data = []
 
-for _, row in specimens.iterrows():
+    for _, row in specimens.iterrows():
 
-    specimen_id = str(
-        row[SPECIMEN_ID]
-    ).strip()
-
-
-    image_text = str(
-        row[IMAGE]
-    ).strip()
-
-
-    # ------------------------------------------------------------
-    # 複数画像
-    #
-    # Excel：
-    #
-    # MDR001.jpg;MDR001_2.jpg;MDR001_3.jpg
-    #
-    # JSON：
-    #
-    # "images": [
-    #     "images/thumbs/MDR001.jpg",
-    #     "images/thumbs/MDR001_2.jpg",
-    #     "images/thumbs/MDR001_3.jpg"
-    # ]
-    #
-    # ------------------------------------------------------------
-
-    image_names = [
-
-        name.strip()
-
-        for name in image_text.split(";")
-
-        if name.strip() != ""
-
-    ]
-
-
-    thumbnail_urls = []
-
-    original_urls = []
-
-
-    for image_name in image_names:
-
-        original_path = (
-
-            IMAGE_FOLDER /
-
-            image_name
-
+        image_names = get_image_names(
+            row[IMAGE]
         )
 
+        image_urls = []
 
-        thumbnail_path = (
+        for image_name in image_names:
 
-            THUMB_FOLDER /
+            original_path = (
+                IMAGE_FOLDER /
+                image_name
+            )
 
-            image_name
+            thumb_path = (
+                THUMB_FOLDER /
+                image_name
+            )
 
-        )
+            image_urls.append({
 
+                "original":
+                    original_path.as_posix(),
 
-        # Web用パス
-        original_url = (
-            original_path.as_posix()
-        )
+                "thumbnail":
+                    thumb_path.as_posix()
 
+            })
 
-        thumbnail_url = (
-            thumbnail_path.as_posix()
-        )
+        data = {
 
+            "specimen_id":
+                str(
+                    row[SPECIMEN_ID]
+                ).strip(),
 
-        original_urls.append(
-            original_url
-        )
+            "classification":
+                str(
+                    row["分　　類"]
+                ).strip(),
 
+            "scientific_name":
+                str(
+                    row["学　　名"]
+                ).strip(),
 
-        thumbnail_urls.append(
-            thumbnail_url
-        )
+            "common_name":
+                str(
+                    row["和　　名"]
+                ).strip(),
 
+            "formation":
+                str(
+                    row["地　層　名"]
+                ).strip(),
 
-    # ------------------------------------------------------------
-    # 後方互換用
-    #
-    # index.htmlを新仕様へ変更するまで
-    # imageにも1枚目を入れておく。
-    # ------------------------------------------------------------
+            "age":
+                str(
+                    row["時　　代"]
+                ).strip(),
 
-    first_original_image = ""
+            "collection_date":
+                str(
+                    row["採　　集　日"]
+                ).strip(),
 
-    first_thumbnail_image = ""
+            "notes":
+                str(
+                    row["備考"]
+                ).strip(),
 
+            "images":
+                image_urls,
 
-    if len(original_urls) > 0:
+            "site_id":
+                str(
+                    row[SITE_ID]
+                ).strip()
 
-        first_original_image = (
-            original_urls[0]
-        )
-
-
-    if len(thumbnail_urls) > 0:
-
-        first_thumbnail_image = (
-            thumbnail_urls[0]
-        )
-
-
-    # ------------------------------------------------------------
-    # データ作成
-    # ------------------------------------------------------------
-
-    data = {
-
-        "specimen_id":
-            specimen_id,
-
-
-        "classification":
-            str(
-                row["分　　類"]
-            ).strip(),
-
-
-        "scientific_name":
-            str(
-                row["学　　名"]
-            ).strip(),
-
-
-        "common_name":
-            str(
-                row["和　　名"]
-            ).strip(),
-
-
-        "formation":
-            str(
-                row["地　層　名"]
-            ).strip(),
-
-
-        "age":
-            str(
-                row["時　　代"]
-            ).strip(),
-
-
-        "collection_date":
-            str(
-                row["採　集　日"]
-            ).strip(),
-
-
-        "notes":
-            str(
-                row["備考"]
-            ).strip(),
-
+        }
 
         # --------------------------------------------------------
-        # 旧仕様
-        # --------------------------------------------------------
-
-        "image":
-            first_original_image,
-
-
-        # --------------------------------------------------------
-        # 新仕様
-        # --------------------------------------------------------
-
-        "thumbnail":
-            first_thumbnail_image,
-
-
-        "images":
-            thumbnail_urls,
-
-
-        "original_images":
-            original_urls,
-
-
-        # --------------------------------------------------------
-        # 地点ID
+        # 後方互換用
         #
-        # 詳細な採集位置IDは公開しない。
+        # 現在のindex.htmlが
+        # specimen.image
+        # を参照している場合にも対応。
         # --------------------------------------------------------
 
-        "site_id":
-            str(
-                row[SITE_ID]
-            ).strip()
+        if image_urls:
 
-    }
+            data["image"] = image_urls[0][
+                "original"
+            ]
 
+        else:
 
-    specimen_data.append(
-        data
-    )
+            data["image"] = ""
 
-
-with open(
-
-    OUTPUT_FOLDER /
-    "specimens.json",
-
-    "w",
-
-    encoding="utf-8"
-
-) as f:
-
-    json.dump(
-
-        specimen_data,
-
-        f,
-
-        ensure_ascii=False,
-
-        indent=2
-
-    )
-
-
-print(
-    "  OK：specimens.jsonを作成しました。"
-)
-
-
-print(
-    "  標本数：",
-    len(specimen_data)
-)
-
-print()
-
-
-# ================================================================
-# 14. localities_public.json
-# ================================================================
-
-print(
-    "【12】localities_public.jsonを作成しています。"
-)
-
-print()
-
-
-locality_data = []
-
-
-processed_site_ids = set()
-
-
-for _, row in localities.iterrows():
-
-    site_id = str(
-        row[SITE_ID]
-    ).strip()
-
-
-    if site_id in processed_site_ids:
-
-        continue
-
-
-    processed_site_ids.add(
-        site_id
-    )
-
-
-    coordinates = site_coordinates.get(
-
-        site_id,
-
-        []
-
-    )
-
-
-    if len(coordinates) == 0:
-
-        continue
-
-
-    # ------------------------------------------------------------
-    # 平均緯度
-    # ------------------------------------------------------------
-
-    average_latitude = (
-
-        sum(
-            coordinate[0]
-            for coordinate in coordinates
+        specimen_data.append(
+            data
         )
 
-        /
+    with open(
+        OUTPUT_FOLDER /
+        "specimens.json",
+        "w",
+        encoding="utf-8"
+    ) as file:
 
-        len(coordinates)
-
-    )
-
-
-    # ------------------------------------------------------------
-    # 平均経度
-    # ------------------------------------------------------------
-
-    average_longitude = (
-
-        sum(
-            coordinate[1]
-            for coordinate in coordinates
+        json.dump(
+            specimen_data,
+            file,
+            ensure_ascii=False,
+            indent=2
         )
 
-        /
-
-        len(coordinates)
-
+    print_ok(
+        "specimens.jsonを作成しました。"
     )
 
+    # ------------------------------------------------------------
+    # localities_public.json
+    # ------------------------------------------------------------
 
-    data = {
+    locality_data = []
 
-        "site_id":
+    processed_site_ids = set()
+
+    for _, row in localities.iterrows():
+
+        site_id = str(
+            row[SITE_ID]
+        ).strip()
+
+        if site_id in processed_site_ids:
+
+            continue
+
+        processed_site_ids.add(
+            site_id
+        )
+
+        coordinates = site_coordinates.get(
             site_id,
+            []
+        )
 
+        if not coordinates:
 
-        "place":
-            str(
-                row["産　　地"]
-            ).strip(),
+            continue
 
+        average_latitude = (
 
-        "formation":
-            str(
-                row["地　層　名"]
-            ).strip(),
+            sum(
+                coordinate[0]
+                for coordinate in coordinates
+            )
+            /
+            len(coordinates)
 
+        )
 
-        "age":
-            str(
-                row["時　　代"]
-            ).strip(),
+        average_longitude = (
 
+            sum(
+                coordinate[1]
+                for coordinate in coordinates
+            )
+            /
+            len(coordinates)
 
-        "latitude":
-            average_latitude,
+        )
 
+        data = {
 
-        "longitude":
-            average_longitude
+            "site_id":
+                site_id,
 
-    }
+            "place":
+                str(
+                    row["産　　地"]
+                ).strip(),
 
+            "formation":
+                str(
+                    row["地　層　名"]
+                ).strip(),
 
-    locality_data.append(
-        data
+            "age":
+                str(
+                    row["時　　代"]
+                ).strip(),
+
+            "latitude":
+                average_latitude,
+
+            "longitude":
+                average_longitude
+
+        }
+
+        locality_data.append(
+            data
+        )
+
+    with open(
+        OUTPUT_FOLDER /
+        "localities_public.json",
+        "w",
+        encoding="utf-8"
+    ) as file:
+
+        json.dump(
+            locality_data,
+            file,
+            ensure_ascii=False,
+            indent=2
+        )
+
+    print_ok(
+        "localities_public.jsonを作成しました。"
     )
 
-
-with open(
-
-    OUTPUT_FOLDER /
-    "localities_public.json",
-
-    "w",
-
-    encoding="utf-8"
-
-) as f:
-
-    json.dump(
-
-        locality_data,
-
-        f,
-
-        ensure_ascii=False,
-
-        indent=2
-
+    return (
+        specimen_data,
+        locality_data
     )
-
-
-print(
-    "  OK：localities_public.jsonを作成しました。"
-)
-
-
-print(
-    "  公開地点数：",
-    len(locality_data)
-)
-
-print()
 
 
 # ================================================================
-# 15. 作成データ確認
+# Git差分確認
 # ================================================================
 
-print("【13】作成されたデータを確認しています。")
-print()
+def show_git_status():
 
+    print_title("【9】Gitの変更内容を確認しています")
 
-# specimens.json確認
-specimens_json = (
-    OUTPUT_FOLDER /
-    "specimens.json"
-)
-
-
-if specimens_json.exists():
-
-    print(
-        "  OK：specimens.json"
+    success, output = run_git_command(
+        [
+            "git",
+            "status",
+            "--short"
+        ]
     )
 
-else:
+    if not success:
+
+        return False
+
+    if output.strip() == "":
+
+        print_info(
+            "Gitに新しい変更はありません。"
+        )
+
+        return True
 
     print(
-        "  ERROR：specimens.jsonがありません。"
+        "今回GitHubへ送信される変更："
     )
-
-
-# localities_public.json確認
-localities_json = (
-    OUTPUT_FOLDER /
-    "localities_public.json"
-)
-
-
-if localities_json.exists():
 
     print(
-        "  OK：localities_public.json"
+        output
     )
 
-else:
-
-    print(
-        "  ERROR：localities_public.jsonがありません。"
-    )
-
-
-print()
+    return True
 
 
 # ================================================================
-# 16. 最終結果
+# Git add
 # ================================================================
 
-print()
-print("============================================================")
-print(" 更新処理が完了しました")
-print("============================================================")
-print()
+def git_add():
+
+    print_title("【10】Gitへ変更を登録しています")
+
+    success, _ = run_git_command(
+        [
+            "git",
+            "add",
+            "."
+        ]
+    )
+
+    if not success:
+
+        print_error(
+            "git addに失敗しました。"
+        )
+
+        return False
+
+    print_ok(
+        "Git add完了"
+    )
+
+    return True
 
 
-print("【更新内容】")
-print()
+# ================================================================
+# Git commit
+# ================================================================
+
+def git_commit():
+
+    print_title("【11】Gitへコミットしています")
+
+    success, _ = run_git_command(
+        [
+            "git",
+            "diff",
+            "--cached",
+            "--quiet"
+        ]
+    )
+
+    # returncode 0 → 差分なし
+    # returncode 1 → 差分あり
+
+    if success:
+
+        print_info(
+            "コミットする変更はありません。"
+        )
+
+        return True
+
+    commit_message = (
+        "Update fossil database automatically"
+    )
+
+    success, _ = run_git_command(
+        [
+            "git",
+            "commit",
+            "-m",
+            commit_message
+        ]
+    )
+
+    if not success:
+
+        print_error(
+            "git commitに失敗しました。"
+        )
+
+        return False
+
+    print_ok(
+        "Git commit完了"
+    )
+
+    return True
 
 
-print(
-    "① Excel読み込み"
-)
+# ================================================================
+# Git push
+# ================================================================
 
-print(
-    "② データチェック"
-)
+def git_push():
 
-print(
-    "③ 画像チェック"
-)
+    print_title("【12】GitHubへpushしています")
 
-print(
-    "④ サムネイル生成"
-)
+    print(
+        "  リモート：",
+        GIT_REMOTE
+    )
 
-print(
-    "⑤ specimens.json更新"
-)
+    print(
+        "  ブランチ：",
+        GIT_BRANCH
+    )
 
-print(
-    "⑥ localities_public.json更新"
-)
+    print()
 
-print()
+    success, _ = run_git_command(
+        [
+            "git",
+            "push",
+            GIT_REMOTE,
+            GIT_BRANCH
+        ]
+    )
 
+    if not success:
 
-print("【作成・更新されたファイル】")
-print()
+        print_error(
+            "GitHubへのpushに失敗しました。"
+        )
 
+        print()
 
-print(
-    "  images/thumbs/"
-)
+        print(
+            "GitHub認証が必要な場合は、"
+            "ブラウザ認証を完了してください。"
+        )
 
-print(
-    "  public_data/specimens.json"
-)
+        return False
 
-print(
-    "  public_data/localities_public.json"
-)
+    print_ok(
+        "GitHubへのpushが完了しました。"
+    )
 
-print()
-
-
-print("【画像仕様】")
-print()
-
-
-print(
-    f"  サムネイル長辺：最大 {THUMB_MAX_SIZE}px"
-)
-
-print(
-    f"  JPEG品質：{THUMB_QUALITY}"
-)
-
-print()
+    return True
 
 
-print("【複数画像について】")
-print()
+# ================================================================
+# メイン処理
+# ================================================================
+
+def main():
+
+    print()
+    print("=" * 60)
+    print(" 鵡川高校 化石デジタルライブラリー")
+    print(" 自動更新プログラム")
+    print("=" * 60)
+    print()
+
+    print(
+        "このプログラムは以下を自動実行します。"
+    )
+
+    print(
+        "  1. データチェック"
+    )
+
+    print(
+        "  2. 公開JSON生成"
+    )
+
+    print(
+        "  3. サムネイル生成"
+    )
+
+    print(
+        "  4. Git commit"
+    )
+
+    print(
+        "  5. GitHub push"
+    )
+
+    print()
+
+    # ------------------------------------------------------------
+    # Gitリポジトリ確認
+    # ------------------------------------------------------------
+
+    if not check_git_repository():
+
+        input(
+            "\nEnterキーを押して終了してください。"
+        )
+
+        return
+
+    # ------------------------------------------------------------
+    # Excel
+    # ------------------------------------------------------------
+
+    specimens, localities = load_excel()
+
+    if specimens is None:
+
+        input(
+            "\nEnterキーを押して終了してください。"
+        )
+
+        return
+
+    # ------------------------------------------------------------
+    # データチェック
+    # ------------------------------------------------------------
+
+    all_errors = []
+
+    errors = check_columns(
+        specimens,
+        localities
+    )
+
+    all_errors.extend(
+        errors
+    )
+
+    if errors:
+
+        print()
+
+        print_error(
+            "列名に問題があるため処理を中止します。"
+        )
+
+        input(
+            "\nEnterキーを押して終了してください。"
+        )
+
+        return
+
+    errors = check_specimen_ids(
+        specimens
+    )
+
+    all_errors.extend(
+        errors
+    )
+
+    errors = check_site_ids(
+        specimens,
+        localities
+    )
+
+    all_errors.extend(
+        errors
+    )
+
+    errors = check_images(
+        specimens
+    )
+
+    all_errors.extend(
+        errors
+    )
+
+    coordinate_errors, site_coordinates = (
+        check_coordinates(
+            localities
+        )
+    )
+
+    all_errors.extend(
+        coordinate_errors
+    )
+
+    # ------------------------------------------------------------
+    # エラーがあれば公開データを作らない
+    # ------------------------------------------------------------
+
+    if all_errors:
+
+        print_title(
+            "★★★ データチェックエラー ★★★"
+        )
+
+        print(
+            "エラー件数：",
+            len(all_errors),
+            "件"
+        )
+
+        print()
+
+        print(
+            "安全のため、"
+            "JSON生成・GitHubへのpushを中止します。"
+        )
+
+        print()
+
+        input(
+            "Enterキーを押して終了してください。"
+        )
+
+        return
+
+    # ------------------------------------------------------------
+    # サムネイル
+    # ------------------------------------------------------------
+
+    if not create_thumbnails():
+
+        print()
+
+        print_error(
+            "サムネイル作成に失敗したため、"
+            "GitHubへのpushを中止します。"
+        )
+
+        input(
+            "\nEnterキーを押して終了してください。"
+        )
+
+        return
+
+    # ------------------------------------------------------------
+    # JSON
+    # ------------------------------------------------------------
+
+    specimen_data, locality_data = (
+        create_public_json(
+            specimens,
+            localities,
+            site_coordinates
+        )
+    )
+
+    # ------------------------------------------------------------
+    # Git status
+    # ------------------------------------------------------------
+
+    if not show_git_status():
+
+        input(
+            "\nEnterキーを押して終了してください。"
+        )
+
+        return
+
+    # ------------------------------------------------------------
+    # Git add
+    # ------------------------------------------------------------
+
+    if not git_add():
+
+        input(
+            "\nEnterキーを押して終了してください。"
+        )
+
+        return
+
+    # ------------------------------------------------------------
+    # Git commit
+    # ------------------------------------------------------------
+
+    if not git_commit():
+
+        input(
+            "\nEnterキーを押して終了してください。"
+        )
+
+        return
+
+    # ------------------------------------------------------------
+    # Git push
+    # ------------------------------------------------------------
+
+    if not git_push():
+
+        input(
+            "\nEnterキーを押して終了してください。"
+        )
+
+        return
+
+    # ------------------------------------------------------------
+    # 完了
+    # ------------------------------------------------------------
+
+    print()
+    print("=" * 60)
+    print(" ★★★ 自動更新完了 ★★★")
+    print("=" * 60)
+    print()
+
+    print(
+        "標本数：",
+        len(specimen_data),
+        "件"
+    )
+
+    print(
+        "公開地点数：",
+        len(locality_data),
+        "件"
+    )
+
+    print()
+
+    print(
+        "完了した処理："
+    )
+
+    print(
+        "  ✓ Excelデータチェック"
+    )
+
+    print(
+        "  ✓ 画像チェック"
+    )
+
+    print(
+        "  ✓ サムネイル生成"
+    )
+
+    print(
+        "  ✓ specimens.json更新"
+    )
+
+    print(
+        "  ✓ localities_public.json更新"
+    )
+
+    print(
+        "  ✓ Git commit"
+    )
+
+    print(
+        "  ✓ GitHub push"
+    )
+
+    print()
+
+    print(
+        "GitHub Pagesは自動的に更新されます。"
+    )
+
+    print()
+
+    input(
+        "Enterキーを押して終了してください。"
+    )
 
 
-print(
-    "Excelの「画像データ」欄に"
-)
+# ================================================================
+# 実行
+# ================================================================
 
-print(
-    "画像ファイル名を「;」で区切って入力できます。"
-)
+if __name__ == "__main__":
 
-print()
-
-
-print(
-    "例："
-)
-
-print(
-    "MDR260516-01.jpg;"
-    "MDR260516-01_2.jpg;"
-    "MDR260516-01_3.jpg"
-)
-
-print()
-
-
-print("【公開データの仕様】")
-print()
-
-
-print(
-    "  ① 詳細産地 → specimens.jsonから除外"
-)
-
-print(
-    "  ② 採集位置ID → specimens.jsonから除外"
-)
-
-print(
-    "  ③ 採集者 → specimens.jsonから除外"
-)
-
-print(
-    "  ④ サムネイル → images/thumbs/"
-)
-
-print(
-    "  ⑤ 元画像 → images/"
-)
-
-print(
-    "  ⑥ 公開用座標 → localities_public.json"
-)
-
-print(
-    "  ⑦ 同じ地点IDの複数座標 → 平均して代表座標に統合"
-)
-
-print()
-
-
-print("処理終了。")
-print()
+    main()
+```
