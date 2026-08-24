@@ -402,6 +402,44 @@ a{color:inherit}
 }
 
 /* =========================================================
+   REGION MAP
+   ========================================================= */
+
+.region-boundary{
+    stroke-width:3;
+    fill-opacity:.16;
+    cursor:pointer;
+}
+
+.region-boundary:hover{
+    fill-opacity:.24;
+    stroke-width:4;
+}
+
+.region-label{
+    background:rgba(255,255,255,.94);
+    border:1px solid #cfdad2;
+    border-radius:999px;
+    box-shadow:0 3px 10px rgba(24,60,42,.12);
+    color:#183c2a;
+    font-weight:800;
+    font-size:12px;
+    padding:4px 9px;
+}
+
+.region-popup-title{
+    font-weight:800;
+    font-size:15px;
+    margin-bottom:5px;
+}
+
+.region-popup-note{
+    color:#66736b;
+    font-size:12px;
+    line-height:1.6;
+}
+
+/* =========================================================
    SITE FILTER
    ========================================================= */
 
@@ -985,7 +1023,7 @@ footer{
     <div class="map-note">
         ※ 地図には公開用に加工した地点情報のみを表示しています。
         詳細な採集位置は公開していません。<br>
-        ※ 地点をクリックすると、その地点に関連する標本を表示できます。
+        ※ 地図上では個別の採集地点をピン表示せず、公開地点を大まかな地域枠として表示しています。地域枠をクリックすると、その地域に関連する標本を表示できます。
     </div>
 
 </section>
@@ -1099,15 +1137,43 @@ function initializeMap() {
 }
 
 // ================================================================
-// MAP MARKERS
+// REGION MAP
+// 個別ピンではなく、公開地点を大まかな地域枠にまとめて表示する。
+// 公開座標そのものを地図上のピンとして表示しないことで、
+// 詳細な採集位置を直接示さず、地域単位で標本へアクセスできる構成とする。
 // ================================================================
 
-function displayLocalitiesOnMap() {
+function getRegionInfo(locality) {
+    const place = String(locality.place || "");
 
-    const markers = [];
+    if (place.includes("長和")) {
+        return {
+            key: "hobetsu-nagawa",
+            name: "穂別長和地区"
+        };
+    }
+
+    if (place.includes("稲里")) {
+        return {
+            key: "hobetsu-inasato",
+            name: "穂別稲里地区"
+        };
+    }
+
+    return {
+        key: "site-" + String(locality.site_id || "unknown"),
+        name: place || "公開採集地域"
+    };
+}
+
+function displayLocalitiesOnMap() {
+    if (!map || !Array.isArray(localities)) {
+        return;
+    }
+
+    const regionMap = new Map();
 
     localities.forEach(locality => {
-
         const latitude = Number(locality.latitude);
         const longitude = Number(locality.longitude);
 
@@ -1118,45 +1184,180 @@ function displayLocalitiesOnMap() {
             return;
         }
 
-        const siteSpecimens = specimens.filter(
+        const region = getRegionInfo(locality);
+
+        if (!regionMap.has(region.key)) {
+            regionMap.set(region.key, {
+                key: region.key,
+                name: region.name,
+                points: [],
+                siteIds: new Set()
+            });
+        }
+
+        const item = regionMap.get(region.key);
+        item.points.push([latitude, longitude]);
+        item.siteIds.add(String(locality.site_id || ""));
+    });
+
+    const regions = Array.from(regionMap.values());
+    const layers = [];
+
+    regions.forEach((region, index) => {
+        if (!region.points.length) {
+            return;
+        }
+
+        const latitudes = region.points.map(point => point[0]);
+        const longitudes = region.points.map(point => point[1]);
+
+        let minLat = Math.min(...latitudes);
+        let maxLat = Math.max(...latitudes);
+        let minLon = Math.min(...longitudes);
+        let maxLon = Math.max(...longitudes);
+
+        // 1点だけの地域でも、個別地点を特定しにくい「地域枠」になるよう
+        // 最低限の幅を確保する。公開JSONの座標をそのままピン表示しない。
+        const paddingLat = 0.010;
+        const paddingLon = 0.010;
+
+        if ((maxLat - minLat) < paddingLat * 2) {
+            const center = (minLat + maxLat) / 2;
+            minLat = center - paddingLat;
+            maxLat = center + paddingLat;
+        } else {
+            minLat -= paddingLat;
+            maxLat += paddingLat;
+        }
+
+        if ((maxLon - minLon) < paddingLon * 2) {
+            const center = (minLon + maxLon) / 2;
+            minLon = center - paddingLon;
+            maxLon = center + paddingLon;
+        } else {
+            minLon -= paddingLon;
+            maxLon += paddingLon;
+        }
+
+        const siteIdList = Array.from(region.siteIds)
+            .filter(Boolean);
+
+        const regionSpecimens = specimens.filter(
             specimen =>
-                String(specimen.site_id) ===
-                String(locality.site_id)
+                siteIdList.includes(
+                    String(specimen.site_id || "")
+                )
         );
 
-        const marker = L.marker([
-            latitude,
-            longitude
-        ]).addTo(map);
+        const palette = [
+            { color: "#2f6b4c", fill: "#2f6b4c" },
+            { color: "#c79b3b", fill: "#c79b3b" },
+            { color: "#527aa3", fill: "#527aa3" },
+            { color: "#8a5a7b", fill: "#8a5a7b" }
+        ];
 
-        marker.bindPopup(`
+        const style = palette[index % palette.length];
+
+        const rectangle = L.rectangle(
+            [
+                [minLat, minLon],
+                [maxLat, maxLon]
+            ],
+            {
+                color: style.color,
+                weight: 3,
+                fillColor: style.fill,
+                fillOpacity: 0.14,
+                className: "region-boundary"
+            }
+        ).addTo(map);
+
+        rectangle.bindTooltip(
+            region.name,
+            {
+                permanent: true,
+                direction: "center",
+                className: "region-label",
+                opacity: 1
+            }
+        );
+
+        rectangle.bindPopup(`
             <div class="map-popup">
-                <strong>採集地点</strong><br>
-                地点ID：${escapeHtml(locality.site_id || "")}<br>
-                標本数：${siteSpecimens.length}件<br>
+                <div class="region-popup-title">
+                    ${escapeHtml(region.name)}
+                </div>
+                <div>
+                    対象標本：${regionSpecimens.length}件
+                </div>
+                <div class="region-popup-note">
+                    この地域枠には、公開用に加工した複数の採集地点を
+                    まとめて表示しています。
+                </div>
                 <button
                     class="map-popup-button"
                     type="button"
-                    onclick="filterBySite('${escapeAttribute(locality.site_id || "")}')"
+                    onclick="filterByRegion(
+                        ${JSON.stringify(siteIdList)},
+                        '${escapeAttribute(region.name)}'
+                    )"
                 >
-                    この地点の標本を見る
+                    この地域の標本を見る
                 </button>
             </div>
         `);
 
-        marker.on("click", () => {
-            filterBySite(locality.site_id);
+        rectangle.on("click", () => {
+            filterByRegion(siteIdList, region.name);
         });
 
-        markers.push(marker);
+        layers.push(rectangle);
     });
 
-    if (markers.length) {
+    if (layers.length) {
+        const group = L.featureGroup(layers);
         map.fitBounds(
-            L.featureGroup(markers).getBounds(),
+            group.getBounds(),
             { padding: [30, 30] }
         );
     }
+}
+
+// ================================================================
+// REGION FILTER
+// ================================================================
+
+function filterByRegion(siteIds, regionName) {
+    const normalizedSiteIds = siteIds.map(
+        siteId => String(siteId)
+    );
+
+    currentSiteId = null;
+
+    document.getElementById("search-input").value = "";
+    resetDropdownFilters();
+
+    const filtered = specimens.filter(
+        specimen =>
+            normalizedSiteIds.includes(
+                String(specimen.site_id || "")
+            )
+    );
+
+    const box = document.getElementById("filter-box");
+    box.classList.add("active");
+
+    document.getElementById("filter-title").innerHTML = `
+        <strong>${escapeHtml(regionName)}</strong>
+        の標本　${filtered.length}件
+    `;
+
+    displaySpecimens(filtered);
+
+    document.getElementById("filter-box").scrollIntoView({
+        behavior: "smooth",
+        block: "center"
+    });
 }
 
 // ================================================================
