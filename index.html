@@ -402,22 +402,27 @@ a{color:inherit}
 }
 
 /* =========================================================
-   REGION MAP
+   ADMINISTRATIVE AREA MAP
+   行政区域GeoJSONをそのまま表示する。
+   公開用座標から区域を生成・推定しない。
    ========================================================= */
 
-.region-boundary{
-    stroke-width:3;
-    fill-opacity:.16;
+.administrative-area{
+    stroke:#24563d;
+    stroke-width:2.5;
+    fill:#2f6b4c;
+    fill-opacity:.14;
     cursor:pointer;
+    transition:fill-opacity .2s ease,stroke-width .2s ease;
 }
 
-.region-boundary:hover{
-    fill-opacity:.24;
-    stroke-width:4;
+.administrative-area:hover{
+    fill-opacity:.25;
+    stroke-width:3.5;
 }
 
-.region-label{
-    background:rgba(255,255,255,.94);
+.administrative-area-label{
+    background:rgba(255,255,255,.95);
     border:1px solid #cfdad2;
     border-radius:999px;
     box-shadow:0 3px 10px rgba(24,60,42,.12);
@@ -427,16 +432,31 @@ a{color:inherit}
     padding:4px 9px;
 }
 
-.region-popup-title{
+.map-popup-title{
     font-weight:800;
     font-size:15px;
     margin-bottom:5px;
 }
 
-.region-popup-note{
+.map-popup-note{
     color:#66736b;
     font-size:12px;
     line-height:1.6;
+    margin:7px 0 10px;
+}
+
+.map-popup-button{
+    border:0;
+    background:#24563d;
+    color:#fff;
+    padding:8px 11px;
+    border-radius:8px;
+    cursor:pointer;
+    font-size:12px;
+}
+
+.map-popup-button:hover{
+    background:#2f6b4c;
 }
 
 /* =========================================================
@@ -1021,9 +1041,10 @@ footer{
     <div id="map"></div>
 
     <div class="map-note">
-        ※ 地図には公開用に加工した地点情報のみを表示しています。
-        詳細な採集位置は公開していません。<br>
-        ※ 地図上では個別の採集地点をピン表示せず、公開地点を大まかな地域枠として表示しています。地域枠をクリックすると、その地域に関連する標本を表示できます。
+        ※ 地図上の区域は、公開用採集座標から生成したものではなく、
+        別ファイルの行政区域GeoJSONをそのまま表示しています。<br>
+        ※ 行政区域をクリックすると、その区域に対応付けた標本を表示できます。
+        詳細な採集位置は地図上に表示しません。
     </div>
 
 </section>
@@ -1113,6 +1134,7 @@ footer{
 
 let specimens = [];
 let localities = [];
+let administrativeAreas = null;
 let map = null;
 let currentSiteId = null;
 
@@ -1137,181 +1159,183 @@ function initializeMap() {
 }
 
 // ================================================================
-// REGION MAP
-// 個別ピンではなく、公開地点を大まかな地域枠にまとめて表示する。
-// 公開座標そのものを地図上のピンとして表示しないことで、
-// 詳細な採集位置を直接示さず、地域単位で標本へアクセスできる構成とする。
+// MAP MARKERS
 // ================================================================
 
-function getRegionInfo(locality) {
-    const place = String(locality.place || "");
+async function loadAdministrativeAreas() {
 
-    if (place.includes("長和")) {
-        return {
-            key: "hobetsu-nagawa",
-            name: "穂別長和地区"
-        };
+    const response = await fetch(
+        "public_data/administrative_areas.geojson",
+        { cache: "no-store" }
+    );
+
+    if (!response.ok) {
+        throw new Error(
+            "administrative_areas.geojsonを読み込めませんでした。"
+        );
     }
 
-    if (place.includes("稲里")) {
-        return {
-            key: "hobetsu-inasato",
-            name: "穂別稲里地区"
-        };
+    const geojson = await response.json();
+
+    if (
+        !geojson ||
+        geojson.type !== "FeatureCollection" ||
+        !Array.isArray(geojson.features)
+    ) {
+        throw new Error(
+            "administrative_areas.geojsonの形式が正しくありません。"
+        );
     }
 
-    return {
-        key: "site-" + String(locality.site_id || "unknown"),
-        name: place || "公開採集地域"
-    };
+    administrativeAreas = geojson;
 }
 
-function displayLocalitiesOnMap() {
-    if (!map || !Array.isArray(localities)) {
+function getAdministrativeSiteIds(properties) {
+
+    if (!properties || typeof properties !== "object") {
+        return [];
+    }
+
+    let value =
+        properties.site_ids ??
+        properties.siteIds ??
+        properties.site_id ??
+        properties.siteId ??
+        [];
+
+    if (Array.isArray(value)) {
+        return value
+            .map(item => String(item).trim())
+            .filter(Boolean);
+    }
+
+    if (typeof value === "string") {
+        return value
+            .split(/[、,\s]+/)
+            .map(item => item.trim())
+            .filter(Boolean);
+    }
+
+    return [];
+}
+
+function getAdministrativeAreaName(properties) {
+
+    if (!properties || typeof properties !== "object") {
+        return "公開採集地域";
+    }
+
+    return String(
+        properties.region_name ??
+        properties.regionName ??
+        properties.name ??
+        properties.NAME ??
+        "公開採集地域"
+    ).trim() || "公開採集地域";
+}
+
+function getAdministrativeAreaKey(properties, index) {
+
+    if (!properties || typeof properties !== "object") {
+        return "area-" + index;
+    }
+
+    return String(
+        properties.region_key ??
+        properties.regionKey ??
+        properties.id ??
+        properties.code ??
+        "area-" + index
+    );
+}
+
+function displayAdministrativeAreasOnMap() {
+
+    if (!map || !administrativeAreas) {
         return;
     }
 
-    const regionMap = new Map();
-
-    localities.forEach(locality => {
-        const latitude = Number(locality.latitude);
-        const longitude = Number(locality.longitude);
-
-        if (
-            !Number.isFinite(latitude) ||
-            !Number.isFinite(longitude)
-        ) {
-            return;
-        }
-
-        const region = getRegionInfo(locality);
-
-        if (!regionMap.has(region.key)) {
-            regionMap.set(region.key, {
-                key: region.key,
-                name: region.name,
-                points: [],
-                siteIds: new Set()
-            });
-        }
-
-        const item = regionMap.get(region.key);
-        item.points.push([latitude, longitude]);
-        item.siteIds.add(String(locality.site_id || ""));
-    });
-
-    const regions = Array.from(regionMap.values());
     const layers = [];
 
-    regions.forEach((region, index) => {
-        if (!region.points.length) {
+    administrativeAreas.features.forEach((feature, index) => {
+
+        if (!feature || !feature.geometry) {
             return;
         }
 
-        const latitudes = region.points.map(point => point[0]);
-        const longitudes = region.points.map(point => point[1]);
-
-        let minLat = Math.min(...latitudes);
-        let maxLat = Math.max(...latitudes);
-        let minLon = Math.min(...longitudes);
-        let maxLon = Math.max(...longitudes);
-
-        // 1点だけの地域でも、個別地点を特定しにくい「地域枠」になるよう
-        // 最低限の幅を確保する。公開JSONの座標をそのままピン表示しない。
-        const paddingLat = 0.010;
-        const paddingLon = 0.010;
-
-        if ((maxLat - minLat) < paddingLat * 2) {
-            const center = (minLat + maxLat) / 2;
-            minLat = center - paddingLat;
-            maxLat = center + paddingLat;
-        } else {
-            minLat -= paddingLat;
-            maxLat += paddingLat;
-        }
-
-        if ((maxLon - minLon) < paddingLon * 2) {
-            const center = (minLon + maxLon) / 2;
-            minLon = center - paddingLon;
-            maxLon = center + paddingLon;
-        } else {
-            minLon -= paddingLon;
-            maxLon += paddingLon;
-        }
-
-        const siteIdList = Array.from(region.siteIds)
-            .filter(Boolean);
+        const properties = feature.properties || {};
+        const regionName = getAdministrativeAreaName(properties);
+        const regionKey = getAdministrativeAreaKey(properties, index);
+        const siteIds = getAdministrativeSiteIds(properties);
 
         const regionSpecimens = specimens.filter(
             specimen =>
-                siteIdList.includes(
+                siteIds.includes(
                     String(specimen.site_id || "")
                 )
         );
 
-        const palette = [
-            { color: "#2f6b4c", fill: "#2f6b4c" },
-            { color: "#c79b3b", fill: "#c79b3b" },
-            { color: "#527aa3", fill: "#527aa3" },
-            { color: "#8a5a7b", fill: "#8a5a7b" }
-        ];
-
-        const style = palette[index % palette.length];
-
-        const rectangle = L.rectangle(
-            [
-                [minLat, minLon],
-                [maxLat, maxLon]
-            ],
+        const layer = L.geoJSON(
+            feature,
             {
-                color: style.color,
-                weight: 3,
-                fillColor: style.fill,
-                fillOpacity: 0.14,
-                className: "region-boundary"
+                style: {
+                    color: "#24563d",
+                    weight: 2.5,
+                    fillColor: "#2f6b4c",
+                    fillOpacity: 0.14,
+                    className: "administrative-area"
+                },
+                onEachFeature: function(_feature, areaLayer) {
+
+                    areaLayer.bindTooltip(
+                        regionName,
+                        {
+                            permanent: true,
+                            direction: "center",
+                            className: "administrative-area-label",
+                            opacity: 1
+                        }
+                    );
+
+                    areaLayer.bindPopup(`
+                        <div class="map-popup">
+                            <div class="map-popup-title">
+                                ${escapeHtml(regionName)}
+                            </div>
+                            <div>
+                                対象標本：${regionSpecimens.length}件
+                            </div>
+                            <div class="map-popup-note">
+                                この区域は行政区域GeoJSONに登録された
+                                区域形状を表示しています。<br>
+                                公開用採集座標から区域を作成・推定していません。
+                            </div>
+                            <button
+                                class="map-popup-button"
+                                type="button"
+                                onclick="filterByRegion(
+                                    ${JSON.stringify(siteIds)},
+                                    '${escapeAttribute(regionName)}',
+                                    '${escapeAttribute(regionKey)}'
+                                )"
+                            >
+                                この地域の標本を見る
+                            </button>
+                        </div>
+                    `);
+
+                    areaLayer.on("click", function() {
+                        filterByRegion(
+                            siteIds,
+                            regionName,
+                            regionKey
+                        );
+                    });
+                }
             }
         ).addTo(map);
 
-        rectangle.bindTooltip(
-            region.name,
-            {
-                permanent: true,
-                direction: "center",
-                className: "region-label",
-                opacity: 1
-            }
-        );
-
-        rectangle.bindPopup(`
-            <div class="map-popup">
-                <div class="region-popup-title">
-                    ${escapeHtml(region.name)}
-                </div>
-                <div>
-                    対象標本：${regionSpecimens.length}件
-                </div>
-                <div class="region-popup-note">
-                    この地域枠には、公開用に加工した複数の採集地点を
-                    まとめて表示しています。
-                </div>
-                <button
-                    class="map-popup-button"
-                    type="button"
-                    onclick="filterByRegion(
-                        ${JSON.stringify(siteIdList)},
-                        '${escapeAttribute(region.name)}'
-                    )"
-                >
-                    この地域の標本を見る
-                </button>
-            </div>
-        `);
-
-        rectangle.on("click", () => {
-            filterByRegion(siteIdList, region.name);
-        });
-
-        layers.push(rectangle);
+        layers.push(layer);
     });
 
     if (layers.length) {
@@ -1325,12 +1349,14 @@ function displayLocalitiesOnMap() {
 
 // ================================================================
 // REGION FILTER
+// 行政区域GeoJSONに登録したsite_idsを使って標本を絞り込む。
+// 公開座標との空間判定は行わない。
 // ================================================================
 
-function filterByRegion(siteIds, regionName) {
-    const normalizedSiteIds = siteIds.map(
-        siteId => String(siteId)
-    );
+function filterByRegion(siteIds, regionName, regionKey) {
+
+    const normalizedSiteIds = (Array.isArray(siteIds) ? siteIds : [])
+        .map(siteId => String(siteId));
 
     currentSiteId = null;
 
@@ -1432,22 +1458,32 @@ async function loadData() {
 
         specimens = await specimenResponse.json();
 
-        const localityResponse = await fetch(
-            "public_data/localities_public.json",
-            { cache: "no-store" }
-        );
+        // ============================================================
+        // 地図はlocalities_public.jsonの公開座標を使用しない。
+        // 行政区域GeoJSONそのものを表示し、区域と標本の対応は
+        // GeoJSONのproperties.site_idsで明示的に管理する。
+        // ============================================================
+        try {
+            await loadAdministrativeAreas();
+            displayAdministrativeAreasOnMap();
+        } catch (mapError) {
+            console.error(mapError);
 
-        if (!localityResponse.ok) {
-            throw new Error(
-                "localities_public.jsonを読み込めませんでした。"
-            );
+            const mapNote = document.querySelector(".map-note");
+
+            if (mapNote) {
+                mapNote.innerHTML = `
+                    ※ 行政区域GeoJSONを読み込めなかったため、
+                    地図上の区域表示は現在利用できません。<br>
+                    標本検索・絞り込み・画像表示など、
+                    地図以外の機能はそのまま利用できます。<br>
+                    ※ 地図表示には公開用採集座標を使用していません。
+                `;
+            }
         }
-
-        localities = await localityResponse.json();
 
         updateStatistics();
         createFilterOptions();
-        displayLocalitiesOnMap();
         displaySpecimens(specimens);
 
         openSpecimenFromURL();
