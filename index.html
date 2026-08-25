@@ -460,6 +460,52 @@ a{color:inherit}
 }
 
 /* =========================================================
+   MAP REGION SELECTOR
+   ========================================================= */
+
+.map-region-select-title{
+    margin-top:10px;
+    padding-top:9px;
+    border-top:1px solid #e1e8e3;
+    font-size:11px;
+    font-weight:800;
+    color:#536159;
+}
+
+.map-region-select-list{
+    display:grid;
+    gap:6px;
+    margin-top:7px;
+}
+
+.map-popup-region-button{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
+    width:100%;
+    border:1px solid #cfdad2;
+    background:#f7faf8;
+    color:#24563d;
+    padding:7px 9px;
+    border-radius:7px;
+    cursor:pointer;
+    font-size:11px;
+    text-align:left;
+}
+
+.map-popup-region-button:hover{
+    background:#edf6ef;
+    border-color:#a9c5b2;
+}
+
+.map-popup-region-button span{
+    flex:none;
+    color:#66736b;
+    font-size:10px;
+}
+
+/* =========================================================
    SITE FILTER
    ========================================================= */
 
@@ -1219,6 +1265,70 @@ function getAdministrativeSiteIds(properties) {
     return [];
 }
 
+// ================================================================
+// 公開地域と地点IDの対応
+// ================================================================
+// 行政区域GeoJSONには「長和」「稲里」という行政区域属性が存在しない。
+// そのため、行政区域の形状はGeoJSONを使用し、標本との対応だけを
+// localities_public.jsonの公開用「place」と地点IDから取得する。
+// 緯度・経度はこの対応付けには一切使用しない。
+
+function getPublicRegionDefinitions() {
+
+    const definitions = [
+        {
+            key: "hobetsu-nagawa",
+            name: "むかわ町穂別長和",
+            keywords: ["長和"]
+        },
+        {
+            key: "hobetsu-inasato",
+            name: "むかわ町穂別稲里",
+            keywords: ["稲里"]
+        }
+    ];
+
+    return definitions.map(definition => {
+
+        const siteIds = new Set();
+
+        localities.forEach(locality => {
+
+            const place = String(
+                locality.place ||
+                locality.region ||
+                ""
+            ).trim();
+
+            if (!place) {
+                return;
+            }
+
+            const matched = definition.keywords.some(keyword =>
+                place.includes(keyword)
+            );
+
+            if (matched && locality.site_id) {
+                siteIds.add(String(locality.site_id).trim());
+            }
+        });
+
+        const normalizedSiteIds = Array.from(siteIds).filter(Boolean);
+
+        const regionSpecimens = specimens.filter(specimen =>
+            normalizedSiteIds.includes(
+                String(specimen.site_id || "")
+            )
+        );
+
+        return {
+            ...definition,
+            siteIds: normalizedSiteIds,
+            specimenCount: regionSpecimens.length
+        };
+    });
+}
+
 function getAdministrativeAreaName(properties) {
 
     if (!properties || typeof properties !== "object") {
@@ -1228,8 +1338,11 @@ function getAdministrativeAreaName(properties) {
     return String(
         properties.region_name ??
         properties.regionName ??
+        properties.display_name ??
+        properties.displayName ??
         properties.name ??
         properties.NAME ??
+        properties.municipality ??
         "公開採集地域"
     ).trim() || "公開採集地域";
 }
@@ -1266,7 +1379,33 @@ function displayAdministrativeAreasOnMap() {
         const properties = feature.properties || {};
         const regionName = getAdministrativeAreaName(properties);
         const regionKey = getAdministrativeAreaKey(properties, index);
-        const siteIds = getAdministrativeSiteIds(properties);
+
+        // GeoJSONにsite_idsが登録されている場合は、それを最優先する。
+        // 現在の国土数値情報由来GeoJSONにはsite_idsがないため、
+        // その場合は公開用localitiesの「place」から地域別site_idを
+        // 取得する。座標による空間判定は行わない。
+        let siteIds = getAdministrativeSiteIds(properties);
+        const publicRegions = getPublicRegionDefinitions();
+
+        if (!siteIds.length) {
+            const municipality = String(
+                properties.municipality ||
+                properties.display_name ||
+                properties.displayName ||
+                regionName ||
+                ""
+            );
+
+            if (municipality.includes("むかわ町")) {
+                siteIds = Array.from(
+                    new Set(
+                        localities
+                            .map(locality => String(locality.site_id || "").trim())
+                            .filter(Boolean)
+                    )
+                );
+            }
+        }
 
         const regionSpecimens = specimens.filter(
             specimen =>
@@ -1319,8 +1458,36 @@ function displayAdministrativeAreasOnMap() {
                                     '${escapeAttribute(regionKey)}'
                                 )"
                             >
-                                この地域の標本を見る
+                                この区域の標本を見る
                             </button>
+                            ${
+                                publicRegions.some(region => region.siteIds.length)
+                                ? `
+                                    <div class="map-region-select-title">
+                                        公開採集地域から選択
+                                    </div>
+                                    <div class="map-region-select-list">
+                                        ${publicRegions
+                                            .filter(region => region.siteIds.length)
+                                            .map(region => `
+                                                <button
+                                                    class="map-popup-region-button"
+                                                    type="button"
+                                                    onclick="filterByRegion(
+                                                        ${JSON.stringify(region.siteIds)},
+                                                        '${escapeAttribute(region.name)}',
+                                                        '${escapeAttribute(region.key)}'
+                                                    )"
+                                                >
+                                                    ${escapeHtml(region.name)}
+                                                    <span>${region.specimenCount}件</span>
+                                                </button>
+                                            `)
+                                            .join("")}
+                                    </div>
+                                `
+                                : ""
+                            }
                         </div>
                     `);
 
@@ -1457,6 +1624,27 @@ async function loadData() {
         }
 
         specimens = await specimenResponse.json();
+
+        // 公開地域名と地点IDの対応だけを取得する。
+        // 緯度・経度は地図区域の生成・判定には使用しない。
+        const localityResponse = await fetch(
+            "public_data/localities_public.json",
+            { cache: "no-store" }
+        );
+
+        if (!localityResponse.ok) {
+            throw new Error(
+                "localities_public.jsonを読み込めませんでした。"
+            );
+        }
+
+        localities = await localityResponse.json();
+
+        if (!Array.isArray(localities)) {
+            throw new Error(
+                "localities_public.jsonの形式が正しくありません。"
+            );
+        }
 
         // ============================================================
         // 地図はlocalities_public.jsonの公開座標を使用しない。
