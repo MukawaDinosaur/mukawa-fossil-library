@@ -1452,7 +1452,7 @@ function displayAdministrativeAreasOnMap() {
                             <button
                                 class="map-popup-button"
                                 type="button"
-                                onclick="filterByRegion(
+                                onclick="event.stopPropagation(); filterByRegion(
                                     ${JSON.stringify(siteIds)},
                                     '${escapeAttribute(regionName)}',
                                     '${escapeAttribute(regionKey)}'
@@ -1473,7 +1473,7 @@ function displayAdministrativeAreasOnMap() {
                                                 <button
                                                     class="map-popup-region-button"
                                                     type="button"
-                                                    onclick="filterByRegion(
+                                                    onclick="event.stopPropagation(); filterByRegion(
                                                         ${JSON.stringify(region.siteIds)},
                                                         '${escapeAttribute(region.name)}',
                                                         '${escapeAttribute(region.key)}'
