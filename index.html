@@ -162,7 +162,7 @@ a{color:inherit}
 }
 
 /* =========================================================
-   ABOUT
+   ABOUT / TOP SUMMARY
    ========================================================= */
 
 .about-box{
@@ -402,7 +402,9 @@ a{color:inherit}
 }
 
 /* =========================================================
-   ADMINISTRATIVE AREA
+   ADMINISTRATIVE AREA MAP
+   行政区域GeoJSONをそのまま表示する。
+   公開用座標から区域を生成・推定しない。
    ========================================================= */
 
 .administrative-area{
@@ -417,6 +419,35 @@ a{color:inherit}
 .administrative-area:hover{
     fill-opacity:.25;
     stroke-width:3.5;
+}
+
+.region-point-label{
+    background:rgba(255,255,255,.96);
+    border:1px solid #c79b3b;
+    border-radius:999px;
+    box-shadow:0 3px 10px rgba(24,60,42,.14);
+    color:#183c2a;
+    font-weight:800;
+    font-size:12px;
+    padding:4px 9px;
+}
+
+.region-point-marker{
+    width:14px;
+    height:14px;
+    border-radius:50%;
+    background:#c79b3b;
+    border:3px solid #fff;
+    box-shadow:0 2px 8px rgba(0,0,0,.28);
+}
+
+.school-map-marker{
+    width:18px;
+    height:18px;
+    border-radius:50%;
+    background:#24563d;
+    border:4px solid #fff;
+    box-shadow:0 2px 9px rgba(0,0,0,.32);
 }
 
 .administrative-area-label{
@@ -501,35 +532,6 @@ a{color:inherit}
     flex:none;
     color:#66736b;
     font-size:10px;
-}
-
-/* =========================================================
-   SCHOOL PIN
-   ========================================================= */
-
-.school-pin{
-    width:32px;
-    height:32px;
-    display:grid;
-    place-items:center;
-    border-radius:50%;
-    background:#24563d;
-    border:3px solid #fff;
-    box-shadow:0 3px 12px rgba(0,0,0,.3);
-    color:#fff;
-    font-size:16px;
-    font-weight:800;
-}
-
-.school-pin-label{
-    background:rgba(255,255,255,.96);
-    border:1px solid #cfdad2;
-    border-radius:999px;
-    box-shadow:0 3px 10px rgba(24,60,42,.14);
-    color:#183c2a;
-    font-weight:800;
-    font-size:12px;
-    padding:4px 9px;
 }
 
 /* =========================================================
@@ -701,7 +703,7 @@ a{color:inherit}
 }
 
 /* =========================================================
-   EMPTY
+   EMPTY / MESSAGE
    ========================================================= */
 
 .message{
@@ -971,7 +973,25 @@ footer{
 
 <main class="container">
 
-<!-- AUTO_ABOUT_TOP_START -->
+<!-- =========================================================
+     ABOUT
+     ========================================================= -->
+
+<section id="about" class="about-box">
+
+    <div class="about-inner">
+
+        <div class="section-heading">
+            <div class="section-icon">🦴</div>
+            <div>
+                <h2>このデータベースについて</h2>
+                <p>鵡川高校 化石デジタルライブラリーの概要</p>
+            </div>
+        </div>
+
+        <div class="about-content">
+
+            <!-- AUTO_ABOUT_TOP_START -->
 
 <p>
     「鵡川高校 化石デジタルライブラリー」は、
@@ -1009,6 +1029,20 @@ footer{
 </p>
 
 <!-- AUTO_ABOUT_TOP_END -->
+
+            <a class="about-link" href="about/">
+                詳細な説明を見る →
+            </a>
+
+        </div>
+
+    </div>
+
+</section>
+
+<!-- =========================================================
+     SEARCH
+     ========================================================= -->
 
 <section id="database" class="search-box">
 
@@ -1048,6 +1082,10 @@ footer{
 
 </section>
 
+<!-- =========================================================
+     STATISTICS
+     ========================================================= -->
+
 <section class="statistics">
 
     <div class="stat-card">
@@ -1067,6 +1105,10 @@ footer{
 
 </section>
 
+<!-- =========================================================
+     MAP
+     ========================================================= -->
+
 <section id="map-section" class="map-container">
 
     <div class="map-title">化石採集地点</div>
@@ -1076,11 +1118,15 @@ footer{
     <div class="map-note">
         ※ 地図上の区域は、公開用採集座標から生成したものではなく、
         別ファイルの行政区域GeoJSONをそのまま表示しています。<br>
-        ※ 行政区域をクリックすると、その区域の代表点へ地図が移動し、
-        公開採集地域と標本を確認できます。詳細な採集位置は表示しません。
+        ※ 行政区域をクリックすると、その区域に対応付けた標本を表示できます。
+        詳細な採集位置は地図上に表示しません。
     </div>
 
 </section>
+
+<!-- =========================================================
+     SITE FILTER
+     ========================================================= -->
 
 <section id="filter-box" class="filter-box">
 
@@ -1111,6 +1157,10 @@ footer{
     <div>北海道鵡川高等学校</div>
 </footer>
 
+<!-- =========================================================
+     DETAIL
+     ========================================================= -->
+
 <div id="detail-overlay" class="detail-overlay">
 
     <div class="detail-window">
@@ -1129,6 +1179,10 @@ footer{
     </div>
 
 </div>
+
+<!-- =========================================================
+     ZOOM
+     ========================================================= -->
 
 <div
     id="zoom-overlay"
@@ -1173,106 +1227,21 @@ function initializeMap() {
     L.tileLayer(
         "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
         {
-            maxZoom:19,
-            attribution:"&copy; OpenStreetMap contributors"
+            maxZoom: 19,
+            attribution: "&copy; OpenStreetMap contributors"
         }
     ).addTo(map);
 }
 
 // ================================================================
-// SCHOOL PIN
-// 鵡川高校は採集地点不明標本の公開地点として固定表示
-// ================================================================
-
-function addSchoolMarker() {
-
-    if (!map) {
-        return;
-    }
-
-    /*
-     * 鵡川高校の公開位置。
-     * 実際の化石採集地点ではなく、
-     * 「採集地点不明標本を鵡川高校として表示するための固定地点」
-     * として使用する。
-     */
-    const schoolLat = 42.575;
-    const schoolLng = 141.928;
-
-    const schoolIcon = L.divIcon({
-        className:"",
-        html:`<div class="school-pin">🏫</div>`,
-        iconSize:[32,32],
-        iconAnchor:[16,16],
-        popupAnchor:[0,-16]
-    });
-
-    const schoolSpecimens = specimens.filter(
-        specimen =>
-            String(specimen.site_id || "").toUpperCase() === "SCHOOL"
-    );
-
-    const marker = L.marker(
-        [schoolLat,schoolLng],
-        {
-            icon:schoolIcon,
-            zIndexOffset:1000
-        }
-    ).addTo(map);
-
-    marker.bindTooltip(
-        "鵡川高校",
-        {
-            permanent:true,
-            direction:"top",
-            offset:[0,-17],
-            className:"school-pin-label",
-            opacity:1
-        }
-    );
-
-    marker.bindPopup(`
-        <div class="map-popup">
-            <div class="map-popup-title">
-                鵡川高校
-            </div>
-
-            <div>
-                公開標本：${schoolSpecimens.length}件
-            </div>
-
-            <div class="map-popup-note">
-                採集地点が特定できない標本を、
-                「鵡川高校」の公開地点として表示しています。
-            </div>
-
-            <button
-                class="map-popup-button"
-                type="button"
-                onclick="
-                    event.stopPropagation();
-                    filterByRegion(
-                        ['SCHOOL'],
-                        '鵡川高校',
-                        'school'
-                    )
-                "
-            >
-                鵡川高校の標本を見る
-            </button>
-        </div>
-    `);
-}
-
-// ================================================================
-// ADMINISTRATIVE AREAS
+// MAP MARKERS
 // ================================================================
 
 async function loadAdministrativeAreas() {
 
     const response = await fetch(
         "public_data/administrative_areas.geojson",
-        {cache:"no-store"}
+        { cache: "no-store" }
     );
 
     if (!response.ok) {
@@ -1296,17 +1265,13 @@ async function loadAdministrativeAreas() {
     administrativeAreas = geojson;
 }
 
-// ================================================================
-// GEOJSON SITE IDS
-// ================================================================
-
 function getAdministrativeSiteIds(properties) {
 
     if (!properties || typeof properties !== "object") {
         return [];
     }
 
-    const value =
+    let value =
         properties.site_ids ??
         properties.siteIds ??
         properties.site_id ??
@@ -1314,14 +1279,12 @@ function getAdministrativeSiteIds(properties) {
         [];
 
     if (Array.isArray(value)) {
-
         return value
             .map(item => String(item).trim())
             .filter(Boolean);
     }
 
     if (typeof value === "string") {
-
         return value
             .split(/[、,\s]+/)
             .map(item => item.trim())
@@ -1332,168 +1295,137 @@ function getAdministrativeSiteIds(properties) {
 }
 
 // ================================================================
-// MAP CENTER
-// GeoJSONに登録した代表点を取得
+// 行政区域GeoJSON内の「公開採集地域代表点」
 // ================================================================
+// Polygon = 実際の行政区域
+// Point   = 公開地図上で地区を代表する位置
+//
+// Pointの位置は詳細な採集地点ではなく、地区の代表位置としてのみ使用する。
+// 標本との対応はsite_idで行い、公開用採集座標との空間判定は行わない。
 
-function getMapCenter(properties) {
+function getRegionPointFeatures() {
 
-    if (!properties || typeof properties !== "object") {
-        return null;
+    if (!administrativeAreas || !Array.isArray(administrativeAreas.features)) {
+        return [];
     }
 
-    /*
-     * 推奨形式：
-     *
-     * "map_center": {
-     *     "lat": 42.123456,
-     *     "lng": 142.123456
-     * }
-     */
-
-    const center = properties.map_center;
-
-    if (
-        center &&
-        typeof center === "object"
-    ) {
-
-        const lat = Number(
-            center.lat ??
-            center.latitude
-        );
-
-        const lng = Number(
-            center.lng ??
-            center.lon ??
-            center.longitude
-        );
-
-        if (
-            Number.isFinite(lat) &&
-            Number.isFinite(lng) &&
-            lat >= -90 &&
-            lat <= 90 &&
-            lng >= -180 &&
-            lng <= 180
-        ) {
-            return [lat,lng];
-        }
-    }
-
-    /*
-     * 将来、別形式で管理する場合にも対応できるよう、
-     * map_center_lat / map_center_lng も許容する。
-     */
-
-    const lat = Number(
-        properties.map_center_lat
+    return administrativeAreas.features.filter(feature =>
+        feature &&
+        feature.geometry &&
+        feature.geometry.type === "Point" &&
+        feature.properties &&
+        (
+            feature.properties.feature_type === "region_point" ||
+            feature.properties.region_point === true
+        )
     );
-
-    const lng = Number(
-        properties.map_center_lng
-    );
-
-    if (
-        Number.isFinite(lat) &&
-        Number.isFinite(lng) &&
-        lat >= -90 &&
-        lat <= 90 &&
-        lng >= -180 &&
-        lng <= 180
-    ) {
-        return [lat,lng];
-    }
-
-    return null;
 }
 
-// ================================================================
-// PUBLIC REGION DEFINITIONS
-// ================================================================
+function getRegionSiteIdsFromLocalities(regionName, keywords) {
+
+    const siteIds = new Set();
+
+    localities.forEach(locality => {
+
+        const place = String(
+            locality.place ||
+            locality.region ||
+            ""
+        ).trim();
+
+        if (!place || !locality.site_id) {
+            return;
+        }
+
+        const matched =
+            (regionName && place.includes(regionName)) ||
+            (Array.isArray(keywords) && keywords.some(keyword =>
+                place.includes(String(keyword))
+            ));
+
+        if (matched) {
+            siteIds.add(String(locality.site_id).trim());
+        }
+    });
+
+    return Array.from(siteIds).filter(Boolean);
+}
 
 function getPublicRegionDefinitions() {
 
-    /*
-     * 公開地域名はここでは「表示名」と「localities_public.json
-     * のplaceを判定するキーワード」としてのみ使用する。
-     *
-     * 詳細な採集場所は使用しない。
-     */
+    return getRegionPointFeatures().map(feature => {
 
-    const definitions = [
-        {
-            key:"hobetsu-nagawa",
-            name:"むかわ町穂別長和",
-            keywords:["長和"]
-        },
-        {
-            key:"hobetsu-inasato",
-            name:"むかわ町穂別稲里",
-            keywords:["稲里"]
-        }
-    ];
+        const properties = feature.properties || {};
 
-    return definitions.map(definition => {
+        const regionName = String(
+            properties.region_name ||
+            properties.regionName ||
+            properties.display_name ||
+            properties.displayName ||
+            properties.name ||
+            "公開採集地域"
+        ).trim();
 
-        const siteIds = new Set();
+        const regionKey = String(
+            properties.region_key ||
+            properties.regionKey ||
+            properties.area_id ||
+            properties.id ||
+            regionName
+        ).trim();
 
-        localities.forEach(locality => {
+        let siteIds = getAdministrativeSiteIds(properties);
 
-            const place = String(
-                locality.place ||
-                locality.region ||
-                ""
-            ).trim();
-
-            if (!place) {
-                return;
-            }
-
-            const matched =
-                definition.keywords.some(
-                    keyword => place.includes(keyword)
-                );
-
-            if (
-                matched &&
-                locality.site_id
-            ) {
-                siteIds.add(
-                    String(locality.site_id).trim()
-                );
-            }
-        });
-
-        const normalizedSiteIds =
-            Array.from(siteIds).filter(Boolean);
-
-        const regionSpecimens =
-            specimens.filter(
-                specimen =>
-                    normalizedSiteIds.includes(
-                        String(specimen.site_id || "").trim()
-                    )
+        // GeoJSON側でsite_idsを指定していない場合は、
+        // localities_public.jsonの公開用placeから地域名に対応する地点IDを取得。
+        if (!siteIds.length) {
+            siteIds = getRegionSiteIdsFromLocalities(
+                regionName,
+                properties.keywords || []
             );
+        }
+
+        const regionSpecimens = specimens.filter(specimen =>
+            siteIds.includes(String(specimen.site_id || ""))
+        );
+
+        const coordinates =
+            feature.geometry &&
+            Array.isArray(feature.geometry.coordinates)
+                ? feature.geometry.coordinates
+                : [];
+
+        const mapCenter =
+            Array.isArray(properties.map_center) &&
+            properties.map_center.length === 2
+                ? [
+                    Number(properties.map_center[0]),
+                    Number(properties.map_center[1])
+                ]
+                : (
+                    coordinates.length === 2
+                        ? [Number(coordinates[1]), Number(coordinates[0])]
+                        : null
+                );
 
         return {
-            ...definition,
-            siteIds:normalizedSiteIds,
-            specimenCount:regionSpecimens.length
+            feature,
+            regionKey,
+            name: regionName,
+            siteIds,
+            specimenCount: regionSpecimens.length,
+            description: String(
+                properties.description ||
+                "詳細な採集地点を示さない地区代表点です。"
+            ),
+            mapCenter
         };
     });
 }
 
-// ================================================================
-// ADMINISTRATIVE AREA NAME
-// ================================================================
-
 function getAdministrativeAreaName(properties) {
 
-    if (
-        !properties ||
-        typeof properties !== "object"
-    ) {
+    if (!properties || typeof properties !== "object") {
         return "公開採集地域";
     }
 
@@ -1504,624 +1436,452 @@ function getAdministrativeAreaName(properties) {
         properties.displayName ??
         properties.name ??
         properties.NAME ??
+        properties.municipality ??
         "公開採集地域"
     ).trim() || "公開採集地域";
 }
 
-// ================================================================
-// ADMINISTRATIVE AREA KEY
-// ================================================================
+function getAdministrativeAreaKey(properties, index) {
 
-function getAdministrativeAreaKey(properties,index) {
-
-    if (
-        !properties ||
-        typeof properties !== "object"
-    ) {
+    if (!properties || typeof properties !== "object") {
         return "area-" + index;
     }
 
     return String(
         properties.region_key ??
         properties.regionKey ??
+        properties.area_id ??
         properties.id ??
         properties.code ??
         "area-" + index
     );
 }
 
-// ================================================================
-// ADMINISTRATIVE AREA DISPLAY
-// ================================================================
+function createRegionPopupHtml(region) {
 
-function displayAdministrativeAreasOnMap() {
+    return `
+        <div class="map-popup">
+            <div class="map-popup-title">
+                ${escapeHtml(region.name)}
+            </div>
 
-    if (
-        !map ||
-        !administrativeAreas
-    ) {
+            <div>
+                対象標本：${region.specimenCount}件
+            </div>
+
+            <div class="map-popup-note">
+                ${escapeHtml(region.description)}<br>
+                詳細な採集地点は表示していません。
+            </div>
+
+            <button
+                class="map-popup-button"
+                type="button"
+                onclick="event.stopPropagation(); focusRegionPoint('${escapeAttribute(region.regionKey)}')"
+            >
+                地区の代表位置を見る
+            </button>
+
+            <button
+                class="map-popup-button"
+                type="button"
+                style="margin-left:6px;"
+                onclick="event.stopPropagation(); filterByRegion(
+                    ${JSON.stringify(region.siteIds)},
+                    '${escapeAttribute(region.name)}',
+                    '${escapeAttribute(region.regionKey)}'
+                )"
+            >
+                この地域の化石を見る
+            </button>
+        </div>
+    `;
+}
+
+function createPublicRegionSelectorHtml(publicRegions) {
+
+    const usableRegions = publicRegions.filter(region =>
+        region.siteIds.length
+    );
+
+    if (!usableRegions.length) {
+        return "";
+    }
+
+    return `
+        <div class="map-region-select-title">
+            公開採集地域から選択
+        </div>
+        <div class="map-region-select-list">
+            ${usableRegions.map(region => `
+                <button
+                    class="map-popup-region-button"
+                    type="button"
+                    onclick="event.stopPropagation(); focusRegionPoint('${escapeAttribute(region.regionKey)}')"
+                >
+                    ${escapeHtml(region.name)}
+                    <span>${region.specimenCount}件</span>
+                </button>
+            `).join("")}
+        </div>
+    `;
+}
+
+function focusRegionPoint(regionKey) {
+
+    const region = getPublicRegionDefinitions().find(item =>
+        String(item.regionKey) === String(regionKey)
+    );
+
+    if (!region || !region.mapCenter || !map) {
         return;
     }
 
-    const layers = [];
-
-    const publicRegions =
-        getPublicRegionDefinitions();
-
-    administrativeAreas.features.forEach(
-        (feature,index) => {
-
-            if (
-                !feature ||
-                !feature.geometry
-            ) {
-                return;
-            }
-
-            const properties =
-                feature.properties || {};
-
-            const regionName =
-                getAdministrativeAreaName(
-                    properties
-                );
-
-            const regionKey =
-                getAdministrativeAreaKey(
-                    properties,
-                    index
-                );
-
-            /*
-             * GeoJSONに明示されたsite_idsを使用。
-             *
-             * 重要：
-             * 座標による判定は一切しない。
-             */
-
-            let siteIds =
-                getAdministrativeSiteIds(
-                    properties
-                );
-
-            /*
-             * site_idsがない行政区域について、
-             * むかわ町全体の区域である場合のみ、
-             * 公開地域との対応を表示用に構成する。
-             *
-             * 詳細座標からの空間判定は行わない。
-             */
-
-            const isMukawaMunicipality =
-                String(
-                    properties.municipality ||
-                    properties.municipality_name ||
-                    ""
-                ).includes("むかわ町") &&
-                !properties.region_name &&
-                !properties.regionName;
-
-            /*
-             * GeoJSON側にsite_idsが設定されていない場合でも、
-             * 「むかわ町」の行政区域では公開地域選択を表示できる。
-             */
-
-            if (
-                isMukawaMunicipality &&
-                !siteIds.length
-            ) {
-
-                siteIds = Array.from(
-                    new Set(
-                        publicRegions.flatMap(
-                            region => region.siteIds
-                        )
-                    )
-                );
-            }
-
-            const regionSpecimens =
-                specimens.filter(
-                    specimen =>
-                        siteIds.includes(
-                            String(
-                                specimen.site_id || ""
-                            ).trim()
-                        )
-                );
-
-            const mapCenter =
-                getMapCenter(properties);
-
-            const layer =
-                L.geoJSON(
-                    feature,
-                    {
-                        style:{
-                            color:"#24563d",
-                            weight:2.5,
-                            fillColor:"#2f6b4c",
-                            fillOpacity:.14,
-                            className:"administrative-area"
-                        },
-
-                        onEachFeature:
-                        function(
-                            _feature,
-                            areaLayer
-                        ){
-
-                            /*
-                             * 行政区域名だけを表示。
-                             *
-                             * GeoJSON properties に
-                             * 詳細採集地点を入れないこと。
-                             */
-
-                            areaLayer.bindTooltip(
-                                regionName,
-                                {
-                                    permanent:true,
-                                    direction:"center",
-                                    className:
-                                        "administrative-area-label",
-                                    opacity:1
-                                }
-                            );
-
-                            /*
-                             * ポップアップの内容を生成
-                             */
-
-                            let popupHtml = `
-                                <div class="map-popup">
-
-                                    <div class="map-popup-title">
-                                        ${escapeHtml(regionName)}
-                                    </div>
-
-                                    <div>
-                                        公開地域に対応する標本：
-                                        ${regionSpecimens.length}件
-                                    </div>
-
-                                    <div class="map-popup-note">
-                                        行政区域を代表する位置を表示しています。<br>
-                                        実際の化石採集地点ではありません。
-                                    </div>
-                            `;
-
-                            /*
-                             * この区域の標本を見る
-                             *
-                             * siteIdsがある場合のみ表示
-                             */
-
-                            if (
-                                siteIds.length
-                            ) {
-
-                                popupHtml += `
-                                    <button
-                                        class="map-popup-button"
-                                        type="button"
-                                        onclick="
-                                            event.stopPropagation();
-                                            filterByRegion(
-                                                ${JSON.stringify(siteIds)},
-                                                '${escapeAttribute(regionName)}',
-                                                '${escapeAttribute(regionKey)}'
-                                            )
-                                        "
-                                    >
-                                        この区域の標本を見る
-                                    </button>
-                                `;
-                            }
-
-                            /*
-                             * 公開採集地域から選択
-                             *
-                             * むかわ町全体の行政区域などから、
-                             * 長和・稲里などを選択できる。
-                             */
-
-                            const availablePublicRegions =
-                                publicRegions.filter(
-                                    region =>
-                                        region.siteIds.length
-                                );
-
-                            if (
-                                availablePublicRegions.length
-                            ) {
-
-                                popupHtml += `
-                                    <div class="map-region-select-title">
-                                        公開採集地域から選択
-                                    </div>
-
-                                    <div class="map-region-select-list">
-                                `;
-
-                                availablePublicRegions.forEach(
-                                    region => {
-
-                                        popupHtml += `
-                                            <button
-                                                class="map-popup-region-button"
-                                                type="button"
-                                                onclick="
-                                                    event.stopPropagation();
-                                                    selectPublicRegion(
-                                                        '${escapeAttribute(region.key)}'
-                                                    )
-                                                "
-                                            >
-                                                ${escapeHtml(region.name)}
-                                                <span>
-                                                    ${region.specimenCount}件
-                                                </span>
-                                            </button>
-                                        `;
-                                    }
-                                );
-
-                                popupHtml += `
-                                    </div>
-                                `;
-                            }
-
-                            popupHtml += `
-                                </div>
-                            `;
-
-                            areaLayer.bindPopup(
-                                popupHtml
-                            );
-
-                            /*
-                             * ★今回の重要変更
-                             *
-                             * 行政区域をクリックしただけでは、
-                             * 標本一覧を絞り込まない。
-                             *
-                             * map_centerが登録されていれば、
-                             * そこへ移動してポップアップを開く。
-                             */
-
-                            areaLayer.on(
-                                "click",
-                                function(event){
-
-                                    if (
-                                        mapCenter
-                                    ) {
-
-                                        map.flyTo(
-                                            mapCenter,
-                                            Math.max(
-                                                map.getZoom(),
-                                                13
-                                            ),
-                                            {
-                                                duration:0.8
-                                            }
-                                        );
-
-                                        setTimeout(
-                                            function(){
-
-                                                areaLayer.openPopup(
-                                                    mapCenter
-                                                );
-
-                                            },
-                                            850
-                                        );
-
-                                    } else {
-
-                                        /*
-                                         * map_centerが未登録の場合は
-                                         * ポリゴン中心へ自動移動しない。
-                                         *
-                                         * 安全性のため、
-                                         * 公開座標などから代表点を推定しない。
-                                         */
-
-                                        console.warn(
-                                            "map_centerがGeoJSONに設定されていません：",
-                                            regionName
-                                        );
-
-                                        areaLayer.openPopup(
-                                            event.latlng
-                                        );
-                                    }
-                                }
-                            );
-
-                        }
-                    }
-                ).addTo(map);
-
-            layers.push(layer);
-        }
+    map.flyTo(
+        region.mapCenter,
+        Math.max(map.getZoom(), 13),
+        { duration: 0.8 }
     );
 
-    /*
-     * 全行政区域が見える範囲に調整
-     */
+    setTimeout(() => {
 
-    if (layers.length) {
+        const popupHtml = `
+            <div class="map-popup">
+                <div class="map-popup-title">
+                    ${escapeHtml(region.name)}
+                </div>
 
-        const group =
-            L.featureGroup(layers);
+                <div class="map-popup-note">
+                    ${escapeHtml(region.description)}<br>
+                    この位置は地区の代表位置であり、
+                    詳細な採集地点を示すものではありません。
+                </div>
 
-        map.fitBounds(
-            group.getBounds(),
-            {
-                padding:[30,30]
-            }
-        );
-    }
+                <div style="margin-bottom:8px;">
+                    対象標本：${region.specimenCount}件
+                </div>
 
-    /*
-     * 行政区域を表示した後、
-     * 鵡川高校固定ピンを常に表示する。
-     */
+                <button
+                    class="map-popup-button"
+                    type="button"
+                    onclick="event.stopPropagation(); filterByRegion(
+                        ${JSON.stringify(region.siteIds)},
+                        '${escapeAttribute(region.name)}',
+                        '${escapeAttribute(region.regionKey)}'
+                    )"
+                >
+                    この地域の化石を見る
+                </button>
+            </div>
+        `;
 
-    addSchoolMarker();
+        L.popup({
+            maxWidth:320,
+            closeButton:true,
+            autoPan:true
+        })
+        .setLatLng(region.mapCenter)
+        .setContent(popupHtml)
+        .openOn(map);
+
+    }, 850);
 }
 
-// ================================================================
-// PUBLIC REGION SELECTION
-// ================================================================
+function displayRegionPointFeatures() {
 
-function selectPublicRegion(regionKey) {
+    const publicRegions = getPublicRegionDefinitions();
 
-    const definitions =
-        getPublicRegionDefinitions();
+    publicRegions.forEach(region => {
 
-    const region =
-        definitions.find(
-            item =>
-                item.key === regionKey
+        if (!region.mapCenter) {
+            return;
+        }
+
+        const marker = L.marker(
+            region.mapCenter,
+            {
+                icon: L.divIcon({
+                    className: "region-point-marker-wrapper",
+                    html: '<div class="region-point-marker"></div>',
+                    iconSize: [18,18],
+                    iconAnchor: [9,9]
+                }),
+                zIndexOffset: 300
+            }
+        ).addTo(map);
+
+        marker.bindTooltip(
+            region.name,
+            {
+                direction:"top",
+                offset:[0,-7],
+                className:"region-point-label",
+                opacity:1
+            }
         );
 
-    if (!region) {
+        marker.on("click", function() {
+            focusRegionPoint(region.regionKey);
+        });
+    });
+}
 
-        console.warn(
-            "公開採集地域が見つかりません：",
-            regionKey
-        );
+function displaySchoolPin() {
 
+    if (!map) {
         return;
     }
 
-    /*
-     * 地区の代表点をGeoJSONから探す。
-     *
-     * site_idと座標を結び付けて代表点を推定することはしない。
-     */
+    // 北海道鵡川高等学校
+    // 〒054-0032 北海道勇払郡むかわ町福住4丁目2番地1
+    const schoolLatLng = [42.5835966, 141.919786];
 
-    let targetCenter = null;
-
-    if (
-        administrativeAreas &&
-        Array.isArray(
-            administrativeAreas.features
-        )
-    ) {
-
-        const targetFeature =
-            administrativeAreas.features.find(
-                feature => {
-
-                    const properties =
-                        feature.properties || {};
-
-                    const featureKey =
-                        String(
-                            properties.region_key ??
-                            properties.regionKey ??
-                            properties.id ??
-                            ""
-                        );
-
-                    return (
-                        featureKey ===
-                        region.key
-                    );
-                }
-            );
-
-        if (targetFeature) {
-
-            targetCenter =
-                getMapCenter(
-                    targetFeature.properties || {}
-                );
+    const schoolMarker = L.marker(
+        schoolLatLng,
+        {
+            icon: L.divIcon({
+                className: "school-marker-wrapper",
+                html: '<div class="school-map-marker"></div>',
+                iconSize:[22,22],
+                iconAnchor:[11,11]
+            }),
+            zIndexOffset:1000
         }
-    }
+    ).addTo(map);
 
-    /*
-     * GeoJSONのregion_keyがなくても、
-     * region_nameから安全に探す。
-     */
-
-    if (!targetCenter) {
-
-        const targetFeature =
-            administrativeAreas?.features?.find(
-                feature => {
-
-                    const properties =
-                        feature.properties || {};
-
-                    const name =
-                        getAdministrativeAreaName(
-                            properties
-                        );
-
-                    return name === region.name;
-                }
-            );
-
-        if (targetFeature) {
-
-            targetCenter =
-                getMapCenter(
-                    targetFeature.properties || {}
-                );
+    schoolMarker.bindTooltip(
+        "鵡川高校",
+        {
+            permanent:true,
+            direction:"top",
+            offset:[0,-10],
+            className:"region-point-label",
+            opacity:1
         }
-    }
-
-    /*
-     * 地区代表点が設定されている場合のみ移動。
-     */
-
-    if (targetCenter && map) {
-
-        map.flyTo(
-            targetCenter,
-            Math.max(
-                map.getZoom(),
-                13
-            ),
-            {
-                duration:.8
-            }
-        );
-
-        /*
-         * 代表点に説明ポップアップを表示
-         */
-
-        setTimeout(
-            function(){
-
-                L.popup()
-                    .setLatLng(
-                        targetCenter
-                    )
-                    .setContent(`
-                        <div class="map-popup">
-                            <div class="map-popup-title">
-                                ${escapeHtml(region.name)}
-                            </div>
-
-                            <div>
-                                公開採集地域
-                            </div>
-
-                            <div class="map-popup-note">
-                                この位置は地区を代表する位置です。<br>
-                                実際の化石採集地点ではありません。
-                            </div>
-
-                            <button
-                                class="map-popup-button"
-                                type="button"
-                                onclick="
-                                    filterByRegion(
-                                        ${JSON.stringify(region.siteIds)},
-                                        '${escapeAttribute(region.name)}',
-                                        '${escapeAttribute(region.key)}'
-                                    )
-                                "
-                            >
-                                この地域の化石を見る
-                            </button>
-                        </div>
-                    `)
-                    .openOn(map);
-
-            },
-            850
-        );
-    }
-
-    /*
-     * 地図上で代表点が見つからない場合でも、
-     * 標本の絞り込み自体は実行できる。
-     */
-
-    filterByRegion(
-        region.siteIds,
-        region.name,
-        region.key,
-        false
     );
+
+    schoolMarker.bindPopup(`
+        <div class="map-popup">
+            <div class="map-popup-title">鵡川高校</div>
+            <div class="map-popup-note">
+                学校保管標本など、採集地点を特定できない標本を
+                「鵡川高校」として表示するための固定ピンです。
+            </div>
+            <button
+                class="map-popup-button"
+                type="button"
+                onclick="event.stopPropagation(); filterSchoolSpecimens()"
+            >
+                鵡川高校の標本を見る
+            </button>
+        </div>
+    `);
+
+    schoolMarker.on("click", function() {
+        // ポップアップを開くだけ。学校ピンは常時表示する。
+        schoolMarker.openPopup();
+    });
 }
 
-// ================================================================
-// REGION FILTER
-// ================================================================
+function filterSchoolSpecimens() {
 
-function filterByRegion(
-    siteIds,
-    regionName,
-    regionKey,
-    scrollToResults = true
-) {
+    const filtered = specimens.filter(specimen => {
+        const values = [
+            specimen.site_id,
+            specimen.region_id,
+            specimen.region_key,
+            specimen.place,
+            specimen.locality,
+            specimen.location
+        ]
+        .map(value => String(value || "").trim().toUpperCase());
 
-    const normalizedSiteIds =
-        (
-            Array.isArray(siteIds)
-                ? siteIds
-                : []
-        )
-        .map(
-            siteId =>
-                String(siteId).trim()
-        )
-        .filter(Boolean);
+        return values.includes("SCHOOL");
+    });
 
-    currentSiteId = null;
+    currentSiteId = "SCHOOL";
 
-    document.getElementById(
-        "search-input"
-    ).value = "";
-
+    document.getElementById("search-input").value = "";
     resetDropdownFilters();
 
-    const filtered =
-        specimens.filter(
-            specimen =>
-                normalizedSiteIds.includes(
-                    String(
-                        specimen.site_id || ""
-                    ).trim()
-                )
-        );
-
-    const box =
-        document.getElementById(
-            "filter-box"
-        );
-
+    const box = document.getElementById("filter-box");
     box.classList.add("active");
 
-    document.getElementById(
-        "filter-title"
-    ).innerHTML = `
-        <strong>
-            ${escapeHtml(regionName)}
-        </strong>
+    document.getElementById("filter-title").innerHTML = `
+        <strong>鵡川高校</strong>
         の標本　${filtered.length}件
     `;
 
     displaySpecimens(filtered);
 
-    if (scrollToResults) {
+    document.getElementById("filter-box").scrollIntoView({
+        behavior:"smooth",
+        block:"center"
+    });
+}
 
-        box.scrollIntoView({
-            behavior:"smooth",
-            block:"center"
-        });
+function displayAdministrativeAreasOnMap() {
+
+    if (!map || !administrativeAreas) {
+        return;
     }
+
+    const layers = [];
+    const publicRegions = getPublicRegionDefinitions();
+
+    administrativeAreas.features.forEach((feature, index) => {
+
+        if (!feature || !feature.geometry) {
+            return;
+        }
+
+        // Point Featureは行政区域Polygonとは別に表示する。
+        if (feature.geometry.type === "Point") {
+            return;
+        }
+
+        const properties = feature.properties || {};
+        const regionName = getAdministrativeAreaName(properties);
+        const regionKey = getAdministrativeAreaKey(properties, index);
+
+        let siteIds = getAdministrativeSiteIds(properties);
+
+        // むかわ町Polygon全体については、公開用localitiesに登録された
+        // 地域IDをまとめて「この区域の標本」として扱う。
+        if (!siteIds.length && String(regionName).includes("むかわ町")) {
+            siteIds = Array.from(
+                new Set(
+                    localities
+                        .map(locality => String(locality.site_id || "").trim())
+                        .filter(Boolean)
+                )
+            );
+        }
+
+        const regionSpecimens = specimens.filter(specimen =>
+            siteIds.includes(String(specimen.site_id || ""))
+        );
+
+        const selectorHtml = createPublicRegionSelectorHtml(publicRegions);
+
+        const layer = L.geoJSON(
+            feature,
+            {
+                style: {
+                    color: "#24563d",
+                    weight: 2.5,
+                    fillColor: "#2f6b4c",
+                    fillOpacity: 0.14,
+                    className: "administrative-area"
+                },
+                onEachFeature: function(_feature, areaLayer) {
+
+                    areaLayer.bindTooltip(
+                        regionName,
+                        {
+                            permanent:true,
+                            direction:"center",
+                            className:"administrative-area-label",
+                            opacity:1
+                        }
+                    );
+
+                    areaLayer.bindPopup(`
+                        <div class="map-popup">
+                            <div class="map-popup-title">
+                                ${escapeHtml(regionName)}
+                            </div>
+
+                            <div>
+                                対象標本：${regionSpecimens.length}件
+                            </div>
+
+                            <div class="map-popup-note">
+                                この区域は国土数値情報の行政区域GeoJSONを
+                                そのまま表示しています。<br>
+                                公開用採集座標から区域を作成・推定していません。
+                            </div>
+
+                            <button
+                                class="map-popup-button"
+                                type="button"
+                                onclick="event.stopPropagation(); filterByRegion(
+                                    ${JSON.stringify(siteIds)},
+                                    '${escapeAttribute(regionName)}',
+                                    '${escapeAttribute(regionKey)}'
+                                )"
+                            >
+                                この区域の標本を見る
+                            </button>
+
+                            ${selectorHtml}
+                        </div>
+                    `);
+
+                    // Polygonをクリックしただけでは標本一覧を変更しない。
+                    // まず行政区域の説明と「公開採集地域から選択」を表示する。
+                    areaLayer.on("click", function() {
+                        areaLayer.openPopup();
+                    });
+                }
+            }
+        ).addTo(map);
+
+        layers.push(layer);
+    });
+
+    // 地区代表Pointを表示
+    displayRegionPointFeatures();
+
+    // 鵡川高校固定ピンを常時表示
+    displaySchoolPin();
+
+    if (layers.length) {
+        const group = L.featureGroup(layers);
+        map.fitBounds(
+            group.getBounds(),
+            { padding:[30,30] }
+        );
+    }
+}
+
+// ================================================================
+// REGION FILTER
+// 行政区域GeoJSONに登録したsite_idsを使って標本を絞り込む。
+// 公開座標との空間判定は行わない。
+// ================================================================
+
+function filterByRegion(siteIds, regionName, regionKey) {
+
+    const normalizedSiteIds = (Array.isArray(siteIds) ? siteIds : [])
+        .map(siteId => String(siteId));
+
+    currentSiteId = null;
+
+    document.getElementById("search-input").value = "";
+    resetDropdownFilters();
+
+    const filtered = specimens.filter(
+        specimen =>
+            normalizedSiteIds.includes(
+                String(specimen.site_id || "")
+            )
+    );
+
+    const box = document.getElementById("filter-box");
+    box.classList.add("active");
+
+    document.getElementById("filter-title").innerHTML = `
+        <strong>${escapeHtml(regionName)}</strong>
+        の標本　${filtered.length}件
+    `;
+
+    displaySpecimens(filtered);
+
+    document.getElementById("filter-box").scrollIntoView({
+        behavior: "smooth",
+        block: "center"
+    });
 }
 
 // ================================================================
@@ -2130,43 +1890,27 @@ function filterByRegion(
 
 function filterBySite(siteId) {
 
-    currentSiteId =
-        String(siteId);
+    currentSiteId = String(siteId);
 
-    document.getElementById(
-        "search-input"
-    ).value = "";
-
+    document.getElementById("search-input").value = "";
     resetDropdownFilters();
 
-    const filtered =
-        specimens.filter(
-            specimen =>
-                String(
-                    specimen.site_id
-                ) ===
-                String(siteId)
-        );
+    const filtered = specimens.filter(
+        specimen =>
+            String(specimen.site_id) === String(siteId)
+    );
 
-    const box =
-        document.getElementById(
-            "filter-box"
-        );
-
+    const box = document.getElementById("filter-box");
     box.classList.add("active");
 
-    document.getElementById(
-        "filter-title"
-    ).innerHTML = `
-        <strong>
-            地点ID：${escapeHtml(siteId)}
-        </strong>
+    document.getElementById("filter-title").innerHTML = `
+        <strong>地点ID：${escapeHtml(siteId)}</strong>
         の標本　${filtered.length}件
     `;
 
     displaySpecimens(filtered);
 
-    box.scrollIntoView({
+    document.getElementById("filter-box").scrollIntoView({
         behavior:"smooth",
         block:"center"
     });
@@ -2186,9 +1930,7 @@ function clearSiteFilter() {
 
     resetDropdownFilters();
 
-    displaySpecimens(
-        specimens
-    );
+    displaySpecimens(specimens);
 }
 
 // ================================================================
@@ -2201,87 +1943,54 @@ async function loadData() {
 
         initializeMap();
 
-        const specimenResponse =
-            await fetch(
-                "public_data/specimens.json",
-                {
-                    cache:"no-store"
-                }
-            );
+        const specimenResponse = await fetch(
+            "public_data/specimens.json",
+            { cache: "no-store" }
+        );
 
         if (!specimenResponse.ok) {
-
             throw new Error(
                 "specimens.jsonを読み込めませんでした。"
             );
         }
 
-        specimens =
-            await specimenResponse.json();
+        specimens = await specimenResponse.json();
 
-        if (!Array.isArray(specimens)) {
-
-            throw new Error(
-                "specimens.jsonの形式が正しくありません。"
-            );
-        }
-
-        const localityResponse =
-            await fetch(
-                "public_data/localities_public.json",
-                {
-                    cache:"no-store"
-                }
-            );
+        // 公開地域名と地点IDの対応だけを取得する。
+        // 緯度・経度は地図区域の生成・判定には使用しない。
+        const localityResponse = await fetch(
+            "public_data/localities_public.json",
+            { cache: "no-store" }
+        );
 
         if (!localityResponse.ok) {
-
             throw new Error(
                 "localities_public.jsonを読み込めませんでした。"
             );
         }
 
-        localities =
-            await localityResponse.json();
+        localities = await localityResponse.json();
 
         if (!Array.isArray(localities)) {
-
             throw new Error(
                 "localities_public.jsonの形式が正しくありません。"
             );
         }
 
-        /*
-         * 地図は公開座標を使用しない。
-         *
-         * administrative_areas.geojson
-         *      ↓
-         * 行政区域ポリゴン
-         *      ↓
-         * map_center
-         *      ↓
-         * 地区代表点
-         */
-
+        // ============================================================
+        // 地図はlocalities_public.jsonの公開座標を使用しない。
+        // 行政区域GeoJSONそのものを表示し、区域と標本の対応は
+        // GeoJSONのproperties.site_idsで明示的に管理する。
+        // ============================================================
         try {
-
             await loadAdministrativeAreas();
-
             displayAdministrativeAreasOnMap();
-
         } catch (mapError) {
+            console.error(mapError);
 
-            console.error(
-                mapError
-            );
-
-            const mapNote =
-                document.querySelector(
-                    ".map-note"
-                );
+            const mapNote = document.querySelector(".map-note");
 
             if (mapNote) {
-
                 mapNote.innerHTML = `
                     ※ 行政区域GeoJSONを読み込めなかったため、
                     地図上の区域表示は現在利用できません。<br>
@@ -2290,22 +1999,11 @@ async function loadData() {
                     ※ 地図表示には公開用採集座標を使用していません。
                 `;
             }
-
-            /*
-             * GeoJSONが読み込めなくても
-             * 鵡川高校の固定ピンは表示する。
-             */
-
-            addSchoolMarker();
         }
 
         updateStatistics();
-
         createFilterOptions();
-
-        displaySpecimens(
-            specimens
-        );
+        displaySpecimens(specimens);
 
         openSpecimenFromURL();
 
@@ -2318,9 +2016,7 @@ async function loadData() {
         ).innerHTML = `
             <div class="message">
                 データを読み込めませんでした。<br><br>
-                ${escapeHtml(
-                    error.message
-                )}
+                ${escapeHtml(error.message)}
             </div>
         `;
     }
@@ -2332,44 +2028,33 @@ async function loadData() {
 
 function updateStatistics() {
 
-    const classifications =
-        new Set(
-            specimens
-                .map(
-                    specimen =>
-                        String(
-                            specimen.classification || ""
-                        ).trim()
-                )
-                .filter(Boolean)
-        );
+    const classifications = new Set(
+        specimens
+            .map(specimen =>
+                String(specimen.classification || "").trim()
+            )
+            .filter(Boolean)
+    );
 
-    const localityIds =
-        new Set(
-            specimens
-                .map(
-                    specimen =>
-                        String(
-                            specimen.site_id || ""
-                        ).trim()
-                )
-                .filter(Boolean)
-        );
+    const localityIds = new Set(
+        specimens
+            .map(specimen =>
+                String(specimen.site_id || "").trim()
+            )
+            .filter(Boolean)
+    );
 
     document.getElementById(
         "stat-specimens"
-    ).textContent =
-        specimens.length;
+    ).textContent = specimens.length;
 
     document.getElementById(
         "stat-classifications"
-    ).textContent =
-        classifications.size;
+    ).textContent = classifications.size;
 
     document.getElementById(
         "stat-localities"
-    ).textContent =
-        localityIds.size;
+    ).textContent = localityIds.size;
 }
 
 // ================================================================
@@ -2380,76 +2065,45 @@ function createFilterOptions() {
 
     createOptions(
         "classification-filter",
-        specimens.map(
-            s => s.classification
-        )
+        specimens.map(s => s.classification)
     );
 
     createOptions(
         "formation-filter",
-        specimens.map(
-            s => s.formation
-        )
+        specimens.map(s => s.formation)
     );
 
     createOptions(
         "age-filter",
-        specimens.map(
-            s => s.age
-        )
+        specimens.map(s => s.age)
     );
 }
 
-function createOptions(
-    elementId,
-    values
-) {
+function createOptions(elementId, values) {
 
-    const select =
-        document.getElementById(
-            elementId
-        );
+    const select = document.getElementById(elementId);
 
-    const unique =
-        [
-            ...new Set(
-                values
-                    .map(
-                        value =>
-                            String(
-                                value || ""
-                            ).trim()
-                    )
-                    .filter(Boolean)
-            )
-        ]
-        .sort(
-            (a,b) =>
-                a.localeCompare(
-                    b,
-                    "ja"
+    const unique = [
+        ...new Set(
+            values
+                .map(value =>
+                    String(value || "").trim()
                 )
-        );
-
-    unique.forEach(
-        value => {
-
-            const option =
-                document.createElement(
-                    "option"
-                );
-
-            option.value =
-                value;
-
-            option.textContent =
-                value;
-
-            select.appendChild(
-                option
-            );
-        }
+                .filter(Boolean)
+        )
+    ].sort((a, b) =>
+        a.localeCompare(b, "ja")
     );
+
+    unique.forEach(value => {
+
+        const option = document.createElement("option");
+
+        option.value = value;
+        option.textContent = value;
+
+        select.appendChild(option);
+    });
 }
 
 // ================================================================
@@ -2464,75 +2118,50 @@ function applyFilters() {
         "filter-box"
     ).classList.remove("active");
 
-    const keyword =
-        document.getElementById(
-            "search-input"
-        ).value
-        .trim()
+    const keyword = document.getElementById(
+        "search-input"
+    ).value.trim().toLowerCase();
+
+    const classification = document.getElementById(
+        "classification-filter"
+    ).value;
+
+    const formation = document.getElementById(
+        "formation-filter"
+    ).value;
+
+    const age = document.getElementById(
+        "age-filter"
+    ).value;
+
+    const filtered = specimens.filter(specimen => {
+
+        const text = [
+            specimen.specimen_id,
+            specimen.classification,
+            specimen.scientific_name,
+            specimen.common_name,
+            specimen.formation,
+            specimen.age,
+            specimen.collection_date,
+            specimen.note,
+            specimen.notes
+        ]
+        .join(" ")
         .toLowerCase();
 
-    const classification =
-        document.getElementById(
-            "classification-filter"
-        ).value;
-
-    const formation =
-        document.getElementById(
-            "formation-filter"
-        ).value;
-
-    const age =
-        document.getElementById(
-            "age-filter"
-        ).value;
-
-    const filtered =
-        specimens.filter(
-            specimen => {
-
-                const text =
-                    [
-                        specimen.specimen_id,
-                        specimen.classification,
-                        specimen.scientific_name,
-                        specimen.common_name,
-                        specimen.formation,
-                        specimen.age,
-                        specimen.collection_date,
-                        specimen.note,
-                        specimen.notes
-                    ]
-                    .join(" ")
-                    .toLowerCase();
-
-                return (
-                    (
-                        !keyword ||
-                        text.includes(
-                            keyword
-                        )
-                    ) &&
-                    (
-                        !classification ||
-                        specimen.classification ===
-                        classification
-                    ) &&
-                    (
-                        !formation ||
-                        specimen.formation ===
-                        formation
-                    ) &&
-                    (
-                        !age ||
-                        specimen.age === age
-                    )
-                );
-            }
+        return (
+            (!keyword || text.includes(keyword)) &&
+            (!classification ||
+                specimen.classification === classification) &&
+            (!formation ||
+                specimen.formation === formation) &&
+            (!age ||
+                specimen.age === age)
         );
+    });
 
-    displaySpecimens(
-        filtered
-    );
+    displaySpecimens(filtered);
 }
 
 // ================================================================
@@ -2543,13 +2172,11 @@ function displaySpecimens(data) {
 
     document.getElementById(
         "result-count"
-    ).textContent =
-        `${data.length}件の標本`;
+    ).textContent = `${data.length}件の標本`;
 
-    const list =
-        document.getElementById(
-            "specimen-list"
-        );
+    const list = document.getElementById(
+        "specimen-list"
+    );
 
     if (!data.length) {
 
@@ -2562,12 +2189,9 @@ function displaySpecimens(data) {
         return;
     }
 
-    list.innerHTML =
-        data
-            .map(
-                createSpecimenCard
-            )
-            .join("");
+    list.innerHTML = data
+        .map(createSpecimenCard)
+        .join("");
 }
 
 // ================================================================
@@ -2579,115 +2203,70 @@ function getImages(specimen) {
     const originals = [];
 
     if (
-        Array.isArray(
-            specimen.images
-        ) &&
+        Array.isArray(specimen.images) &&
         specimen.images.length
     ) {
+        specimen.images.forEach(image => {
 
-        specimen.images.forEach(
-            image => {
+            if (typeof image === "string") {
+                originals.push(image);
+                return;
+            }
 
-                if (
-                    typeof image ===
-                    "string"
-                ) {
+            if (image && typeof image === "object") {
+                const original =
+                    image.original ||
+                    image.image ||
+                    image.thumb ||
+                    "";
 
-                    originals.push(
-                        image
-                    );
-
-                    return;
-                }
-
-                if (
-                    image &&
-                    typeof image ===
-                    "object"
-                ) {
-
-                    const original =
-                        image.original ||
-                        image.image ||
-                        image.thumb ||
-                        "";
-
-                    if (original) {
-
-                        originals.push(
-                            original
-                        );
-                    }
+                if (original) {
+                    originals.push(original);
                 }
             }
-        );
+        });
     }
 
-    if (
-        !originals.length &&
-        specimen.image
-    ) {
-
-        originals.push(
-            specimen.image
-        );
+    if (!originals.length && specimen.image) {
+        originals.push(specimen.image);
     }
 
-    return originals.map(
-        (
-            original,
-            index
-        ) => {
+    return originals.map((original, index) => {
 
-            let thumb = "";
+        let thumb = "";
 
-            if (
-                index === 0 &&
-                specimen.thumb
-            ) {
-
-                thumb =
-                    specimen.thumb;
-            }
-
-            if (!thumb) {
-
-                const filename =
-                    String(
-                        original
-                    )
-                    .split("/")
-                    .pop();
-
-                thumb =
-                    filename
-                        ? `images/thumbs/${filename}`
-                        : original;
-            }
-
-            return {
-                thumb,
-                original
-            };
+        if (
+            index === 0 &&
+            specimen.thumb
+        ) {
+            thumb = specimen.thumb;
         }
-    );
+
+        if (!thumb) {
+            const filename = String(
+                original
+            ).split("/").pop();
+
+            thumb = filename
+                ? `images/thumbs/${filename}`
+                : original;
+        }
+
+        return {
+            thumb,
+            original
+        };
+    });
 }
 
 // ================================================================
 // CARD
 // ================================================================
 
-function createSpecimenCard(
-    specimen
-) {
+function createSpecimenCard(specimen) {
 
-    const images =
-        getImages(
-            specimen
-        );
-
-    const firstImage =
-        images[0];
+    const images = getImages(specimen);
+    const firstImage = images[0];
 
     let imageHtml = "";
 
@@ -2699,18 +2278,14 @@ function createSpecimenCard(
                 href="#"
                 onclick="
                     openSpecimenDetailById(
-                        '${escapeAttribute(
-                            specimen.specimen_id
-                        )}'
+                        '${escapeAttribute(specimen.specimen_id)}'
                     );
                     return false;
                 "
             >
                 <img
                     class="specimen-image"
-                    src="${escapeAttribute(
-                        firstImage.thumb
-                    )}"
+                    src="${escapeAttribute(firstImage.thumb)}"
                     alt="${escapeAttribute(
                         specimen.common_name ||
                         "化石標本"
@@ -2718,9 +2293,7 @@ function createSpecimenCard(
                     loading="lazy"
                     onerror="
                         this.onerror=null;
-                        this.src='${escapeAttribute(
-                            firstImage.original
-                        )}';
+                        this.src='${escapeAttribute(firstImage.original)}';
                     "
                 >
 
@@ -2753,6 +2326,8 @@ function createSpecimenCard(
         `;
     }
 
+    const note = specimen.note || specimen.notes || "";
+
     return `
         <article class="specimen-card">
 
@@ -2761,8 +2336,7 @@ function createSpecimenCard(
             <div class="specimen-content">
 
                 <div class="specimen-id">
-                    標本番号：
-                    ${escapeHtml(
+                    標本番号：${escapeHtml(
                         specimen.specimen_id || ""
                     )}
                 </div>
@@ -2799,10 +2373,7 @@ function createSpecimenCard(
                         specimen.formation
                         ? `
                             <div class="info-row">
-                                <div class="info-label">
-                                    地層
-                                </div>
-
+                                <div class="info-label">地層</div>
                                 <div class="info-value">
                                     ${escapeHtml(
                                         specimen.formation
@@ -2817,10 +2388,7 @@ function createSpecimenCard(
                         specimen.age
                         ? `
                             <div class="info-row">
-                                <div class="info-label">
-                                    時代
-                                </div>
-
+                                <div class="info-label">時代</div>
                                 <div class="info-value">
                                     ${escapeHtml(
                                         specimen.age
@@ -2837,10 +2405,7 @@ function createSpecimenCard(
                         )
                         ? `
                             <div class="info-row">
-                                <div class="info-label">
-                                    採集日
-                                </div>
-
+                                <div class="info-label">採集日</div>
                                 <div class="info-value">
                                     ${escapeHtml(
                                         formatDate(
@@ -2856,7 +2421,6 @@ function createSpecimenCard(
                 </div>
 
             </div>
-
         </article>
     `;
 }
@@ -2865,47 +2429,30 @@ function createSpecimenCard(
 // DETAIL
 // ================================================================
 
-function openSpecimenDetailById(
-    specimenId
-) {
+function openSpecimenDetailById(specimenId) {
 
-    const specimen =
-        specimens.find(
-            s =>
-                String(
-                    s.specimen_id
-                ) ===
-                String(
-                    specimenId
-                )
-        );
+    const specimen = specimens.find(
+        s =>
+            String(s.specimen_id) ===
+            String(specimenId)
+    );
 
     if (specimen) {
-
-        openSpecimenDetail(
-            specimen
-        );
+        openSpecimenDetail(specimen);
     }
 }
 
-function openSpecimenDetail(
-    specimen
-) {
+function openSpecimenDetail(specimen) {
 
-    const images =
-        getImages(
-            specimen
-        );
+    const images = getImages(specimen);
 
-    const panel =
-        document.getElementById(
-            "detail-image-panel"
-        );
+    const panel = document.getElementById(
+        "detail-image-panel"
+    );
 
-    const dataPanel =
-        document.getElementById(
-            "detail-data-panel"
-        );
+    const dataPanel = document.getElementById(
+        "detail-data-panel"
+    );
 
     if (images.length) {
 
@@ -2944,17 +2491,12 @@ function openSpecimenDetail(
 
     let galleryHtml = "";
 
-    if (
-        images.length > 1
-    ) {
+    if (images.length > 1) {
 
         galleryHtml = `
             <div class="gallery">
                 ${images.map(
-                    (
-                        image,
-                        index
-                    ) => `
+                    (image, index) => `
                         <img
                             class="gallery-thumb"
                             src="${escapeAttribute(
@@ -2981,10 +2523,7 @@ function openSpecimenDetail(
         `;
     }
 
-    const note =
-        specimen.note ||
-        specimen.notes ||
-        "";
+    const note = specimen.note || specimen.notes || "";
 
     dataPanel.innerHTML = `
 
@@ -3097,9 +2636,7 @@ function openSpecimenDetail(
                 <div class="detail-notes">
                     <strong>備考</strong>
                     <br>
-                    ${escapeHtml(
-                        note
-                    )}
+                    ${escapeHtml(note)}
                 </div>
             `
             : ""
@@ -3114,12 +2651,9 @@ function openSpecimenDetail(
 
     document.getElementById(
         "detail-overlay"
-    ).classList.add(
-        "active"
-    );
+    ).classList.add("active");
 
-    document.body.style.overflow =
-        "hidden";
+    document.body.style.overflow = "hidden";
 
     history.pushState(
         null,
@@ -3135,12 +2669,9 @@ function closeDetail() {
 
     document.getElementById(
         "detail-overlay"
-    ).classList.remove(
-        "active"
-    );
+    ).classList.remove("active");
 
-    document.body.style.overflow =
-        "";
+    document.body.style.overflow = "";
 
     history.pushState(
         null,
@@ -3149,18 +2680,14 @@ function closeDetail() {
     );
 }
 
-function changeDetailImage(
-    image
-) {
+function changeDetailImage(image) {
 
-    const main =
-        document.getElementById(
-            "detail-main-image"
-        );
+    const main = document.getElementById(
+        "detail-main-image"
+    );
 
     if (main) {
-        main.src =
-            image;
+        main.src = image;
     }
 }
 
@@ -3168,35 +2695,26 @@ function changeDetailImage(
 // IMAGE ZOOM
 // ================================================================
 
-function openZoom(
-    src,
-    alt
-) {
+function openZoom(src, alt) {
 
     document.getElementById(
         "zoom-image"
-    ).src =
-        src;
+    ).src = src;
 
     document.getElementById(
         "zoom-image"
-    ).alt =
-        alt || "";
+    ).alt = alt || "";
 
     document.getElementById(
         "zoom-overlay"
-    ).classList.add(
-        "active"
-    );
+    ).classList.add("active");
 }
 
 function closeZoom() {
 
     document.getElementById(
         "zoom-overlay"
-    ).classList.remove(
-        "active"
-    );
+    ).classList.remove("active");
 }
 
 // ================================================================
@@ -3205,36 +2723,24 @@ function closeZoom() {
 
 function openSpecimenFromURL() {
 
-    const params =
-        new URLSearchParams(
-            window.location.search
-        );
+    const params = new URLSearchParams(
+        window.location.search
+    );
 
-    const specimenId =
-        params.get(
-            "id"
-        );
+    const specimenId = params.get("id");
 
     if (!specimenId) {
         return;
     }
 
-    const specimen =
-        specimens.find(
-            s =>
-                String(
-                    s.specimen_id
-                ) ===
-                String(
-                    specimenId
-                )
-        );
+    const specimen = specimens.find(
+        s =>
+            String(s.specimen_id) ===
+            String(specimenId)
+    );
 
     if (specimen) {
-
-        openSpecimenDetail(
-            specimen
-        );
+        openSpecimenDetail(specimen);
     }
 }
 
@@ -3242,9 +2748,7 @@ function openSpecimenFromURL() {
 // DATE
 // ================================================================
 
-function formatDate(
-    value
-) {
+function formatDate(value) {
 
     if (
         value === null ||
@@ -3253,58 +2757,31 @@ function formatDate(
         return "";
     }
 
-    let text =
-        String(
-            value
-        ).trim();
+    let text = String(value).trim();
 
     if (!text) {
         return "";
     }
 
-    if (
-        text.includes(
-            "T"
-        )
-    ) {
-
-        text =
-            text.split(
-                "T"
-            )[0];
+    if (text.includes("T")) {
+        text = text.split("T")[0];
     }
 
-    if (
-        text.includes(
-            " "
-        )
-    ) {
-
-        text =
-            text.split(
-                " "
-            )[0];
+    if (text.includes(" ")) {
+        text = text.split(" ")[0];
     }
 
-    const japaneseDate =
-        text.match(
-            /^(\d{4})年(\d{1,2})月(\d{1,2})日$/
-        );
+    const japaneseDate = text.match(
+        /^(\d{4})年(\d{1,2})月(\d{1,2})日$/
+    );
 
     if (japaneseDate) {
-
         return (
             japaneseDate[1] +
             "/" +
-            japaneseDate[2].padStart(
-                2,
-                "0"
-            ) +
+            japaneseDate[2].padStart(2, "0") +
             "/" +
-            japaneseDate[3].padStart(
-                2,
-                "0"
-            )
+            japaneseDate[3].padStart(2, "0")
         );
     }
 
@@ -3319,18 +2796,15 @@ function resetDropdownFilters() {
 
     document.getElementById(
         "classification-filter"
-    ).value =
-        "";
+    ).value = "";
 
     document.getElementById(
         "formation-filter"
-    ).value =
-        "";
+    ).value = "";
 
     document.getElementById(
         "age-filter"
-    ).value =
-        "";
+    ).value = "";
 }
 
 // ================================================================
@@ -3378,23 +2852,17 @@ document.getElementById(
 
 document.addEventListener(
     "keydown",
-    function(event){
+    function(event) {
 
-        if (
-            event.key ===
-            "Escape"
-        ) {
+        if (event.key === "Escape") {
 
             closeZoom();
 
             if (
                 document.getElementById(
                     "detail-overlay"
-                ).classList.contains(
-                    "active"
-                )
+                ).classList.contains("active")
             ) {
-
                 closeDetail();
             }
         }
@@ -3405,9 +2873,7 @@ document.addEventListener(
 // HTML ESCAPE
 // ================================================================
 
-function escapeHtml(
-    value
-) {
+function escapeHtml(value) {
 
     if (
         value === null ||
@@ -3416,37 +2882,16 @@ function escapeHtml(
         return "";
     }
 
-    return String(
-        value
-    )
-    .replace(
-        /&/g,
-        "&amp;"
-    )
-    .replace(
-        /</g,
-        "&lt;"
-    )
-    .replace(
-        />/g,
-        "&gt;"
-    )
-    .replace(
-        /"/g,
-        "&quot;"
-    )
-    .replace(
-        /'/g,
-        "&#039;"
-    );
+    return String(value)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
 }
 
-function escapeAttribute(
-    value
-) {
-    return escapeHtml(
-        value
-    );
+function escapeAttribute(value) {
+    return escapeHtml(value);
 }
 
 // ================================================================
