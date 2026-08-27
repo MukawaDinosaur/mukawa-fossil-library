@@ -38,5 +38,13 @@
     "place": "むかわ町穂別稲里マッカシマップ沢",
     "formation": "中部蝦夷層群",
     "age": "約9000万年前"
+  },
+  {
+    "site_id": "SCHOOL",
+    "latitude": 42.583639,
+    "longitude": 141.920028,
+    "place": "恐竜研究同好会保管資料",
+    "formation": "不明",
+    "age": "不明"
   }
 ]

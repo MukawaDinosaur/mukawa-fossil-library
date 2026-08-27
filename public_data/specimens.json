@@ -298,5 +298,100 @@
     "images": [
       "images/MDR260620-07/MDR260620-07.jpg"
     ]
+  },
+  {
+    "specimen_id": "MDRMHS-001",
+    "classification": "二枚貝化石",
+    "scientific_name": "Inoceramus sp.",
+    "common_name": "イノセラムスの一種",
+    "formation": "不明",
+    "age": "不明",
+    "collection_date": "不明",
+    "note": "恐竜研究同好会発足以降保管されている化石。保管している中ではなかなかの大きさのイノセラムスである。",
+    "site_id": "SCHOOL",
+    "image": "images/MDRMHS-001/MDRMHS-001_01.jpg",
+    "images": [
+      "images/MDRMHS-001/MDRMHS-001_01.jpg",
+      "images/MDRMHS-001/MDRMHS-001_02.jpg"
+    ]
+  },
+  {
+    "specimen_id": "MDRMHS-002",
+    "classification": "アンモナイト類",
+    "scientific_name": "Neophylloceras. Sp",
+    "common_name": "ネオフィロセラスの一種",
+    "formation": "不明",
+    "age": "不明",
+    "collection_date": "不明",
+    "note": "恐竜研究同好会発足以降保管されている化石。クリーニング状態も良好で、肋や臍がきれいにろしゅつしている。",
+    "site_id": "SCHOOL",
+    "image": "images/MDRMHS-002/MDRMHS-002_01.jpg",
+    "images": [
+      "images/MDRMHS-002/MDRMHS-002_01.jpg",
+      "images/MDRMHS-002/MDRMHS-002_02.jpg"
+    ]
+  },
+  {
+    "specimen_id": "MDRMHS-003",
+    "classification": "アンモナイト類",
+    "scientific_name": "Gaudryceras tenuiliratu",
+    "common_name": "ゴードリセラス・テヌイテラータム",
+    "formation": "不明",
+    "age": "不明",
+    "collection_date": "不明",
+    "note": "恐竜研究同好会発足以降保管されている化石。ゴードリセラス・テヌイテラータムは穂別稲里地区でもこれまで多数産出しており、ポピュラーな種の１つである。",
+    "site_id": "SCHOOL",
+    "image": "images/MDRMHS-003/MDRMHS-003.jpg",
+    "images": [
+      "images/MDRMHS-003/MDRMHS-003.jpg"
+    ]
+  },
+  {
+    "specimen_id": "MDRMHS-004",
+    "classification": "アンモナイト類",
+    "scientific_name": "Gaudryceras tenuiliratu",
+    "common_name": "ゴードリセラス・テヌイテラータム",
+    "formation": "不明",
+    "age": "不明",
+    "collection_date": "不明",
+    "note": "恐竜研究同好会発足以降保管されている化石。ゴードリセラス・テヌイテラータムは穂別稲里地区でもこれまで多数産出しており、ポピュラーな種の１つである。この資料はクリーニングが完璧すぎる。おそらく過去にカムイサウルス第一発見者の堀田良幸氏との交流の際に寄贈されたものと思われる。嫉妬するレベルのクリーニング技術である。",
+    "site_id": "SCHOOL",
+    "image": "images/MDRMHS-004/MDRMHS-004_01.jpg",
+    "images": [
+      "images/MDRMHS-004/MDRMHS-004_01.jpg",
+      "images/MDRMHS-004/MDRMHS-004_02.jpg"
+    ]
+  },
+  {
+    "specimen_id": "MDRMHS-005",
+    "classification": "アンモナイト類",
+    "scientific_name": "Polyptychoceras jimboi",
+    "common_name": "ポリプチコセラス・ジンボイ",
+    "formation": "中部蝦夷層群",
+    "age": "約9000万年前",
+    "collection_date": "2023年",
+    "note": "2024年度卒業の前同好会長が自ら発掘した異常巻きアンモナイト。顧問A先生はこの化石を見せてもらい、ポリプチコセラスに憧れを抱くようになった。",
+    "site_id": "SCHOOL",
+    "image": "images/MDRMHS-005/MDRMHS-005_01.jpg",
+    "images": [
+      "images/MDRMHS-005/MDRMHS-005_01.jpg",
+      "images/MDRMHS-005/MDRMHS-005_02.jpg",
+      "images/MDRMHS-005/MDRMHS-005_03.jpg"
+    ]
+  },
+  {
+    "specimen_id": "MDRMHS-006",
+    "classification": "アンモナイト類",
+    "scientific_name": "Mantelliceras sp.?",
+    "common_name": "マンテリセラスの一種？",
+    "formation": "不明",
+    "age": "不明",
+    "collection_date": "不明",
+    "note": "恐竜研究同好会発足以降保管されている化石。肋や巻き方からマンテリセラスかと思われるが、クリーニング途中資料のため、今後の作業により同定結果が変わる可能性がある。",
+    "site_id": "SCHOOL",
+    "image": "images/MDRMHS-006/MDRMHS-006.jpg",
+    "images": [
+      "images/MDRMHS-006/MDRMHS-006.jpg"
+    ]
   }
 ]
