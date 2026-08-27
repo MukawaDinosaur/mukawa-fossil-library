@@ -403,8 +403,6 @@ a{color:inherit}
 
 /* =========================================================
    ADMINISTRATIVE AREA MAP
-   行政区域GeoJSONをそのまま表示する。
-   公開用座標から区域を生成・推定しない。
    ========================================================= */
 
 .administrative-area{
@@ -419,35 +417,6 @@ a{color:inherit}
 .administrative-area:hover{
     fill-opacity:.25;
     stroke-width:3.5;
-}
-
-.region-point-label{
-    background:rgba(255,255,255,.96);
-    border:1px solid #c79b3b;
-    border-radius:999px;
-    box-shadow:0 3px 10px rgba(24,60,42,.14);
-    color:#183c2a;
-    font-weight:800;
-    font-size:12px;
-    padding:4px 9px;
-}
-
-.region-point-marker{
-    width:14px;
-    height:14px;
-    border-radius:50%;
-    background:#c79b3b;
-    border:3px solid #fff;
-    box-shadow:0 2px 8px rgba(0,0,0,.28);
-}
-
-.school-map-marker{
-    width:18px;
-    height:18px;
-    border-radius:50%;
-    background:#24563d;
-    border:4px solid #fff;
-    box-shadow:0 2px 9px rgba(0,0,0,.32);
 }
 
 .administrative-area-label{
@@ -973,25 +942,7 @@ footer{
 
 <main class="container">
 
-<!-- =========================================================
-     ABOUT
-     ========================================================= -->
-
-<section id="about" class="about-box">
-
-    <div class="about-inner">
-
-        <div class="section-heading">
-            <div class="section-icon">🦴</div>
-            <div>
-                <h2>このデータベースについて</h2>
-                <p>鵡川高校 化石デジタルライブラリーの概要</p>
-            </div>
-        </div>
-
-        <div class="about-content">
-
-            <!-- AUTO_ABOUT_TOP_START -->
+<!-- AUTO_ABOUT_TOP_START -->
 
 <p>
     「鵡川高校 化石デジタルライブラリー」は、
@@ -1029,20 +980,6 @@ footer{
 </p>
 
 <!-- AUTO_ABOUT_TOP_END -->
-
-            <a class="about-link" href="about/">
-                詳細な説明を見る →
-            </a>
-
-        </div>
-
-    </div>
-
-</section>
-
-<!-- =========================================================
-     SEARCH
-     ========================================================= -->
 
 <section id="database" class="search-box">
 
@@ -1082,10 +1019,6 @@ footer{
 
 </section>
 
-<!-- =========================================================
-     STATISTICS
-     ========================================================= -->
-
 <section class="statistics">
 
     <div class="stat-card">
@@ -1105,10 +1038,6 @@ footer{
 
 </section>
 
-<!-- =========================================================
-     MAP
-     ========================================================= -->
-
 <section id="map-section" class="map-container">
 
     <div class="map-title">化石採集地点</div>
@@ -1123,10 +1052,6 @@ footer{
     </div>
 
 </section>
-
-<!-- =========================================================
-     SITE FILTER
-     ========================================================= -->
 
 <section id="filter-box" class="filter-box">
 
@@ -1157,10 +1082,6 @@ footer{
     <div>北海道鵡川高等学校</div>
 </footer>
 
-<!-- =========================================================
-     DETAIL
-     ========================================================= -->
-
 <div id="detail-overlay" class="detail-overlay">
 
     <div class="detail-window">
@@ -1179,10 +1100,6 @@ footer{
     </div>
 
 </div>
-
-<!-- =========================================================
-     ZOOM
-     ========================================================= -->
 
 <div
     id="zoom-overlay"
@@ -1271,7 +1188,7 @@ function getAdministrativeSiteIds(properties) {
         return [];
     }
 
-    let value =
+    const value =
         properties.site_ids ??
         properties.siteIds ??
         properties.site_id ??
@@ -1295,17 +1212,15 @@ function getAdministrativeSiteIds(properties) {
 }
 
 // ================================================================
-// 行政区域GeoJSON内の「公開採集地域代表点」
+// 公開採集地域の対応関係
 // ================================================================
-// Polygon = 実際の行政区域
-// Point   = 公開地図上で地区を代表する位置
-//
-// Pointの位置は詳細な採集地点ではなく、地区の代表位置としてのみ使用する。
-// 標本との対応はsite_idで行い、公開用採集座標との空間判定は行わない。
 
 function getRegionPointFeatures() {
 
-    if (!administrativeAreas || !Array.isArray(administrativeAreas.features)) {
+    if (
+        !administrativeAreas ||
+        !Array.isArray(administrativeAreas.features)
+    ) {
         return [];
     }
 
@@ -1321,30 +1236,80 @@ function getRegionPointFeatures() {
     );
 }
 
-function getRegionSiteIdsFromLocalities(regionName, keywords) {
+function normalizePublicPlace(value) {
+
+    return String(value || "")
+        .trim()
+        .replace(/\s+/g, "");
+}
+
+function getRegionSiteIdsFromLocalities(
+    regionName,
+    keywords,
+    district
+) {
 
     const siteIds = new Set();
 
+    const normalizedRegionName = normalizePublicPlace(regionName);
+    const normalizedDistrict = normalizePublicPlace(district);
+
+    const keywordList = Array.isArray(keywords)
+        ? keywords
+            .map(keyword => normalizePublicPlace(keyword))
+            .filter(Boolean)
+        : [];
+
+    if (normalizedDistrict) {
+        keywordList.push(normalizedDistrict);
+    }
+
     localities.forEach(locality => {
 
-        const place = String(
-            locality.place ||
-            locality.region ||
-            ""
-        ).trim();
-
-        if (!place || !locality.site_id) {
+        if (!locality || !locality.site_id) {
             return;
         }
 
+        const place = normalizePublicPlace(
+            locality.place ||
+            locality.region ||
+            locality.district ||
+            ""
+        );
+
+        if (!place) {
+            return;
+        }
+
+        const localityDistrict = normalizePublicPlace(
+            locality.district ||
+            ""
+        );
+
         const matched =
-            (regionName && place.includes(regionName)) ||
-            (Array.isArray(keywords) && keywords.some(keyword =>
-                place.includes(String(keyword))
-            ));
+            (
+                normalizedRegionName &&
+                (
+                    place.includes(normalizedRegionName) ||
+                    normalizedRegionName.includes(place)
+                )
+            ) ||
+            (
+                normalizedDistrict &&
+                (
+                    place.includes(normalizedDistrict) ||
+                    localityDistrict.includes(normalizedDistrict)
+                )
+            ) ||
+            keywordList.some(keyword =>
+                place.includes(keyword) ||
+                localityDistrict.includes(keyword)
+            );
 
         if (matched) {
-            siteIds.add(String(locality.site_id).trim());
+            siteIds.add(
+                String(locality.site_id).trim()
+            );
         }
     });
 
@@ -1376,17 +1341,18 @@ function getPublicRegionDefinitions() {
 
         let siteIds = getAdministrativeSiteIds(properties);
 
-        // GeoJSON側でsite_idsを指定していない場合は、
-        // localities_public.jsonの公開用placeから地域名に対応する地点IDを取得。
         if (!siteIds.length) {
             siteIds = getRegionSiteIdsFromLocalities(
                 regionName,
-                properties.keywords || []
+                properties.keywords || [],
+                properties.district || ""
             );
         }
 
         const regionSpecimens = specimens.filter(specimen =>
-            siteIds.includes(String(specimen.site_id || ""))
+            siteIds.includes(
+                String(specimen.site_id || "").trim()
+            )
         );
 
         const coordinates =
@@ -1395,18 +1361,37 @@ function getPublicRegionDefinitions() {
                 ? feature.geometry.coordinates
                 : [];
 
-        const mapCenter =
+        let mapCenter = null;
+
+        if (
             Array.isArray(properties.map_center) &&
             properties.map_center.length === 2
-                ? [
-                    Number(properties.map_center[0]),
-                    Number(properties.map_center[1])
-                ]
-                : (
-                    coordinates.length === 2
-                        ? [Number(coordinates[1]), Number(coordinates[0])]
-                        : null
-                );
+        ) {
+            const lat = Number(properties.map_center[0]);
+            const lng = Number(properties.map_center[1]);
+
+            if (
+                Number.isFinite(lat) &&
+                Number.isFinite(lng)
+            ) {
+                mapCenter = [lat, lng];
+            }
+        }
+
+        if (
+            !mapCenter &&
+            coordinates.length === 2
+        ) {
+            const lng = Number(coordinates[0]);
+            const lat = Number(coordinates[1]);
+
+            if (
+                Number.isFinite(lat) &&
+                Number.isFinite(lng)
+            ) {
+                mapCenter = [lat, lng];
+            }
+        }
 
         return {
             feature,
@@ -1414,10 +1399,6 @@ function getPublicRegionDefinitions() {
             name: regionName,
             siteIds,
             specimenCount: regionSpecimens.length,
-            description: String(
-                properties.description ||
-                "詳細な採集地点を示さない地区代表点です。"
-            ),
             mapCenter
         };
     });
@@ -1457,7 +1438,58 @@ function getAdministrativeAreaKey(properties, index) {
     );
 }
 
-function createRegionPopupHtml(region) {
+// ================================================================
+// 地区代表Point用の公開説明文
+// ================================================================
+
+function getRegionPublicNote(_region) {
+
+    return "この位置は地区の代表位置であり、詳細な採集地点を示すものではありません。";
+}
+
+// ================================================================
+// 地区代表Pointへ移動
+// ================================================================
+
+function focusRegionPoint(regionKey) {
+
+    const region = getPublicRegionDefinitions().find(item =>
+        String(item.regionKey) === String(regionKey)
+    );
+
+    if (!region || !region.mapCenter || !map) {
+        return;
+    }
+
+    map.flyTo(
+        region.mapCenter,
+        Math.max(map.getZoom(), 13),
+        { duration: 0.8 }
+    );
+
+    setTimeout(() => {
+
+        const popupHtml = createRegionPointPopupHtml(region);
+
+        L.popup({
+            maxWidth: 340,
+            closeButton: true,
+            autoPan: true
+        })
+        .setLatLng(region.mapCenter)
+        .setContent(popupHtml)
+        .openOn(map);
+
+    }, 850);
+}
+
+// ================================================================
+// 地区代表Pointのポップアップ
+// ================================================================
+
+function createRegionPointPopupHtml(region) {
+
+    const publicNote = getRegionPublicNote(region);
 
     return `
         <div class="map-popup">
@@ -1465,38 +1497,49 @@ function createRegionPopupHtml(region) {
                 ${escapeHtml(region.name)}
             </div>
 
-            <div>
+            <div class="map-popup-note">
+                ${escapeHtml(publicNote)}
+            </div>
+
+            <div style="margin-bottom:8px;">
                 対象標本：${region.specimenCount}件
             </div>
 
-            <div class="map-popup-note">
-                ${escapeHtml(region.description)}<br>
-                詳細な採集地点は表示していません。
-            </div>
-
             <button
                 class="map-popup-button"
                 type="button"
-                onclick="event.stopPropagation(); focusRegionPoint('${escapeAttribute(region.regionKey)}')"
-            >
-                地区の代表位置を見る
-            </button>
-
-            <button
-                class="map-popup-button"
-                type="button"
-                style="margin-left:6px;"
-                onclick="event.stopPropagation(); filterByRegion(
-                    ${JSON.stringify(region.siteIds)},
-                    '${escapeAttribute(region.name)}',
-                    '${escapeAttribute(region.regionKey)}'
-                )"
+                onclick="event.stopPropagation(); filterByRegionKey('${escapeAttribute(region.regionKey)}')"
             >
                 この地域の化石を見る
             </button>
         </div>
     `;
 }
+
+// ================================================================
+// 地区代表Pointの標本フィルタ
+// ================================================================
+
+function filterByRegionKey(regionKey) {
+
+    const region = getPublicRegionDefinitions().find(item =>
+        String(item.regionKey) === String(regionKey)
+    );
+
+    if (!region) {
+        return;
+    }
+
+    filterByRegion(
+        region.siteIds,
+        region.name,
+        region.regionKey
+    );
+}
+
+// ================================================================
+// 「公開採集地域から選択」
+// ================================================================
 
 function createPublicRegionSelectorHtml(publicRegions) {
 
@@ -1519,7 +1562,7 @@ function createPublicRegionSelectorHtml(publicRegions) {
                     type="button"
                     onclick="event.stopPropagation(); focusRegionPoint('${escapeAttribute(region.regionKey)}')"
                 >
-                    ${escapeHtml(region.name)}
+                    <span>${escapeHtml(region.name)}</span>
                     <span>${region.specimenCount}件</span>
                 </button>
             `).join("")}
@@ -1527,67 +1570,15 @@ function createPublicRegionSelectorHtml(publicRegions) {
     `;
 }
 
-function focusRegionPoint(regionKey) {
-
-    const region = getPublicRegionDefinitions().find(item =>
-        String(item.regionKey) === String(regionKey)
-    );
-
-    if (!region || !region.mapCenter || !map) {
-        return;
-    }
-
-    map.flyTo(
-        region.mapCenter,
-        Math.max(map.getZoom(), 13),
-        { duration: 0.8 }
-    );
-
-    setTimeout(() => {
-
-        const popupHtml = `
-            <div class="map-popup">
-                <div class="map-popup-title">
-                    ${escapeHtml(region.name)}
-                </div>
-
-                <div class="map-popup-note">
-                    ${escapeHtml(region.description)}<br>
-                    この位置は地区の代表位置であり、
-                    詳細な採集地点を示すものではありません。
-                </div>
-
-                <div style="margin-bottom:8px;">
-                    対象標本：${region.specimenCount}件
-                </div>
-
-                <button
-                    class="map-popup-button"
-                    type="button"
-                    onclick="event.stopPropagation(); filterByRegion(
-                        ${JSON.stringify(region.siteIds)},
-                        '${escapeAttribute(region.name)}',
-                        '${escapeAttribute(region.regionKey)}'
-                    )"
-                >
-                    この地域の化石を見る
-                </button>
-            </div>
-        `;
-
-        L.popup({
-            maxWidth:320,
-            closeButton:true,
-            autoPan:true
-        })
-        .setLatLng(region.mapCenter)
-        .setContent(popupHtml)
-        .openOn(map);
-
-    }, 850);
-}
+// ================================================================
+// 地区代表Pointを地図上に表示
+// ================================================================
 
 function displayRegionPointFeatures() {
+
+    if (!map) {
+        return;
+    }
 
     const publicRegions = getPublicRegionDefinitions();
 
@@ -1603,8 +1594,8 @@ function displayRegionPointFeatures() {
                 icon: L.divIcon({
                     className: "region-point-marker-wrapper",
                     html: '<div class="region-point-marker"></div>',
-                    iconSize: [18,18],
-                    iconAnchor: [9,9]
+                    iconSize: [18, 18],
+                    iconAnchor: [9, 9]
                 }),
                 zIndexOffset: 300
             }
@@ -1613,18 +1604,29 @@ function displayRegionPointFeatures() {
         marker.bindTooltip(
             region.name,
             {
-                direction:"top",
-                offset:[0,-7],
-                className:"region-point-label",
-                opacity:1
+                direction: "top",
+                offset: [0, -7],
+                className: "region-point-label",
+                opacity: 1
+            }
+        );
+
+        marker.bindPopup(
+            createRegionPointPopupHtml(region),
+            {
+                maxWidth: 340
             }
         );
 
         marker.on("click", function() {
-            focusRegionPoint(region.regionKey);
+            marker.openPopup();
         });
     });
 }
+
+// ================================================================
+// 鵡川高校固定ピン
+// ================================================================
 
 function displaySchoolPin() {
 
@@ -1632,8 +1634,6 @@ function displaySchoolPin() {
         return;
     }
 
-    // 北海道鵡川高等学校
-    // 〒054-0032 北海道勇払郡むかわ町福住4丁目2番地1
     const schoolLatLng = [42.5835966, 141.919786];
 
     const schoolMarker = L.marker(
@@ -1642,21 +1642,21 @@ function displaySchoolPin() {
             icon: L.divIcon({
                 className: "school-marker-wrapper",
                 html: '<div class="school-map-marker"></div>',
-                iconSize:[22,22],
-                iconAnchor:[11,11]
+                iconSize: [22, 22],
+                iconAnchor: [11, 11]
             }),
-            zIndexOffset:1000
+            zIndexOffset: 1000
         }
     ).addTo(map);
 
     schoolMarker.bindTooltip(
         "鵡川高校",
         {
-            permanent:true,
-            direction:"top",
-            offset:[0,-10],
-            className:"region-point-label",
-            opacity:1
+            permanent: true,
+            direction: "top",
+            offset: [0, -10],
+            className: "region-point-label",
+            opacity: 1
         }
     );
 
@@ -1678,7 +1678,6 @@ function displaySchoolPin() {
     `);
 
     schoolMarker.on("click", function() {
-        // ポップアップを開くだけ。学校ピンは常時表示する。
         schoolMarker.openPopup();
     });
 }
@@ -1694,7 +1693,9 @@ function filterSchoolSpecimens() {
             specimen.locality,
             specimen.location
         ]
-        .map(value => String(value || "").trim().toUpperCase());
+        .map(value =>
+            String(value || "").trim().toUpperCase()
+        );
 
         return values.includes("SCHOOL");
     });
@@ -1715,10 +1716,14 @@ function filterSchoolSpecimens() {
     displaySpecimens(filtered);
 
     document.getElementById("filter-box").scrollIntoView({
-        behavior:"smooth",
-        block:"center"
+        behavior: "smooth",
+        block: "center"
     });
 }
+
+// ================================================================
+// 行政区域Polygonを表示
+// ================================================================
 
 function displayAdministrativeAreasOnMap() {
 
@@ -1735,7 +1740,6 @@ function displayAdministrativeAreasOnMap() {
             return;
         }
 
-        // Point Featureは行政区域Polygonとは別に表示する。
         if (feature.geometry.type === "Point") {
             return;
         }
@@ -1746,23 +1750,30 @@ function displayAdministrativeAreasOnMap() {
 
         let siteIds = getAdministrativeSiteIds(properties);
 
-        // むかわ町Polygon全体については、公開用localitiesに登録された
-        // 地域IDをまとめて「この区域の標本」として扱う。
-        if (!siteIds.length && String(regionName).includes("むかわ町")) {
+        if (
+            !siteIds.length &&
+            String(regionName).includes("むかわ町")
+        ) {
             siteIds = Array.from(
                 new Set(
                     localities
-                        .map(locality => String(locality.site_id || "").trim())
+                        .map(locality =>
+                            String(locality.site_id || "").trim()
+                        )
                         .filter(Boolean)
                 )
             );
         }
 
         const regionSpecimens = specimens.filter(specimen =>
-            siteIds.includes(String(specimen.site_id || ""))
+            siteIds.includes(
+                String(specimen.site_id || "").trim()
+            )
         );
 
-        const selectorHtml = createPublicRegionSelectorHtml(publicRegions);
+        const selectorHtml = createPublicRegionSelectorHtml(
+            publicRegions
+        );
 
         const layer = L.geoJSON(
             feature,
@@ -1779,10 +1790,10 @@ function displayAdministrativeAreasOnMap() {
                     areaLayer.bindTooltip(
                         regionName,
                         {
-                            permanent:true,
-                            direction:"center",
-                            className:"administrative-area-label",
-                            opacity:1
+                            permanent: true,
+                            direction: "center",
+                            className: "administrative-area-label",
+                            opacity: 1
                         }
                     );
 
@@ -1818,8 +1829,6 @@ function displayAdministrativeAreasOnMap() {
                         </div>
                     `);
 
-                    // Polygonをクリックしただけでは標本一覧を変更しない。
-                    // まず行政区域の説明と「公開採集地域から選択」を表示する。
                     areaLayer.on("click", function() {
                         areaLayer.openPopup();
                     });
@@ -1830,31 +1839,28 @@ function displayAdministrativeAreasOnMap() {
         layers.push(layer);
     });
 
-    // 地区代表Pointを表示
     displayRegionPointFeatures();
 
-    // 鵡川高校固定ピンを常時表示
     displaySchoolPin();
 
     if (layers.length) {
         const group = L.featureGroup(layers);
         map.fitBounds(
             group.getBounds(),
-            { padding:[30,30] }
+            { padding: [30, 30] }
         );
     }
 }
 
 // ================================================================
 // REGION FILTER
-// 行政区域GeoJSONに登録したsite_idsを使って標本を絞り込む。
-// 公開座標との空間判定は行わない。
 // ================================================================
 
 function filterByRegion(siteIds, regionName, regionKey) {
 
     const normalizedSiteIds = (Array.isArray(siteIds) ? siteIds : [])
-        .map(siteId => String(siteId));
+        .map(siteId => String(siteId).trim())
+        .filter(Boolean);
 
     currentSiteId = null;
 
@@ -1864,7 +1870,7 @@ function filterByRegion(siteIds, regionName, regionKey) {
     const filtered = specimens.filter(
         specimen =>
             normalizedSiteIds.includes(
-                String(specimen.site_id || "")
+                String(specimen.site_id || "").trim()
             )
     );
 
@@ -1882,55 +1888,6 @@ function filterByRegion(siteIds, regionName, regionKey) {
         behavior: "smooth",
         block: "center"
     });
-}
-
-// ================================================================
-// SITE FILTER
-// ================================================================
-
-function filterBySite(siteId) {
-
-    currentSiteId = String(siteId);
-
-    document.getElementById("search-input").value = "";
-    resetDropdownFilters();
-
-    const filtered = specimens.filter(
-        specimen =>
-            String(specimen.site_id) === String(siteId)
-    );
-
-    const box = document.getElementById("filter-box");
-    box.classList.add("active");
-
-    document.getElementById("filter-title").innerHTML = `
-        <strong>地点ID：${escapeHtml(siteId)}</strong>
-        の標本　${filtered.length}件
-    `;
-
-    displaySpecimens(filtered);
-
-    document.getElementById("filter-box").scrollIntoView({
-        behavior:"smooth",
-        block:"center"
-    });
-}
-
-function clearSiteFilter() {
-
-    currentSiteId = null;
-
-    document.getElementById(
-        "filter-box"
-    ).classList.remove("active");
-
-    document.getElementById(
-        "search-input"
-    ).value = "";
-
-    resetDropdownFilters();
-
-    displaySpecimens(specimens);
 }
 
 // ================================================================
@@ -1956,8 +1913,6 @@ async function loadData() {
 
         specimens = await specimenResponse.json();
 
-        // 公開地域名と地点IDの対応だけを取得する。
-        // 緯度・経度は地図区域の生成・判定には使用しない。
         const localityResponse = await fetch(
             "public_data/localities_public.json",
             { cache: "no-store" }
@@ -1977,11 +1932,6 @@ async function loadData() {
             );
         }
 
-        // ============================================================
-        // 地図はlocalities_public.jsonの公開座標を使用しない。
-        // 行政区域GeoJSONそのものを表示し、区域と標本の対応は
-        // GeoJSONのproperties.site_idsで明示的に管理する。
-        // ============================================================
         try {
             await loadAdministrativeAreas();
             displayAdministrativeAreasOnMap();
