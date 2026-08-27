@@ -403,6 +403,8 @@ a{color:inherit}
 
 /* =========================================================
    ADMINISTRATIVE AREA MAP
+   行政区域GeoJSONをそのまま表示する。
+   公開用座標から区域を生成・推定しない。
    ========================================================= */
 
 .administrative-area{
@@ -417,6 +419,35 @@ a{color:inherit}
 .administrative-area:hover{
     fill-opacity:.25;
     stroke-width:3.5;
+}
+
+.region-point-label{
+    background:rgba(255,255,255,.96);
+    border:1px solid #c79b3b;
+    border-radius:999px;
+    box-shadow:0 3px 10px rgba(24,60,42,.14);
+    color:#183c2a;
+    font-weight:800;
+    font-size:12px;
+    padding:4px 9px;
+}
+
+.region-point-marker{
+    width:14px;
+    height:14px;
+    border-radius:50%;
+    background:#c79b3b;
+    border:3px solid #fff;
+    box-shadow:0 2px 8px rgba(0,0,0,.28);
+}
+
+.school-map-marker{
+    width:18px;
+    height:18px;
+    border-radius:50%;
+    background:#24563d;
+    border:4px solid #fff;
+    box-shadow:0 2px 9px rgba(0,0,0,.32);
 }
 
 .administrative-area-label{
@@ -942,7 +973,25 @@ footer{
 
 <main class="container">
 
-<!-- AUTO_ABOUT_TOP_START -->
+<!-- =========================================================
+     ABOUT
+     ========================================================= -->
+
+<section id="about" class="about-box">
+
+    <div class="about-inner">
+
+        <div class="section-heading">
+            <div class="section-icon">🦴</div>
+            <div>
+                <h2>このデータベースについて</h2>
+                <p>鵡川高校 化石デジタルライブラリーの概要</p>
+            </div>
+        </div>
+
+        <div class="about-content">
+
+            <!-- AUTO_ABOUT_TOP_START -->
 
 <p>
     「鵡川高校 化石デジタルライブラリー」は、
@@ -980,6 +1029,20 @@ footer{
 </p>
 
 <!-- AUTO_ABOUT_TOP_END -->
+
+            <a class="about-link" href="about/">
+                詳細な説明を見る →
+            </a>
+
+        </div>
+
+    </div>
+
+</section>
+
+<!-- =========================================================
+     SEARCH
+     ========================================================= -->
 
 <section id="database" class="search-box">
 
@@ -1019,6 +1082,10 @@ footer{
 
 </section>
 
+<!-- =========================================================
+     STATISTICS
+     ========================================================= -->
+
 <section class="statistics">
 
     <div class="stat-card">
@@ -1038,6 +1105,10 @@ footer{
 
 </section>
 
+<!-- =========================================================
+     MAP
+     ========================================================= -->
+
 <section id="map-section" class="map-container">
 
     <div class="map-title">化石採集地点</div>
@@ -1052,6 +1123,10 @@ footer{
     </div>
 
 </section>
+
+<!-- =========================================================
+     SITE FILTER
+     ========================================================= -->
 
 <section id="filter-box" class="filter-box">
 
@@ -1082,6 +1157,10 @@ footer{
     <div>北海道鵡川高等学校</div>
 </footer>
 
+<!-- =========================================================
+     DETAIL
+     ========================================================= -->
+
 <div id="detail-overlay" class="detail-overlay">
 
     <div class="detail-window">
@@ -1100,6 +1179,10 @@ footer{
     </div>
 
 </div>
+
+<!-- =========================================================
+     ZOOM
+     ========================================================= -->
 
 <div
     id="zoom-overlay"
@@ -1214,6 +1297,16 @@ function getAdministrativeSiteIds(properties) {
 // ================================================================
 // 公開採集地域の対応関係
 // ================================================================
+// 行政区域Polygonと地区代表Pointは役割を分ける。
+//
+// Polygon : 国土数値情報等の行政区域
+// Point   : 「穂別長和」「穂別稲里」などの公開地図用代表点
+//
+// 標本との対応付けには公開用採集座標を使用しない。
+// GeoJSONのsite_idsが設定されていればそれを最優先し、
+// 未設定の場合はlocalities_public.jsonの「place」等から
+// 地区名を読み取ってsite_idを対応付ける。
+// ================================================================
 
 function getRegionPointFeatures() {
 
@@ -1260,6 +1353,8 @@ function getRegionSiteIdsFromLocalities(
             .filter(Boolean)
         : [];
 
+    // 地区名として最低限認識しておく名称。
+    // 将来的にはGeoJSONのkeywordsを追加するだけで拡張できる。
     if (normalizedDistrict) {
         keywordList.push(normalizedDistrict);
     }
@@ -1341,6 +1436,8 @@ function getPublicRegionDefinitions() {
 
         let siteIds = getAdministrativeSiteIds(properties);
 
+        // GeoJSONにsite_idsが明示されている場合は、それを最優先。
+        // site_idsが空の場合だけlocalities_public.jsonから対応付ける。
         if (!siteIds.length) {
             siteIds = getRegionSiteIdsFromLocalities(
                 regionName,
@@ -1361,6 +1458,9 @@ function getPublicRegionDefinitions() {
                 ? feature.geometry.coordinates
                 : [];
 
+        // map_centerを最優先する。
+        // GeoJSON Pointのcoordinatesは [経度, 緯度] なので、
+        // Leaflet用には [緯度, 経度] に変換する。
         let mapCenter = null;
 
         if (
@@ -1441,6 +1541,8 @@ function getAdministrativeAreaKey(properties, index) {
 // ================================================================
 // 地区代表Point用の公開説明文
 // ================================================================
+// GeoJSONのdescriptionに同じ意味の文章が入っていても、
+// 画面では必ず一文だけ表示する。
 
 function getRegionPublicNote(_region) {
 
@@ -1467,6 +1569,7 @@ function focusRegionPoint(regionKey) {
         { duration: 0.8 }
     );
 
+    // flyTo完了後に代表Pointの説明ポップアップを開く。
     setTimeout(() => {
 
         const popupHtml = createRegionPointPopupHtml(region);
@@ -1519,6 +1622,9 @@ function createRegionPointPopupHtml(region) {
 // ================================================================
 // 地区代表Pointの標本フィルタ
 // ================================================================
+// ポップアップHTMLへsite_id配列そのものを埋め込むのではなく、
+// regionKeyからGeoJSON上の地区定義を再取得して絞り込む。
+// これにより、将来地区を追加しても同じ仕組みで動作する。
 
 function filterByRegionKey(regionKey) {
 
@@ -1634,6 +1740,8 @@ function displaySchoolPin() {
         return;
     }
 
+    // 北海道鵡川高等学校
+    // 〒054-0032 北海道勇払郡むかわ町福住4丁目2番地1
     const schoolLatLng = [42.5835966, 141.919786];
 
     const schoolMarker = L.marker(
@@ -1740,6 +1848,7 @@ function displayAdministrativeAreasOnMap() {
             return;
         }
 
+        // Point Featureは行政区域Polygonとは別に表示する。
         if (feature.geometry.type === "Point") {
             return;
         }
@@ -1750,6 +1859,8 @@ function displayAdministrativeAreasOnMap() {
 
         let siteIds = getAdministrativeSiteIds(properties);
 
+        // むかわ町Polygon全体については、公開用localitiesに登録された
+        // 地点IDをまとめて「この区域の標本」とする。
         if (
             !siteIds.length &&
             String(regionName).includes("むかわ町")
@@ -1829,6 +1940,9 @@ function displayAdministrativeAreasOnMap() {
                         </div>
                     `);
 
+                    // Polygonをクリックしただけでは標本一覧を変更しない。
+                    // 「公開採集地域から選択」または「この区域の標本を見る」から
+                    // 明示的に標本フィルタを実行する。
                     areaLayer.on("click", function() {
                         areaLayer.openPopup();
                     });
@@ -1839,8 +1953,10 @@ function displayAdministrativeAreasOnMap() {
         layers.push(layer);
     });
 
+    // 地区代表Pointを表示
     displayRegionPointFeatures();
 
+    // 鵡川高校固定ピンを常時表示
     displaySchoolPin();
 
     if (layers.length) {
@@ -1855,6 +1971,8 @@ function displayAdministrativeAreasOnMap() {
 // ================================================================
 // REGION FILTER
 // ================================================================
+// 行政区域GeoJSONまたは地区代表Pointから渡されたsite_idを使って
+// 標本を絞り込む。公開座標との空間判定は行わない。
 
 function filterByRegion(siteIds, regionName, regionKey) {
 
@@ -1913,6 +2031,8 @@ async function loadData() {
 
         specimens = await specimenResponse.json();
 
+        // 公開地域名と地点IDの対応だけを取得する。
+        // 緯度・経度は地図区域の生成・判定には使用しない。
         const localityResponse = await fetch(
             "public_data/localities_public.json",
             { cache: "no-store" }
@@ -1932,6 +2052,11 @@ async function loadData() {
             );
         }
 
+        // ============================================================
+        // 地図はlocalities_public.jsonの公開座標を使用しない。
+        // 行政区域GeoJSONそのものを表示し、区域と標本の対応は
+        // GeoJSONのproperties.site_idsで明示的に管理する。
+        // ============================================================
         try {
             await loadAdministrativeAreas();
             displayAdministrativeAreasOnMap();
@@ -2755,6 +2880,28 @@ function resetDropdownFilters() {
     document.getElementById(
         "age-filter"
     ).value = "";
+}
+
+// ================================================================
+// CLEAR FILTER
+// ================================================================
+
+function clearSiteFilter() {
+
+    currentSiteId = null;
+
+    const box = document.getElementById("filter-box");
+    if (box) {
+        box.classList.remove("active");
+    }
+
+    const searchInput = document.getElementById("search-input");
+    if (searchInput) {
+        searchInput.value = "";
+    }
+
+    resetDropdownFilters();
+    displaySpecimens(specimens);
 }
 
 // ================================================================
