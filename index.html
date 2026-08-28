@@ -2717,7 +2717,7 @@ function getImages(specimen) {
 //
 //   "model_3d": "models/MDRxxxx/model.glb"
 //   "model3d": "models/MDRxxxx/model.glb"
-//   "models_3d": ["models/MDRxxxx/a.glb", "models/MDRxxxx/b.stl"]
+//   "models_3d": ["models/MDRxxxx/a.glb", "models/MDRxxxx/b.glb"]
 //
 // オブジェクト形式にも対応：
 //   {"url":"models/MDRxxxx/model.glb", "name":"3Dモデル"}
@@ -2856,7 +2856,7 @@ function isSupported3DFormat(model) {
 // 軽量Web用3D表示
 // ================================================================
 // 公開ページではSTLを直接読み込まない。
-// update_all_3d.py がSTLをGLBへ変換し、公開JSONにはGLBだけを登録する。
+// update_all.py がSTLをWeb用GLBへ変換し、公開JSONにはGLBだけを登録する。
 
 async function render3DModelHost(host, model) {
 

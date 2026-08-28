@@ -558,6 +558,15 @@
     "images": [
       "images/MDRMHS-009/MDRMHS-009_01.jpg",
       "images/MDRMHS-009/MDRMHS-009_02.jpg"
+    ],
+    "model_3d": "models/MDRMHS-009/MDRMHS-009_web.glb",
+    "models_3d": [
+      {
+        "url": "models/MDRMHS-009/MDRMHS-009_web.glb",
+        "name": "MDRMHS-009_web.glb",
+        "format": "glb",
+        "source_format": "stl"
+      }
     ]
   }
 ]
