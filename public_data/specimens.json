@@ -394,5 +394,154 @@
     "images": [
       "images/MDRMHS-006/MDRMHS-006.jpg"
     ]
+  },
+  {
+    "specimen_id": "MDRMHS-007",
+    "classification": "アンモナイト類",
+    "scientific_name": "Gaudryceras tenuiliratu",
+    "common_name": "ゴードリセラス・テヌイテラータム",
+    "formation": "不明",
+    "age": "不明",
+    "collection_date": "不明",
+    "note": "恐竜研究同好会発足以降保管されている化石。ゴードリセラス・テヌイテラータムは穂別稲里地区でもこれまで多数産出しており、ポピュラーな種の１つである。",
+    "site_id": "SCHOOL",
+    "image": "images/MDRMHS-007/MDRMHS-007.jpg",
+    "images": [
+      "images/MDRMHS-007/MDRMHS-007.jpg"
+    ]
+  },
+  {
+    "specimen_id": "MDRMHS-008",
+    "classification": "アンモナイト類",
+    "scientific_name": "Gaudryceras tenuiliratu",
+    "common_name": "ゴードリセラス・テヌイテラータム",
+    "formation": "不明",
+    "age": "不明",
+    "collection_date": "不明",
+    "note": "恐竜研究同好会発足以降保管されている化石。ゴードリセラス・テヌイテラータムは穂別稲里地区でもこれまで多数産出しており、ポピュラーな種の１つである。この資料もクリーニングの状態が良いため、もしかしたら堀田良幸氏からの寄贈品かもしれない。",
+    "site_id": "SCHOOL",
+    "image": "images/MDRMHS-008/MDRMHS-008.jpg",
+    "images": [
+      "images/MDRMHS-008/MDRMHS-008.jpg"
+    ]
+  },
+  {
+    "specimen_id": "MDR260814-01",
+    "classification": "ノジュール",
+    "scientific_name": "fossil nodule",
+    "common_name": "ノジュール",
+    "formation": "中部蝦夷層群",
+    "age": "約9000万年前",
+    "collection_date": "2026-08-14",
+    "note": "顧問A先生がプライベートで発掘に行き採集したノジュール。”いかにも”なノジュールである。ノジュールとは、化石や砂粒を核として、岩石中の珪酸や炭酸塩などが集まって沈殿しながら固まったものである。露頭から顔をのぞかせていたり、流水作用により川に落ちていたりする。このノジュールは地層中に埋まっているものを掘り出した。中にどんな化石が入っているか、今後のクリーニングに期待がかかる。もちろん、何も入っていないこともある。",
+    "site_id": "A001",
+    "image": "images/MDR260814-01/MDR260814-01_01.jpg",
+    "images": [
+      "images/MDR260814-01/MDR260814-01_01.jpg",
+      "images/MDR260814-01/MDR260814-01_02.jpg"
+    ]
+  },
+  {
+    "specimen_id": "MDR260814-02",
+    "classification": "ノジュール",
+    "scientific_name": "fossil nodule",
+    "common_name": "ノジュール",
+    "formation": "中部蝦夷層群",
+    "age": "約9000万年前",
+    "collection_date": "2026-08-14",
+    "note": "顧問A先生がプライベートで発掘に行き採集したノジュール（２個目）。表面を見た感じで（何か入っていそう…）と思い採集したものである。クリーニングが待たれる資料の一つである。",
+    "site_id": "A001",
+    "image": "images/MDR260814-02/MDR260814-02_01.jpg",
+    "images": [
+      "images/MDR260814-02/MDR260814-02_01.jpg",
+      "images/MDR260814-02/MDR260814-02_02.jpg",
+      "images/MDR260814-02/MDR260814-02_03.jpg",
+      "images/MDR260814-02/MDR260814-02_04.jpg"
+    ]
+  },
+  {
+    "specimen_id": "MDR260814-03",
+    "classification": "ノジュール",
+    "scientific_name": "fossil nodule",
+    "common_name": "ノジュール",
+    "formation": "中部蝦夷層群",
+    "age": "約9000万年前",
+    "collection_date": "2026-08-14",
+    "note": "顧問A先生がプライベートで発掘に行き採集したノジュール（３個目）。こちらは現場で好奇心に駆られ砕いてみたところ、中に化石が確認されたためそれ以上の破砕を中止し持ち帰ったものである。画像中に黒く見えるのは植物片の化石と思われる。また02画像右下及び03画像中央やや上のノジュール中には、アンモナイトの一部と思われるものが見えている。こちらもこれからのクリーニングが期待される資料の一つである。",
+    "site_id": "A001",
+    "image": "images/MDR260814-03/MDR260814-03_01.jpg",
+    "images": [
+      "images/MDR260814-03/MDR260814-03_01.jpg",
+      "images/MDR260814-03/MDR260814-03_02.jpg",
+      "images/MDR260814-03/MDR260814-03_03.jpg"
+    ]
+  },
+  {
+    "specimen_id": "MDR260814-05",
+    "classification": "ノジュール",
+    "scientific_name": "fossil nodule",
+    "common_name": "ノジュール",
+    "formation": "中部蝦夷層群",
+    "age": "約9000万年前",
+    "collection_date": "2026-08-14",
+    "note": "顧問A先生がプライベートで発掘に行き採集したノジュール（５個目）。こちらも地層中に埋まっているところを掘り出した。形が恐竜の骨っぽい…と思うも、そんなわけないか…と考え直し、好奇心に駆られ現場で割ったところ、アンモナイトの一部が露出した（02画像左下）。アンモナイト一個体分が砕けたノジュール中にある可能性もあるため、慎重にクリーニングを進め、修復していきたい資料である。",
+    "site_id": "A001",
+    "image": "images/MDR260814-05/MDR260814-05_01.jpg",
+    "images": [
+      "images/MDR260814-05/MDR260814-05_01.jpg",
+      "images/MDR260814-05/MDR260814-05_02.jpg",
+      "images/MDR260814-05/MDR260814-05_03.jpg",
+      "images/MDR260814-05/MDR260814-05_04.jpg",
+      "images/MDR260814-05/MDR260814-05_05.jpg"
+    ]
+  },
+  {
+    "specimen_id": "MDR260814-06",
+    "classification": "アンモナイト類",
+    "scientific_name": "未同定",
+    "common_name": "未同定",
+    "formation": "中部蝦夷層群",
+    "age": "約9000万年前",
+    "collection_date": "2026-08-14",
+    "note": "顧問A先生がプライベートで発掘に行き採集した化石である（６個目）。こちらは地層中に埋まっているところをハンマーで割って一部を採集したもの。02画像が現場産出状況である。巨大ノジュールであったため、一部のみの破砕となったが、おそらくまだ化石が埋まっているものと思われる。まだ現場に残っていれば、継続して採集してみたいノジュールである。",
+    "site_id": "A001",
+    "image": "images/MDR260814-06/MDR260814-06_01.jpg",
+    "images": [
+      "images/MDR260814-06/MDR260814-06_01.jpg",
+      "images/MDR260814-06/MDR260814-06_02.jpg"
+    ]
+  },
+  {
+    "specimen_id": "MDR260814-07",
+    "classification": "ノジュール",
+    "scientific_name": "fossil nodule",
+    "common_name": "ノジュール",
+    "formation": "中部蝦夷層群",
+    "age": "約9000万年前",
+    "collection_date": "2026-08-14",
+    "note": "顧問A先生がプライベートで発掘に行き採集したノジュール（７個目）。採集場所に落ちていた。ある程度の大きさだったため、小さく破砕してから持ち帰ろうと思ったが、砕けるたびに化石が顔を出し（04画像：イノセラムスの一種など）、また表面にも化石と思われる突起があったため（02,03画像赤丸部分）、そのまま持ち帰ってきた資料である。",
+    "site_id": "A001",
+    "image": "images/MDR260814-07/MDR260814-07_01.jpg",
+    "images": [
+      "images/MDR260814-07/MDR260814-07_01.jpg",
+      "images/MDR260814-07/MDR260814-07_02.jpg",
+      "images/MDR260814-07/MDR260814-07_03.jpg"
+    ]
+  },
+  {
+    "specimen_id": "MDR260814-08",
+    "classification": "二枚貝化石",
+    "scientific_name": "Inoceramus sp.",
+    "common_name": "イノセラムスの一種",
+    "formation": "中部蝦夷層群",
+    "age": "約9000万年前",
+    "collection_date": "2026-08-14",
+    "note": "顧問A先生がプライベートで発掘に行き採集した化石である（８個目）。こちらも巨大ノジュールを破砕した際に露出したもので、おそらく40～50cm程度のイノセラムスがノジュールに残されている様子であった（02画像：現場産出状況）。割れた断面を見ると殻の続きがまだノジュールに残っていたので取り出したかったが、岩石の硬さの前に断念せざるを得なかった。もし完全に取り出せていたら、かなりの大きさだったと思われる。",
+    "site_id": "A001",
+    "image": "images/MDR260814-08/MDR260814-08_01.jpg",
+    "images": [
+      "images/MDR260814-08/MDR260814-08_01.jpg",
+      "images/MDR260814-08/MDR260814-08_02.jpg"
+    ]
   }
 ]
