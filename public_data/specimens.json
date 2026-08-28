@@ -543,5 +543,21 @@
       "images/MDR260814-08/MDR260814-08_01.jpg",
       "images/MDR260814-08/MDR260814-08_02.jpg"
     ]
+  },
+  {
+    "specimen_id": "MDRMHS-009",
+    "classification": "",
+    "scientific_name": "",
+    "common_name": "ゴードリセラス・テヌイテラータム, ポリプチコセラスの一種",
+    "formation": "不明",
+    "age": "不明",
+    "collection_date": "不明",
+    "note": "恐竜研究同好会発足以降保管されている化石。なんどゴードリセラス・テヌイテラータムとポリプチコセラスの共産化石で、それらを生かしたクリーニング資料となっている。これもおそらく堀田良幸氏からの寄贈品と思われる。",
+    "site_id": "SCHOOL",
+    "image": "images/MDRMHS-009/MDRMHS-009_01.jpg",
+    "images": [
+      "images/MDRMHS-009/MDRMHS-009_01.jpg",
+      "images/MDRMHS-009/MDRMHS-009_02.jpg"
+    ]
   }
 ]

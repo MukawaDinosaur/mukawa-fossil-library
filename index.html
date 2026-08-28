@@ -781,6 +781,168 @@ a{color:inherit}
 }
 
 /* =========================================================
+   3D MODEL
+   ========================================================= */
+
+.three-d-badge{
+    display:inline-flex;
+    align-items:center;
+    gap:5px;
+    margin:0 0 10px;
+    padding:4px 9px;
+    border-radius:999px;
+    background:#f0eee6;
+    color:#6d5a2e;
+    font-size:11px;
+    font-weight:800;
+}
+
+.three-d-section{
+    margin-top:18px;
+    padding-top:16px;
+    border-top:1px solid #e3e9e5;
+}
+
+.three-d-section-title{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
+    margin-bottom:9px;
+    color:#183c2a;
+    font-size:14px;
+    font-weight:800;
+}
+
+.three-d-format{
+    color:#66736b;
+    font-size:10px;
+    font-weight:600;
+}
+
+.three-d-model-list{
+    display:flex;
+    flex-wrap:wrap;
+    gap:6px;
+    margin-bottom:9px;
+}
+
+.three-d-model-button{
+    border:1px solid #cfdad2;
+    background:#f7faf8;
+    color:#24563d;
+    padding:6px 9px;
+    border-radius:7px;
+    cursor:pointer;
+    font-size:11px;
+}
+
+.three-d-model-button:hover,
+.three-d-model-button.active{
+    background:#edf6ef;
+    border-color:#a9c5b2;
+}
+
+.detail-image-panel.has-3d{
+    display:grid;
+    grid-template-rows:minmax(0,1fr) minmax(0,1fr);
+    gap:12px;
+    align-items:stretch;
+}
+
+.detail-image-panel.only-3d{
+    display:flex;
+}
+
+.detail-visual-box{
+    position:relative;
+    min-width:0;
+    min-height:0;
+    overflow:hidden;
+    border:1px solid rgba(255,255,255,.08);
+    border-radius:10px;
+    background:#111;
+}
+
+.detail-visual-label{
+    position:absolute;
+    top:9px;
+    left:9px;
+    z-index:5;
+    padding:4px 8px;
+    border-radius:999px;
+    background:rgba(0,0,0,.62);
+    color:#fff;
+    font-size:10px;
+    font-weight:800;
+    pointer-events:none;
+}
+
+.detail-image-box{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:14px;
+}
+
+.detail-image-box img{
+    max-width:100%;
+    max-height:100%;
+    object-fit:contain;
+    cursor:zoom-in;
+    border-radius:7px;
+}
+
+.three-d-viewer-host{
+    width:100%;
+    height:100%;
+    min-height:180px;
+    background:radial-gradient(circle at center,#2b302d 0,#111 72%);
+}
+
+.three-d-viewer-host model-viewer{
+    display:block;
+    width:100%;
+    height:100%;
+    background:transparent;
+    --poster-color:transparent;
+}
+
+.three-d-canvas{
+    display:block;
+    width:100%;
+    height:100%;
+}
+
+.three-d-message{
+    width:100%;
+    height:100%;
+    min-height:180px;
+    display:grid;
+    place-items:center;
+    padding:20px;
+    text-align:center;
+    color:#bfc7c2;
+    font-size:12px;
+    line-height:1.7;
+}
+
+.three-d-link{
+    display:inline-block;
+    margin-top:8px;
+    padding:7px 10px;
+    border-radius:7px;
+    background:#24563d;
+    color:#fff;
+    text-decoration:none;
+    font-size:11px;
+}
+
+.three-d-link:hover{
+    background:#2f6b4c;
+}
+
+/* =========================================================
    DETAIL MODAL
    ========================================================= */
 
@@ -994,8 +1156,11 @@ footer{
         overflow-y:auto;
     }
     .detail-image-panel{
-        height:45vh;
-        min-height:220px;
+        height:55vh;
+        min-height:360px;
+    }
+    .detail-image-panel.has-3d{
+        grid-template-rows:minmax(0,1fr) minmax(0,1fr);
     }
     .detail-data-panel{
         overflow:visible;
@@ -1276,6 +1441,12 @@ footer{
 </div>
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+<!-- GLB / glTF 表示用。model-viewer は glTF / GLB に対応。 -->
+<script
+    type="module"
+    src="https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js"
+></script>
 
 <script>
 "use strict";
@@ -2472,6 +2643,8 @@ function getImages(specimen) {
                     image.original ||
                     image.image ||
                     image.thumb ||
+                    image.url ||
+                    image.path ||
                     "";
 
                 if (original) {
@@ -2511,6 +2684,537 @@ function getImages(specimen) {
             original
         };
     });
+}
+
+// ================================================================
+// 3D MODEL DATA
+// ================================================================
+// specimens.json に以下のいずれかを持たせることで表示できる。
+//
+//   "model_3d": "models/MDRxxxx/model.glb"
+//   "model3d": "models/MDRxxxx/model.glb"
+//   "models_3d": ["models/MDRxxxx/a.glb", "models/MDRxxxx/b.stl"]
+//
+// オブジェクト形式にも対応：
+//   {"url":"models/MDRxxxx/model.glb", "name":"3Dモデル"}
+//
+// 対応形式：GLB / glTF / STL
+// GLB / glTF は model-viewer、STL は Three.js で表示する。
+
+function get3DModels(specimen) {
+
+    if (!specimen || typeof specimen !== "object") {
+        return [];
+    }
+
+    const candidates = [
+        specimen.models_3d,
+        specimen.models3d,
+        specimen.three_d_models,
+        specimen.threeDModels,
+        specimen.model_3d,
+        specimen.model3d,
+        specimen.three_d_model,
+        specimen.threeDModel,
+        specimen["3d_model"],
+        specimen["3Dモデル"],
+        specimen["3Dデータ"]
+    ];
+
+    const flat = [];
+
+    function append(value) {
+
+        if (value === null || value === undefined) {
+            return;
+        }
+
+        if (Array.isArray(value)) {
+            value.forEach(append);
+            return;
+        }
+
+        if (typeof value === "string") {
+            const url = value.trim();
+            if (url) {
+                flat.push({ url });
+            }
+            return;
+        }
+
+        if (typeof value === "object") {
+            const url = String(
+                value.url ||
+                value.src ||
+                value.path ||
+                value.file ||
+                value.model ||
+                value.model_3d ||
+                value["3Dモデル"] ||
+                value["3Dデータ"] ||
+                ""
+            ).trim();
+
+            if (!url) {
+                return;
+            }
+
+            flat.push({
+                url,
+                name: String(
+                    value.name ||
+                    value.title ||
+                    value.label ||
+                    ""
+                ).trim(),
+                format: String(
+                    value.format ||
+                    value.type ||
+                    ""
+                ).trim().toLowerCase()
+            });
+        }
+    }
+
+    candidates.forEach(append);
+
+    const seen = new Set();
+    const result = [];
+
+    flat.forEach(item => {
+
+        if (!item.url || seen.has(item.url)) {
+            return;
+        }
+
+        seen.add(item.url);
+
+        const cleanUrl = item.url.split("?")[0].split("#")[0];
+        const filename = cleanUrl.split("/").pop() || "3Dモデル";
+        const extensionMatch = filename.match(/\.([a-zA-Z0-9]+)$/);
+        const extension = extensionMatch
+            ? extensionMatch[1].toLowerCase()
+            : "";
+
+        let format = item.format;
+
+        if (format.startsWith(".")) {
+            format = format.slice(1);
+        }
+
+        if (!format) {
+            format = extension;
+        }
+
+        result.push({
+            url: item.url,
+            name: item.name || filename,
+            format: format
+        });
+    });
+
+    return result;
+}
+
+function isSupported3DFormat(model) {
+
+    const format = String(model?.format || "")
+        .toLowerCase()
+        .replace(/^\./, "");
+
+    return [
+        "glb",
+        "gltf",
+        "stl"
+    ].includes(format);
+}
+
+// ================================================================
+// THREE.JS 遅延読み込み
+// ================================================================
+
+let threeModulesPromise = null;
+
+function loadThreeModules() {
+
+    if (!threeModulesPromise) {
+        threeModulesPromise = Promise.all([
+            import("https://unpkg.com/three@0.180.0/build/three.module.js"),
+            import("https://unpkg.com/three@0.180.0/examples/jsm/controls/OrbitControls.js"),
+            import("https://unpkg.com/three@0.180.0/examples/jsm/loaders/STLLoader.js")
+        ]).then(([THREE, controls, stl]) => ({
+            THREE,
+            OrbitControls: controls.OrbitControls,
+            STLLoader: stl.STLLoader
+        }));
+    }
+
+    return threeModulesPromise;
+}
+
+function disposeThreeScene(host) {
+
+    if (!host || !host.__threeViewer) {
+        return;
+    }
+
+    const viewer = host.__threeViewer;
+
+    if (viewer.animationFrame) {
+        cancelAnimationFrame(viewer.animationFrame);
+    }
+
+    if (viewer.controls) {
+        viewer.controls.dispose();
+    }
+
+    if (viewer.renderer) {
+        viewer.renderer.dispose();
+    }
+
+    if (viewer.scene) {
+        viewer.scene.traverse(object => {
+
+            if (object.geometry) {
+                object.geometry.dispose();
+            }
+
+            if (object.material) {
+
+                const materials = Array.isArray(object.material)
+                    ? object.material
+                    : [object.material];
+
+                materials.forEach(material => {
+                    if (material && typeof material.dispose === "function") {
+                        material.dispose();
+                    }
+                });
+            }
+        });
+    }
+
+    host.__threeViewer = null;
+}
+
+async function renderThreeModel(host, model) {
+
+    disposeThreeScene(host);
+
+    host.innerHTML = "";
+
+    const loading = document.createElement("div");
+    loading.className = "three-d-message";
+    loading.textContent = "3Dモデルを読み込んでいます……";
+    host.appendChild(loading);
+
+    try {
+
+        const {
+            THREE,
+            OrbitControls,
+            STLLoader
+        } = await loadThreeModules();
+
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(
+            45,
+            Math.max(host.clientWidth, 1) /
+            Math.max(host.clientHeight, 1),
+            0.01,
+            100000
+        );
+
+        const renderer = new THREE.WebGLRenderer({
+            antialias: true,
+            alpha: true
+        });
+
+        renderer.setPixelRatio(
+            Math.min(window.devicePixelRatio || 1, 2)
+        );
+        renderer.setSize(
+            Math.max(host.clientWidth, 1),
+            Math.max(host.clientHeight, 1),
+            false
+        );
+        renderer.outputColorSpace = THREE.SRGBColorSpace;
+        renderer.setClearColor(0x000000, 0);
+
+        host.innerHTML = "";
+        host.appendChild(renderer.domElement);
+        renderer.domElement.className = "three-d-canvas";
+
+        const ambientLight = new THREE.HemisphereLight(
+            0xffffff,
+            0x4b514e,
+            2.2
+        );
+        scene.add(ambientLight);
+
+        const keyLight = new THREE.DirectionalLight(
+            0xffffff,
+            2.5
+        );
+        keyLight.position.set(4, 6, 8);
+        scene.add(keyLight);
+
+        const fillLight = new THREE.DirectionalLight(
+            0xffffff,
+            1.2
+        );
+        fillLight.position.set(-5, 2, -4);
+        scene.add(fillLight);
+
+        let object;
+
+        const format = String(model.format || "").toLowerCase();
+
+        if (format === "stl") {
+
+            const loader = new STLLoader();
+            const geometry = await loader.loadAsync(model.url);
+
+            geometry.computeVertexNormals();
+
+            const material = new THREE.MeshStandardMaterial({
+                color:0xb6b1a5,
+                roughness:0.72,
+                metalness:0.04
+            });
+
+            object = new THREE.Mesh(
+                geometry,
+                material
+            );
+
+        } else {
+            throw new Error(
+                "この3D表示方式では対応していない形式です。"
+            );
+        }
+
+        scene.add(object);
+
+        const box = new THREE.Box3().setFromObject(object);
+        const center = box.getCenter(
+            new THREE.Vector3()
+        );
+        const size = box.getSize(
+            new THREE.Vector3()
+        );
+
+        object.position.sub(center);
+
+        const maxDimension = Math.max(
+            size.x,
+            size.y,
+            size.z,
+            0.001
+        );
+
+        const distance = maxDimension * 2.2;
+
+        camera.position.set(
+            distance,
+            distance * 0.65,
+            distance
+        );
+
+        camera.lookAt(0, 0, 0);
+
+        const controls = new OrbitControls(
+            camera,
+            renderer.domElement
+        );
+
+        controls.enableDamping = true;
+        controls.dampingFactor = 0.07;
+        controls.minDistance = maxDimension * 0.35;
+        controls.maxDistance = maxDimension * 8;
+        controls.target.set(0, 0, 0);
+
+        const viewer = {
+            THREE,
+            scene,
+            camera,
+            renderer,
+            controls,
+            animationFrame:null
+        };
+
+        host.__threeViewer = viewer;
+
+        function resize() {
+            if (!host.__threeViewer) {
+                return;
+            }
+
+            const width = Math.max(host.clientWidth, 1);
+            const height = Math.max(host.clientHeight, 1);
+
+            camera.aspect = width / height;
+            camera.updateProjectionMatrix();
+            renderer.setSize(width, height, false);
+        }
+
+        function animate() {
+            if (!host.__threeViewer) {
+                return;
+            }
+
+            viewer.animationFrame = requestAnimationFrame(animate);
+            controls.update();
+            renderer.render(scene, camera);
+        }
+
+        viewer.resizeHandler = resize;
+        window.addEventListener("resize", resize);
+
+        viewer.removeResizeHandler = () => {
+            window.removeEventListener("resize", resize);
+        };
+
+        animate();
+
+    } catch (error) {
+
+        console.error(error);
+
+        host.innerHTML = `
+            <div class="three-d-message">
+                3Dモデルを読み込めませんでした。<br>
+                ファイル形式またはファイルパスを確認してください。
+            </div>
+        `;
+    }
+}
+
+function render3DModelHost(host, model) {
+
+    if (!host || !model) {
+        return;
+    }
+
+    const format = String(model.format || "")
+        .toLowerCase()
+        .replace(/^\./, "");
+
+    if (format === "glb" || format === "gltf") {
+
+        host.innerHTML = `
+            <model-viewer
+                src="${escapeAttribute(model.url)}"
+                alt="${escapeAttribute(model.name || "3D化石標本") }"
+                camera-controls
+                touch-action="pan-y"
+                shadow-intensity="1"
+                exposure="1"
+                interaction-prompt="auto"
+                loading="eager"
+            ></model-viewer>
+        `;
+
+        return;
+    }
+
+    if (format === "stl") {
+        renderThreeModel(host, model);
+        return;
+    }
+
+    host.innerHTML = `
+        <div class="three-d-message">
+            現在のページでは「${escapeHtml(format || "不明") }」形式を
+            直接表示できません。<br>
+            <a
+                class="three-d-link"
+                href="${escapeAttribute(model.url)}"
+                target="_blank"
+                rel="noopener noreferrer"
+            >
+                3Dファイルを開く
+            </a>
+        </div>
+    `;
+}
+
+function render3DModelsInDetail(models) {
+
+    if (!models.length) {
+        return "";
+    }
+
+    const supported = models.filter(isSupported3DFormat);
+    const first = supported[0] || models[0];
+
+    const buttons = models.length > 1
+        ? `
+            <div class="three-d-model-list">
+                ${models.map((model, index) => `
+                    <button
+                        type="button"
+                        class="three-d-model-button${index === 0 ? " active" : ""}"
+                        data-model-index="${index}"
+                        onclick="selectDetail3DModel(${index})"
+                    >
+                        ${escapeHtml(model.name)}
+                    </button>
+                `).join("")}
+            </div>
+        `
+        : "";
+
+    return `
+        <div class="three-d-section">
+            <div class="three-d-section-title">
+                <span>3Dモデル</span>
+                <span class="three-d-format">
+                    ${escapeHtml(String(first.format || "").toUpperCase())}
+                </span>
+            </div>
+            ${buttons}
+            <div
+                id="detail-3d-viewer-host"
+                class="three-d-viewer-host"
+            ></div>
+        </div>
+    `;
+}
+
+let currentDetail3DModels = [];
+let currentDetail3DIndex = 0;
+
+function selectDetail3DModel(index) {
+
+    if (
+        !Array.isArray(currentDetail3DModels) ||
+        !currentDetail3DModels[index]
+    ) {
+        return;
+    }
+
+    currentDetail3DIndex = index;
+
+    document.querySelectorAll(
+        ".three-d-model-button"
+    ).forEach(button => {
+        button.classList.toggle(
+            "active",
+            Number(button.dataset.modelIndex) === index
+        );
+    });
+
+    const host = document.getElementById(
+        "detail-3d-viewer-host"
+    );
+
+    if (host) {
+        render3DModelHost(
+            host,
+            currentDetail3DModels[index]
+        );
+    }
 }
 
 // ================================================================
@@ -2581,6 +3285,10 @@ function createSpecimenCard(specimen) {
     }
 
     const note = specimen.note || specimen.notes || "";
+    const threeDModels = get3DModels(specimen);
+    const threeDBadge = threeDModels.length
+        ? `<div class="three-d-badge">◇ 3Dモデルあり</div>`
+        : "";
 
     return `
         <article class="specimen-card">
@@ -2620,6 +3328,8 @@ function createSpecimenCard(specimen) {
                         "分類未入力"
                     )}
                 </div>
+
+                ${threeDBadge}
 
                 <div class="specimen-info mobile-hide">
 
@@ -2699,6 +3409,10 @@ function openSpecimenDetailById(specimenId) {
 function openSpecimenDetail(specimen) {
 
     const images = getImages(specimen);
+    const models = get3DModels(specimen);
+
+    currentDetail3DModels = models;
+    currentDetail3DIndex = 0;
 
     const panel = document.getElementById(
         "detail-image-panel"
@@ -2708,40 +3422,101 @@ function openSpecimenDetail(specimen) {
         "detail-data-panel"
     );
 
+    panel.className = "detail-image-panel";
+
+    // ------------------------------------------------------------
+    // 左側：画像＋3Dモデル
+    // ------------------------------------------------------------
+
+    let imageBox = "";
+
     if (images.length) {
 
-        panel.innerHTML = `
-            <img
-                id="detail-main-image"
-                src="${escapeAttribute(
-                    images[0].original
-                )}"
-                alt="${escapeAttribute(
-                    specimen.common_name ||
-                    "化石標本"
-                )}"
-                onclick="
-                    openZoom(
-                        this.src,
-                        this.alt
-                    )
-                "
-            >
+        imageBox = `
+            <div class="detail-visual-box detail-image-box">
+                <div class="detail-visual-label">標本画像</div>
+                <img
+                    id="detail-main-image"
+                    src="${escapeAttribute(images[0].original)}"
+                    alt="${escapeAttribute(
+                        specimen.common_name ||
+                        "化石標本"
+                    )}"
+                    onclick="
+                        openZoom(
+                            this.src,
+                            this.alt
+                        )
+                    "
+                >
+            </div>
         `;
 
-    } else {
+    } else if (!models.length) {
 
-        panel.innerHTML = `
-            <div
-                style="
-                    color:#aaa;
-                    text-align:center;
-                "
-            >
-                画像は登録されていません。
+        imageBox = `
+            <div class="detail-visual-box detail-image-box">
+                <div
+                    style="
+                        color:#aaa;
+                        text-align:center;
+                    "
+                >
+                    画像は登録されていません。
+                </div>
             </div>
         `;
     }
+
+    let modelBox = "";
+
+    if (models.length) {
+
+        const firstModel = models[0];
+
+        modelBox = `
+            <div class="detail-visual-box">
+                <div class="detail-visual-label">
+                    3Dモデル
+                </div>
+                <div
+                    id="detail-3d-viewer-host"
+                    class="three-d-viewer-host"
+                ></div>
+            </div>
+        `;
+    }
+
+    if (images.length && models.length) {
+        panel.classList.add("has-3d");
+        panel.innerHTML = imageBox + modelBox;
+    } else if (models.length) {
+        panel.classList.add("only-3d");
+        panel.innerHTML = modelBox;
+    } else {
+        panel.innerHTML = imageBox;
+    }
+
+    // ------------------------------------------------------------
+    // 3Dモデルを実際に読み込む
+    // ------------------------------------------------------------
+
+    if (models.length) {
+        const host = document.getElementById(
+            "detail-3d-viewer-host"
+        );
+
+        if (host) {
+            render3DModelHost(
+                host,
+                models[0]
+            );
+        }
+    }
+
+    // ------------------------------------------------------------
+    // ギャラリー
+    // ------------------------------------------------------------
 
     let galleryHtml = "";
 
@@ -2773,6 +3548,56 @@ function openSpecimenDetail(specimen) {
                         >
                     `
                 ).join("")}
+            </div>
+        `;
+    }
+
+    // ------------------------------------------------------------
+    // 3Dモデル一覧
+    // ------------------------------------------------------------
+
+    let modelListHtml = "";
+
+    if (models.length > 1) {
+
+        modelListHtml = `
+            <div class="three-d-section">
+                <div class="three-d-section-title">
+                    <span>3Dモデル</span>
+                    <span class="three-d-format">
+                        ${models.length}ファイル
+                    </span>
+                </div>
+
+                <div class="three-d-model-list">
+                    ${models.map((model, index) => `
+                        <button
+                            type="button"
+                            class="three-d-model-button${index === 0 ? " active" : ""}"
+                            data-model-index="${index}"
+                            onclick="selectDetail3DModel(${index})"
+                        >
+                            ${escapeHtml(model.name)}
+                        </button>
+                    `).join("")}
+                </div>
+            </div>
+        `;
+    } else if (models.length === 1) {
+
+        modelListHtml = `
+            <div class="three-d-section">
+                <div class="three-d-section-title">
+                    <span>3Dモデル</span>
+                    <span class="three-d-format">
+                        ${escapeHtml(
+                            String(models[0].format || "").toUpperCase()
+                        )}
+                    </span>
+                </div>
+                <div style="color:#66736b;font-size:12px;">
+                    ${escapeHtml(models[0].name)}
+                </div>
             </div>
         `;
     }
@@ -2884,6 +3709,8 @@ function openSpecimenDetail(specimen) {
 
         ${galleryHtml}
 
+        ${modelListHtml}
+
         ${
             note
             ? `
@@ -2920,6 +3747,20 @@ function openSpecimenDetail(specimen) {
 }
 
 function closeDetail() {
+
+    const threeDHost = document.getElementById(
+        "detail-3d-viewer-host"
+    );
+
+    if (threeDHost && threeDHost.__threeViewer) {
+        if (threeDHost.__threeViewer.removeResizeHandler) {
+            threeDHost.__threeViewer.removeResizeHandler();
+        }
+        disposeThreeScene(threeDHost);
+    }
+
+    currentDetail3DModels = [];
+    currentDetail3DIndex = 0;
 
     document.getElementById(
         "detail-overlay"
