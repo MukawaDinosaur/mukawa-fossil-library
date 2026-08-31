@@ -335,7 +335,7 @@
   {
     "specimen_id": "MDRMHS-003",
     "classification": "アンモナイト類",
-    "scientific_name": "Gaudryceras tenuiliratu",
+    "scientific_name": "Gaudryceras tenuiliratum",
     "common_name": "ゴードリセラス・テヌイテラータム",
     "formation": "不明",
     "age": "不明",
@@ -350,7 +350,7 @@
   {
     "specimen_id": "MDRMHS-004",
     "classification": "アンモナイト類",
-    "scientific_name": "Gaudryceras tenuiliratu",
+    "scientific_name": "Gaudryceras tenuiliratum",
     "common_name": "ゴードリセラス・テヌイテラータム",
     "formation": "不明",
     "age": "不明",
@@ -398,7 +398,7 @@
   {
     "specimen_id": "MDRMHS-007",
     "classification": "アンモナイト類",
-    "scientific_name": "Gaudryceras tenuiliratu",
+    "scientific_name": "Gaudryceras tenuiliratum",
     "common_name": "ゴードリセラス・テヌイテラータム",
     "formation": "不明",
     "age": "不明",
@@ -413,7 +413,7 @@
   {
     "specimen_id": "MDRMHS-008",
     "classification": "アンモナイト類",
-    "scientific_name": "Gaudryceras tenuiliratu",
+    "scientific_name": "Gaudryceras tenuiliratum",
     "common_name": "ゴードリセラス・テヌイテラータム",
     "formation": "不明",
     "age": "不明",
@@ -547,7 +547,7 @@
   {
     "specimen_id": "MDRMHS-009",
     "classification": "アンモナイト類",
-    "scientific_name": "Gaudryceras tenuiliratu, Polyptychoceras sp.",
+    "scientific_name": "Gaudryceras tenuiliratum, Polyptychoceras sp.",
     "common_name": "ゴードリセラス・テヌイテラータム, ポリプチコセラスの一種",
     "formation": "不明",
     "age": "不明",
@@ -567,6 +567,83 @@
         "format": "glb",
         "source_format": "stl"
       }
+    ]
+  },
+  {
+    "specimen_id": "MDRMHS-010",
+    "classification": "アンモナイト類",
+    "scientific_name": "Mantelliceras sp.?",
+    "common_name": "マンテリセラスの一種？",
+    "formation": "不明",
+    "age": "不明",
+    "collection_date": "不明",
+    "note": "恐竜研究同好会発足以降保管されている化石。肋や巻き方からマンテリセラスかと思われるが、この資料についてもクリーニング途中資料のため、今後の作業により同定結果が変わる可能性がある。",
+    "site_id": "SCHOOL",
+    "image": "images/MDRMHS-010/MDRMHS-010_01.jpg",
+    "images": [
+      "images/MDRMHS-010/MDRMHS-010_01.jpg"
+    ]
+  },
+  {
+    "specimen_id": "MDRMHS-011",
+    "classification": "二枚貝化石",
+    "scientific_name": "Inoceramus sp.",
+    "common_name": "イノセラムスの一種",
+    "formation": "不明",
+    "age": "不明",
+    "collection_date": "不明",
+    "note": "恐竜研究同好会発足以降保管されている化石。殻の形の違いから、MDRMHS-001やMDRMHS-013とは異なる種だと思われる。",
+    "site_id": "SCHOOL",
+    "image": "images/MDRMHS-011/MDRMHS-011_01.jpg",
+    "images": [
+      "images/MDRMHS-011/MDRMHS-011_01.jpg"
+    ]
+  },
+  {
+    "specimen_id": "MDRMHS-012",
+    "classification": "アンモナイト類",
+    "scientific_name": "Pachydiscus sp., Shark tooth, gen. et sp. indet.",
+    "common_name": "ポリプチコセラスの一種、サメの歯（属種未定）",
+    "formation": "中部蝦夷層群",
+    "age": "約9000万年前",
+    "collection_date": "2021-08-21",
+    "note": "2021年８月21に採集記録のある化石。当初は露出していたポリプチコセラスの一種のクリーニングが目的であったが、進めるうちに、なんと同好会発足以来発の「サメの歯」が発見された（02画像矢印先）。今後はより慎重なクリーニングにより、この歯がどの属種のものなのかを同定していきたい。なおサメの歯はエナメル質をもち、生涯生え変わり続けるため、化石に残りやすいことが特徴である。",
+    "site_id": "SCHOOL",
+    "image": "images/MDRMHS-012/MDRMHS-012_01.jpg",
+    "images": [
+      "images/MDRMHS-012/MDRMHS-012_01.jpg",
+      "images/MDRMHS-012/MDRMHS-012_02.jpg"
+    ]
+  },
+  {
+    "specimen_id": "MDRMHS-013",
+    "classification": "二枚貝化石",
+    "scientific_name": "Inoceramus sp.",
+    "common_name": "イノセラムスの一種",
+    "formation": "不明",
+    "age": "不明",
+    "collection_date": "不明",
+    "note": "恐竜研究同好会発足以降保管されている化石。殻の形の違いから、MDRMHS-001やMDRMHS-011とは異なる種だと思われる。",
+    "site_id": "SCHOOL",
+    "image": "images/MDRMHS-013/MDRMHS-013_01.jpg",
+    "images": [
+      "images/MDRMHS-013/MDRMHS-013_01.jpg"
+    ]
+  },
+  {
+    "specimen_id": "MDRMHS-014",
+    "classification": "アンモナイト類",
+    "scientific_name": "Neophylloceras sp.",
+    "common_name": "ネオフィロセラスの一種",
+    "formation": "中部蝦夷層群",
+    "age": "約9000万年前",
+    "collection_date": "2024-05-18",
+    "note": "2024年５月14日に採集記録のある化石。当時の同好会員が発掘したものである。クリーニング作業がなかなか進まず保管されていた。露出しているアンモナイトは「ネオフィロセラス」の一種である。この種類の特徴として、平べったく、長い楕円形の螺環断面を持つこと、臍が非常に狭く、点のように小さいこと、殻全体に細い条線や直線状の細い肋があること、などがある。今後はクリーニングを完遂し、各種計測や形態的特徴により種同定を確実にしていくことが求められる。",
+    "site_id": "SCHOOL",
+    "image": "images/MDRMHS-014/MDRMHS-014_01.jpg",
+    "images": [
+      "images/MDRMHS-014/MDRMHS-014_01.jpg",
+      "images/MDRMHS-014/MDRMHS-014_02.jpg"
     ]
   }
 ]
