@@ -600,7 +600,7 @@
     ]
   },
   {
-    "specimen_id": "MDRMHS-012",
+    "specimen_id": "MDR210821-01",
     "classification": "アンモナイト類",
     "scientific_name": "Pachydiscus sp., Shark tooth, gen. et sp. indet.",
     "common_name": "ポリプチコセラスの一種、サメの歯（属種未定）",
@@ -608,11 +608,11 @@
     "age": "約9000万年前",
     "collection_date": "2021-08-21",
     "note": "2021年８月21に採集記録のある化石。当初は露出していたポリプチコセラスの一種のクリーニングが目的であったが、進めるうちに、なんと同好会発足以来発の「サメの歯」が発見された（02画像矢印先）。今後はより慎重なクリーニングにより、この歯がどの属種のものなのかを同定していきたい。なおサメの歯はエナメル質をもち、生涯生え変わり続けるため、化石に残りやすいことが特徴である。",
-    "site_id": "SCHOOL",
-    "image": "images/MDRMHS-012/MDRMHS-012_01.jpg",
+    "site_id": "A003",
+    "image": "images/MDR210821-01/MDR210821-01_01.jpg",
     "images": [
-      "images/MDRMHS-012/MDRMHS-012_01.jpg",
-      "images/MDRMHS-012/MDRMHS-012_02.jpg"
+      "images/MDR210821-01/MDR210821-01_01.jpg",
+      "images/MDR210821-01/MDR210821-01_02.jpg"
     ]
   },
   {
@@ -631,7 +631,7 @@
     ]
   },
   {
-    "specimen_id": "MDRMHS-014",
+    "specimen_id": "MDR240518-01",
     "classification": "アンモナイト類",
     "scientific_name": "Neophylloceras sp.",
     "common_name": "ネオフィロセラスの一種",
@@ -639,11 +639,10 @@
     "age": "約9000万年前",
     "collection_date": "2024-05-18",
     "note": "2024年５月14日に採集記録のある化石。当時の同好会員が発掘したものである。クリーニング作業がなかなか進まず保管されていた。露出しているアンモナイトは「ネオフィロセラス」の一種である。この種類の特徴として、平べったく、長い楕円形の螺環断面を持つこと、臍が非常に狭く、点のように小さいこと、殻全体に細い条線や直線状の細い肋があること、などがある。今後はクリーニングを完遂し、各種計測や形態的特徴により種同定を確実にしていくことが求められる。",
-    "site_id": "SCHOOL",
-    "image": "images/MDRMHS-014/MDRMHS-014_01.jpg",
+    "site_id": "A001",
+    "image": "images/MDR240518-01/MDR240518-01_02.jpg",
     "images": [
-      "images/MDRMHS-014/MDRMHS-014_01.jpg",
-      "images/MDRMHS-014/MDRMHS-014_02.jpg"
+      "images/MDR240518-01/MDR240518-01_02.jpg"
     ]
   }
 ]
