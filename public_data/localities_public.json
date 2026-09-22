@@ -3,6 +3,7 @@
     "site_id": "A001",
     "latitude": 42.869166666666665,
     "longitude": 142.16141666666667,
+    "public_area": "穂別稲里地区",
     "formation": "中部蝦夷層群",
     "age": "約9000万年前"
   },
@@ -10,6 +11,7 @@
     "site_id": "A002",
     "latitude": 42.87418888888889,
     "longitude": 142.1567611111111,
+    "public_area": "穂別稲里地区",
     "formation": "中部蝦夷層群",
     "age": "約9000万年前"
   },
@@ -17,6 +19,7 @@
     "site_id": "A003",
     "latitude": 42.92037777777777,
     "longitude": 142.17537222222222,
+    "public_area": "穂別長和地区",
     "formation": "中部蝦夷層群",
     "age": "約9000万年前"
   },
@@ -24,6 +27,7 @@
     "site_id": "A004",
     "latitude": 42.87372777777778,
     "longitude": 142.15763333333334,
+    "public_area": "穂別稲里地区",
     "formation": "中部蝦夷層群",
     "age": "約9000万年前"
   },
@@ -31,6 +35,7 @@
     "site_id": "A005",
     "latitude": 42.871433333333336,
     "longitude": 142.15754444444445,
+    "public_area": "穂別稲里地区",
     "formation": "中部蝦夷層群",
     "age": "約9000万年前"
   },
@@ -38,6 +43,7 @@
     "site_id": "SCHOOL",
     "latitude": 42.583639,
     "longitude": 141.920028,
+    "public_area": "鵡川高校",
     "formation": "不明",
     "age": "不明"
   }
