@@ -1,1254 +1,133 @@
-<!DOCTYPE html>
-<html lang="ja">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<title>鵡川高校 化石デジタルライブラリー</title>
-
-<link rel="stylesheet"
-      href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
-
-<style>
-:root{
-    --green-900:#183c2a;
-    --green-800:#24563d;
-    --green-700:#2f6b4c;
-    --green-100:#eaf4ed;
-    --green-050:#f5faf6;
-    --gold:#c79b3b;
-    --gold-light:#fff7df;
-    --ink:#25332b;
-    --muted:#66736b;
-    --line:#dfe7e1;
-    --surface:#ffffff;
-    --page:#f3f7f4;
-    --shadow:0 10px 30px rgba(24,60,42,.08);
-    --radius:18px;
-}
-
-*{box-sizing:border-box}
-
-html{scroll-behavior:smooth}
-
-body{
-    margin:0;
-    font-family:
-        -apple-system,
-        BlinkMacSystemFont,
-        "Noto Sans JP",
-        "Yu Gothic",
-        Meiryo,
-        sans-serif;
-    background:
-        radial-gradient(circle at top left, #ffffff 0, var(--page) 38%, #eef4f0 100%);
-    color:var(--ink);
-    line-height:1.7;
-}
-
-button,input,select{font:inherit}
-
-a{color:inherit}
-
-/* =========================================================
-   HEADER
-   ========================================================= */
-
-.site-header{
-    position:relative;
-    overflow:hidden;
-    color:#fff;
-    background:
-        linear-gradient(135deg,
-            rgba(24,60,42,.98),
-            rgba(47,107,76,.95));
-    box-shadow:0 5px 22px rgba(0,0,0,.12);
-}
-
-.site-header::after{
-    content:"";
-    position:absolute;
-    width:360px;
-    height:360px;
-    right:-120px;
-    top:-210px;
-    border:1px solid rgba(255,255,255,.18);
-    border-radius:50%;
-    box-shadow:
-        0 0 0 35px rgba(255,255,255,.04),
-        0 0 0 75px rgba(255,255,255,.03);
-}
-
-.header-inner{
-    position:relative;
-    z-index:1;
-    max-width:1250px;
-    margin:0 auto;
-    padding:30px 24px 27px;
-}
-
-.brand-kicker{
-    display:inline-flex;
-    align-items:center;
-    gap:8px;
-    padding:5px 11px;
-    border:1px solid rgba(255,255,255,.25);
-    border-radius:999px;
-    background:rgba(255,255,255,.08);
-    font-size:12px;
-    letter-spacing:.08em;
-}
-
-.brand-kicker::before{
-    content:"◆";
-    color:#e4c36e;
-}
-
-.site-title{
-    margin:12px 0 4px;
-    font-size:clamp(26px,4vw,42px);
-    line-height:1.2;
-    letter-spacing:.04em;
-    font-weight:800;
-}
-
-.site-subtitle{
-    margin:0;
-    color:rgba(255,255,255,.82);
-    font-size:14px;
-}
-
-/* =========================================================
-   NAV
-   ========================================================= */
-
-.site-nav{
-    background:#123020;
-    border-top:1px solid rgba(255,255,255,.08);
-}
-
-.nav-inner{
-    max-width:1250px;
-    margin:0 auto;
-    padding:0 24px;
-    display:flex;
-    gap:6px;
-    overflow-x:auto;
-}
-
-.site-nav a{
-    flex:none;
-    display:block;
-    padding:11px 15px;
-    color:#fff;
-    text-decoration:none;
-    font-size:13px;
-    border-bottom:3px solid transparent;
-    transition:.2s ease;
-}
-
-.site-nav a:hover{
-    background:rgba(255,255,255,.07);
-    border-bottom-color:#d9b75d;
-}
-
-/* =========================================================
-   MAIN
-   ========================================================= */
-
-.container{
-    width:min(1250px, calc(100% - 32px));
-    margin:28px auto 55px;
-}
-
-/* =========================================================
-   TOP CONTENT LAYOUT
-   左：このデータベースについて＋標本を探す
-   右：地図
-   ========================================================= */
-
-.top-content-grid{
-    display:grid;
-    grid-template-columns:minmax(0, 1fr) minmax(0, 1.28fr);
-    gap:22px;
-    align-items:stretch;
-    margin-bottom:22px;
-}
-
-.top-left-column{
-    display:flex;
-    flex-direction:column;
-    gap:22px;
-    min-width:0;
-}
-
-.top-left-column .about-box,
-.top-left-column .search-box,
-.top-right-column .map-container{
-    margin-bottom:0;
-}
-
-.top-right-column{
-    min-width:0;
-    display:flex;
-}
-
-.top-right-column .map-container{
-    width:100%;
-    display:flex;
-    flex-direction:column;
-}
-
-.top-right-column #map{
-    flex:1 1 auto;
-    min-height:450px;
-}
-
-@media(max-width:900px){
-    .top-content-grid{
-        grid-template-columns:1fr;
-    }
-
-    .top-right-column #map{
-        flex:none;
-    }
-}
-
-/* =========================================================
-   ABOUT / TOP SUMMARY
-   ========================================================= */
-
-.about-box{
-    position:relative;
-    overflow:hidden;
-    background:var(--surface);
-    border:1px solid var(--line);
-    border-radius:var(--radius);
-    box-shadow:var(--shadow);
-    margin-bottom:22px;
-}
-
-.about-box::before{
-    content:"";
-    display:block;
-    height:6px;
-    background:linear-gradient(90deg,var(--green-800),var(--gold),var(--green-700));
-}
-
-.about-inner{
-    padding:25px 28px 26px;
-}
-
-.section-heading{
-    display:flex;
-    align-items:flex-start;
-    gap:14px;
-    margin:0 0 18px;
-}
-
-.section-icon{
-    flex:none;
-    width:42px;
-    height:42px;
-    display:grid;
-    place-items:center;
-    border-radius:12px;
-    background:var(--green-100);
-    color:var(--green-800);
-    font-size:20px;
-}
-
-.section-heading h2{
-    margin:0;
-    font-size:22px;
-    line-height:1.35;
-}
-
-.section-heading p{
-    margin:3px 0 0;
-    color:var(--muted);
-    font-size:12px;
-}
-
-.about-content{
-    color:#34443b;
-}
-
-.about-content p{
-    margin:0 0 8px;
-}
-
-.about-content{
-    font-size:13px;
-    line-height:1.55;
-}
-
-.about-content p:last-child{
-    margin-bottom:0;
-}
-
-.about-link{
-    display:inline-flex;
-    align-items:center;
-    gap:6px;
-    margin-top:8px;
-    padding:8px 13px;
-    border-radius:999px;
-    color:#fff;
-    background:var(--green-800);
-    text-decoration:none;
-    font-size:13px;
-}
-
-.about-link:hover{
-    background:var(--green-700);
-}
-
-/* =========================================================
-   SEARCH
-   ========================================================= */
-
-.search-box{
-    background:var(--surface);
-    border:1px solid var(--line);
-    border-radius:var(--radius);
-    padding:22px;
-    box-shadow:var(--shadow);
-    margin-bottom:20px;
-}
-
-.search-main{
-    position:relative;
-}
-
-.search-main input{
-    width:100%;
-    padding:14px 17px 14px 45px;
-    border:1px solid #cfdad2;
-    border-radius:12px;
-    outline:none;
-    background:#fbfdfb;
-    color:var(--ink);
-    transition:.2s ease;
-}
-
-.search-main input:focus{
-    border-color:var(--green-700);
-    box-shadow:0 0 0 4px rgba(47,107,76,.10);
-}
-
-.search-icon{
-    position:absolute;
-    left:16px;
-    top:50%;
-    transform:translateY(-50%);
-    color:var(--muted);
-}
-
-.filter-search{
-    display:grid;
-    grid-template-columns:repeat(3,1fr);
-    gap:10px;
-    margin-top:12px;
-}
-
-.filter-search select{
-    width:100%;
-    padding:11px 12px;
-    border:1px solid #cfdad2;
-    border-radius:10px;
-    background:#fff;
-    color:var(--ink);
-}
-
-/* =========================================================
-   STATISTICS
-   ========================================================= */
-
-.statistics{
-    display:grid;
-    grid-template-columns:repeat(3,minmax(0,1fr));
-    gap:14px;
-    margin-bottom:22px;
-}
-
-.stat-card{
-    position:relative;
-    min-width:0;
-    min-height:105px;
-    display:flex;
-    flex-direction:column;
-    justify-content:center;
-    text-align:center;
-    overflow:hidden;
-    background:var(--surface);
-    border:1px solid var(--line);
-    border-radius:15px;
-    padding:17px 20px;
-    box-shadow:var(--shadow);
-}
-
-.stat-card::after{
-    content:"";
-    position:absolute;
-    right:-20px;
-    bottom:-25px;
-    width:90px;
-    height:90px;
-    border-radius:50%;
-    background:var(--green-050);
-}
-
-.stat-number{
-    position:relative;
-    z-index:1;
-    font-size:30px;
-    line-height:1.1;
-    font-weight:800;
-    color:var(--green-800);
-}
-
-.stat-label{
-    position:relative;
-    z-index:1;
-    margin-top:5px;
-    color:var(--muted);
-    font-size:12px;
-}
-
-/* =========================================================
-   MAP
-   ========================================================= */
-
-.map-container{
-    background:var(--surface);
-    border:1px solid var(--line);
-    border-radius:var(--radius);
-    padding:22px;
-    box-shadow:var(--shadow);
-    margin-bottom:22px;
-}
-
-.map-title{
-    display:flex;
-    align-items:center;
-    gap:10px;
-    font-size:20px;
-    font-weight:800;
-    margin-bottom:13px;
-}
-
-.map-title::before{
-    content:"";
-    width:7px;
-    height:25px;
-    border-radius:999px;
-    background:var(--gold);
-}
-
-#map{
-    width:100%;
-    height:450px;
-    border-radius:13px;
-    overflow:hidden;
-    border:1px solid var(--line);
-}
-
-.map-note{
-    margin:11px 0 0;
-    padding:10px 13px;
-    border-radius:10px;
-    background:var(--gold-light);
-    border-left:4px solid var(--gold);
-    color:#6d5a2e;
-    font-size:12px;
-    line-height:1.7;
-}
-
-/* =========================================================
-   ADMINISTRATIVE AREA MAP
-   行政区域GeoJSONをそのまま表示する。
-   公開用座標から区域を生成・推定しない。
-   ========================================================= */
-
-.administrative-area{
-    stroke:#24563d;
-    stroke-width:2.5;
-    fill:#2f6b4c;
-    fill-opacity:.14;
-    cursor:pointer;
-    transition:fill-opacity .2s ease,stroke-width .2s ease;
-}
-
-.administrative-area:hover{
-    fill-opacity:.25;
-    stroke-width:3.5;
-}
-
-.region-point-label{
-    background:rgba(255,255,255,.96);
-    border:1px solid #c79b3b;
-    border-radius:999px;
-    box-shadow:0 3px 10px rgba(24,60,42,.14);
-    color:#183c2a;
-    font-weight:800;
-    font-size:12px;
-    padding:4px 9px;
-}
-
-.region-point-marker{
-    width:21px;
-    height:21px;
-    border-radius:50%;
-    background:#c79b3b;
-    border:3px solid #fff;
-    box-shadow:0 2px 8px rgba(0,0,0,.28);
-}
-
-.school-map-marker{
-    width:27px;
-    height:27px;
-    border-radius:50%;
-    background:#24563d;
-    border:4px solid #fff;
-    box-shadow:0 2px 9px rgba(0,0,0,.32);
-}
-
-.administrative-area-label{
-    background:rgba(255,255,255,.95);
-    border:1px solid #cfdad2;
-    border-radius:999px;
-    box-shadow:0 3px 10px rgba(24,60,42,.12);
-    color:#183c2a;
-    font-weight:800;
-    font-size:12px;
-    padding:4px 9px;
-}
-
-.map-popup-title{
-    font-weight:800;
-    font-size:15px;
-    margin-bottom:5px;
-}
-
-.map-popup-note{
-    color:#66736b;
-    font-size:12px;
-    line-height:1.6;
-    margin:7px 0 10px;
-}
-
-.map-popup-button{
-    border:0;
-    background:#24563d;
-    color:#fff;
-    padding:8px 11px;
-    border-radius:8px;
-    cursor:pointer;
-    font-size:12px;
-}
-
-.map-popup-button:hover{
-    background:#2f6b4c;
-}
-
-/* =========================================================
-   MAP REGION SELECTOR
-   ========================================================= */
-
-.map-region-select-title{
-    margin-top:10px;
-    padding-top:9px;
-    border-top:1px solid #e1e8e3;
-    font-size:11px;
-    font-weight:800;
-    color:#536159;
-}
-
-.map-region-select-list{
-    display:grid;
-    gap:6px;
-    margin-top:7px;
-}
-
-.map-popup-region-button{
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
-    gap:10px;
-    width:100%;
-    border:1px solid #cfdad2;
-    background:#f7faf8;
-    color:#24563d;
-    padding:7px 9px;
-    border-radius:7px;
-    cursor:pointer;
-    font-size:11px;
-    text-align:left;
-}
-
-.map-popup-region-button:hover{
-    background:#edf6ef;
-    border-color:#a9c5b2;
-}
-
-.map-popup-region-button span{
-    flex:none;
-    color:#66736b;
-    font-size:10px;
-}
-
-/* =========================================================
-   SITE FILTER
-   ========================================================= */
-
-.filter-box{
-    display:none;
-    align-items:center;
-    justify-content:space-between;
-    gap:15px;
-    background:#edf6ef;
-    border:1px solid #cfe1d3;
-    border-left:6px solid var(--green-700);
-    padding:13px 16px;
-    border-radius:13px;
-    margin-bottom:18px;
-}
-
-.filter-box.active{display:flex}
-
-#filter-title{
-    font-size:14px;
-    color:var(--green-900);
-}
-
-.clear-filter-button{
-    flex:none;
-    border:none;
-    background:var(--green-800);
-    color:white;
-    padding:8px 13px;
-    border-radius:8px;
-    cursor:pointer;
-}
-
-.clear-filter-button:hover{
-    background:var(--green-700);
-}
-
-/* =========================================================
-   RESULT
-   ========================================================= */
-
-.result-bar{
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
-    gap:12px;
-    margin:0 0 12px;
-}
-
-#result-count{
-    color:var(--muted);
-    font-size:13px;
-}
-
-/* =========================================================
-   SPECIMEN LIST
-   ========================================================= */
-
-#specimen-list{
-    display:grid;
-    grid-template-columns:repeat(auto-fill,minmax(285px,1fr));
-    gap:18px;
-}
-
-.specimen-card{
-    background:var(--surface);
-    border:1px solid var(--line);
-    border-radius:15px;
-    overflow:hidden;
-    box-shadow:0 6px 20px rgba(24,60,42,.06);
-    transition:transform .2s ease,box-shadow .2s ease,border-color .2s ease;
-}
-
-.specimen-card:hover{
-    transform:translateY(-3px);
-    border-color:#c4d7ca;
-    box-shadow:0 13px 30px rgba(24,60,42,.12);
-}
-
-.image-link{
-    display:block;
-    cursor:pointer;
-    text-decoration:none;
-    background:#eef1ef;
-}
-
-.specimen-image{
-    display:block;
-    width:100%;
-    height:220px;
-    object-fit:cover;
-    background:#eef1ef;
-    transition:transform .3s ease;
-}
-
-.specimen-card:hover .specimen-image{
-    transform:scale(1.025);
-}
-
-.image-caption{
-    padding:7px 10px;
-    text-align:center;
-    background:#f7faf8;
-    color:var(--muted);
-    font-size:11px;
-    border-top:1px solid #e5ece7;
-}
-
-.specimen-content{
-    padding:17px 18px 18px;
-}
-
-.specimen-id{
-    color:var(--muted);
-    font-size:12px;
-    margin-bottom:5px;
-}
-
-.common-name{
-    font-size:20px;
-    font-weight:800;
-    margin-bottom:3px;
-    line-height:1.35;
-}
-
-.scientific-name{
-    font-size:14px;
-    font-style:italic;
-    color:var(--muted);
-    margin-bottom:11px;
-}
-
-.classification{
-    display:inline-block;
-    background:var(--green-100);
-    color:var(--green-800);
-    padding:4px 9px;
-    border-radius:999px;
-    font-size:11px;
-    font-weight:700;
-    margin-bottom:13px;
-}
-
-.specimen-info{
-    border-top:1px solid #e8eee9;
-    padding-top:11px;
-    font-size:13px;
-}
-
-.info-row{
-    display:flex;
-    gap:8px;
-    margin-bottom:6px;
-}
-
-.info-label{
-    width:55px;
-    min-width:55px;
-    font-weight:700;
-    color:#59675f;
-}
-
-.info-value{
-    flex:1;
-    word-break:break-word;
-}
-
-/* =========================================================
-   EMPTY / MESSAGE
-   ========================================================= */
-
-.message{
-    grid-column:1 / -1;
-    text-align:center;
-    padding:55px 20px;
-    color:var(--muted);
-    background:var(--surface);
-    border:1px dashed #cbd8cf;
-    border-radius:15px;
-}
-
-/* =========================================================
-   3D MODEL
-   ========================================================= */
-
-.three-d-badge{
-    display:inline-flex;
-    align-items:center;
-    gap:5px;
-    margin:0 0 10px;
-    padding:4px 9px;
-    border-radius:999px;
-    background:#f0eee6;
-    color:#6d5a2e;
-    font-size:11px;
-    font-weight:800;
-}
-
-.three-d-section{
-    margin-top:18px;
-    padding-top:16px;
-    border-top:1px solid #e3e9e5;
-}
-
-.three-d-section-title{
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
-    gap:10px;
-    margin-bottom:9px;
-    color:#183c2a;
-    font-size:14px;
-    font-weight:800;
-}
-
-.three-d-format{
-    color:#66736b;
-    font-size:10px;
-    font-weight:600;
-}
-
-.three-d-model-list{
-    display:flex;
-    flex-wrap:wrap;
-    gap:6px;
-    margin-bottom:9px;
-}
-
-.three-d-model-button{
-    border:1px solid #cfdad2;
-    background:#f7faf8;
-    color:#24563d;
-    padding:6px 9px;
-    border-radius:7px;
-    cursor:pointer;
-    font-size:11px;
-}
-
-.three-d-model-button:hover,
-.three-d-model-button.active{
-    background:#edf6ef;
-    border-color:#a9c5b2;
-}
-
-.detail-image-panel.has-3d{
-    display:grid;
-    grid-template-rows:minmax(0,1fr) minmax(0,1fr);
-    gap:12px;
-    align-items:stretch;
-}
-
-.detail-image-panel.only-3d{
-    display:flex;
-}
-
-.detail-visual-box{
-    position:relative;
-    min-width:0;
-    min-height:0;
-    overflow:hidden;
-    border:1px solid rgba(255,255,255,.08);
-    border-radius:10px;
-    background:#111;
-}
-
-.detail-visual-label{
-    position:absolute;
-    top:9px;
-    left:9px;
-    z-index:5;
-    padding:4px 8px;
-    border-radius:999px;
-    background:rgba(0,0,0,.62);
-    color:#fff;
-    font-size:10px;
-    font-weight:800;
-    pointer-events:none;
-}
-
-.detail-image-box{
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    padding:14px;
-}
-
-.detail-image-box img{
-    max-width:100%;
-    max-height:100%;
-    object-fit:contain;
-    cursor:zoom-in;
-    border-radius:7px;
-}
-
-.three-d-viewer-host{
-    width:100%;
-    height:100%;
-    min-height:180px;
-    background:radial-gradient(circle at center,#2b302d 0,#111 72%);
-    overflow:hidden;
-    contain:layout paint size;
-}
-
-.three-d-viewer-host model-viewer{
-    display:block;
-    width:100%;
-    height:100%;
-    min-height:180px;
-    background:transparent;
-    --poster-color:transparent;
-    touch-action:pan-y;
-}
-
-.three-d-canvas{
-    display:block;
-    width:100%;
-    height:100%;
-}
-
-.three-d-message{
-    width:100%;
-    height:100%;
-    min-height:180px;
-    display:grid;
-    place-items:center;
-    padding:20px;
-    text-align:center;
-    color:#bfc7c2;
-    font-size:12px;
-    line-height:1.7;
-}
-
-.three-d-link{
-    display:inline-block;
-    margin-top:8px;
-    padding:7px 10px;
-    border-radius:7px;
-    background:#24563d;
-    color:#fff;
-    text-decoration:none;
-    font-size:11px;
-}
-
-.three-d-link:hover{
-    background:#2f6b4c;
-}
-
-/* =========================================================
-   DETAIL MODAL
-   ========================================================= */
-
-.detail-overlay{
-    position:fixed;
-    inset:0;
-    background:rgba(8,22,14,.82);
-    backdrop-filter:blur(4px);
-    z-index:9999;
-    display:none;
-    align-items:center;
-    justify-content:center;
-    padding:18px;
-    overflow:auto;
-    overscroll-behavior:contain;
-    -webkit-overflow-scrolling:touch;
-}
-
-.detail-overlay.active{display:flex}
-
-.detail-window{
-    width:100%;
-    max-width:1350px;
-    height:min(92vh,900px);
-    max-height:92vh;
-    min-height:0;
-    background:#fff;
-    border-radius:18px;
-    overflow:hidden;
-    display:grid;
-    grid-template-columns:minmax(0,56%) minmax(0,44%);
-    position:relative;
-    box-shadow:0 25px 80px rgba(0,0,0,.3);
-}
-
-.detail-image-panel{
-    background:
-        radial-gradient(circle at center,#2b302d 0,#111 70%);
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    padding:28px;
-    min-width:0;
-    min-height:0;
-    overflow:hidden;
-}
-
-.detail-image-panel img{
-    max-width:100%;
-    max-height:100%;
-    object-fit:contain;
-    cursor:zoom-in;
-    border-radius:7px;
-}
-
-.detail-data-panel{
-    padding:31px 30px;
-    min-width:0;
-    min-height:0;
-    overflow-y:auto;
-    overflow-x:hidden;
-    overscroll-behavior:contain;
-    -webkit-overflow-scrolling:touch;
-}
-
-.detail-data-panel h2{
-    margin:0 45px 17px 0;
-    font-size:26px;
-    line-height:1.35;
-}
-
-.detail-table{
-    width:100%;
-    border-collapse:collapse;
-}
-
-.detail-table th,
-.detail-table td{
-    border-bottom:1px solid #e3e9e5;
-    padding:9px 8px;
-    text-align:left;
-    vertical-align:top;
-    font-size:13px;
-}
-
-.detail-table th{
-    width:95px;
-    color:#536159;
-    background:#f7faf8;
-    font-weight:700;
-}
-
-.detail-notes{
-    margin-top:18px;
-    padding:15px;
-    background:#fff9e9;
-    border-left:4px solid var(--gold);
-    border-radius:9px;
-    line-height:1.7;
-    font-size:13px;
-}
-
-.detail-public-note{
-    margin-top:17px;
-    padding:11px 13px;
-    border-radius:9px;
-    background:#f3f7f4;
-    color:#68746c;
-    font-size:11px;
-    line-height:1.7;
-}
-
-.close-detail{
-    position:absolute;
-    top:10px;
-    right:10px;
-    z-index:10;
-    width:40px;
-    height:40px;
-    border:1px solid rgba(255,255,255,.35);
-    border-radius:50%;
-    background:rgba(0,0,0,.65);
-    color:white;
-    font-size:24px;
-    line-height:1;
-    cursor:pointer;
-}
-
-/* =========================================================
-   GALLERY
-   ========================================================= */
-
-.gallery{
-    display:flex;
-    gap:8px;
-    margin-top:16px;
-    flex-wrap:wrap;
-}
-
-.gallery-thumb{
-    width:70px;
-    height:70px;
-    object-fit:cover;
-    cursor:pointer;
-    border:2px solid transparent;
-    border-radius:7px;
-    background:#eee;
-}
-
-.gallery-thumb:hover{
-    border-color:var(--green-700);
-}
-
-/* =========================================================
-   ZOOM
-   ========================================================= */
-
-.zoom-overlay{
-    position:fixed;
-    inset:0;
-    background:rgba(0,0,0,.96);
-    z-index:10000;
-    display:none;
-    align-items:center;
-    justify-content:center;
-    padding:20px;
-}
-
-.zoom-overlay.active{display:flex}
-
-.zoom-overlay img{
-    max-width:95vw;
-    max-height:95vh;
-    object-fit:contain;
-}
-
-.close-zoom{
-    position:absolute;
-    top:10px;
-    right:18px;
-    color:#fff;
-    font-size:38px;
-    cursor:pointer;
-    z-index:2;
-}
-
-/* =========================================================
-   FOOTER
-   ========================================================= */
-
-footer{
-    margin-top:50px;
-    padding:28px 20px;
-    text-align:center;
-    background:#163a29;
-    color:rgba(255,255,255,.85);
-    font-size:12px;
-}
-
-.footer-title{
-    color:#fff;
-    font-weight:700;
-    font-size:14px;
-}
-
-/* =========================================================
-   RESPONSIVE
-   ========================================================= */
-
-@media(max-width:800px){
-    .header-inner{padding:24px 17px}
-    .container{width:min(100% - 22px,1250px);margin-top:18px}
-    .filter-search{grid-template-columns:1fr}
-    .statistics{grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
-    .stat-card{padding:13px 7px;min-height:92px}
-    .stat-number{font-size:23px}
-    .stat-label{font-size:10px}
-    #map{height:350px}
-    #specimen-list{grid-template-columns:1fr}
-    .detail-overlay{
-        align-items:flex-start;
-        justify-content:center;
-        padding:10px;
-    }
-    .detail-window{
-        height:auto;
-        max-height:none;
-        min-height:0;
-        grid-template-columns:1fr;
-        overflow:visible;
-    }
-    .detail-image-panel{
-        height:min(48vh,520px);
-        min-height:280px;
-    }
-    .detail-image-panel.has-3d{
-        grid-template-rows:minmax(0,1fr) minmax(0,1fr);
-    }
-    .detail-data-panel{
-        max-height:none;
-        overflow:visible;
-        padding:20px;
-    }
-    .mobile-hide{display:none}
-}
-
-@media(max-width:450px){
-    .site-title{font-size:24px}
-    .statistics{gap:5px}
-    .stat-number{font-size:19px}
-    .stat-label{font-size:9px}
-    .about-inner,.search-box,.map-container{padding:18px}
-    .detail-data-panel h2{font-size:22px}
-}
-</style>
-</head>
-
-<body>
-
-<header class="site-header">
-    <div class="header-inner">
-        <div class="brand-kicker">FOSSIL DIGITAL ARCHIVE</div>
-        <h1 class="site-title">鵡川高校 化石デジタルライブラリー</h1>
-        <p class="site-subtitle">
-            北海道むかわ地域の化石標本を記録・整理・閲覧するデジタル標本庫
-        </p>
-    </div>
-
-    <nav class="site-nav">
-        <div class="nav-inner">
-            <a href="#about">データベースについて</a>
-            <a href="#database">標本を探す</a>
-            <a href="#map-section">採集地点</a>
-        </div>
-    </nav>
-</header>
-
-<main class="container">
-
-<!-- =========================================================
-     ABOUT
-     ========================================================= -->
-
-<div class="top-content-grid">
-
-<div class="top-left-column">
-
-<section id="about" class="about-box">
-
-    <div class="about-inner">
-
-        <div class="section-heading">
-            <div class="section-icon">🦴</div>
-            <div>
-                <h2>このデータベースについて</h2>
-                <p>鵡川高校 化石デジタルライブラリーの概要</p>
-            </div>
-        </div>
-
-        <div class="about-content">
-
-            <!-- AUTO_ABOUT_TOP_START -->
+# -*- coding: utf-8 -*-
+
+"""
+鵡川高校 化石デジタルライブラリー
+update_all.py
+
+============================================================
+目的
+============================================================
+
+Excel・画像を追加した後、このプログラムを実行するだけで、
+
+1. 管理用Excelを読み込む
+2. データをチェックする
+3. 公開用 specimens.json を生成する
+4. 公開用 localities_public.json を生成する
+5. 標本画像を images/ に整理する
+6. サムネイルを images/thumbs/ に生成する
+7. 3Dデータを models/ に整理し、STLはWeb用GLBへ変換する
+8. Git管理対象を安全確認する
+9. 公開用ファイルだけを git add
+10. commit
+11. GitHubへpush
+12. 説明文の元ファイル about/content.html を index.html と about/index.html に反映する
+
+まで自動実行する。
+
+============================================================
+重要
+============================================================
+
+GitHubへ公開するのは以下だけ。
+
+    index.html
+    about/
+        └─ content.html  ← 説明文の元ファイル
+    images/
+    models/
+    public_data/
+    .gitignore
+
+以下はGitHubへ公開しない。
+
+    specimens.xlsx
+    localities_open.xlsx
+    01_標本データ/
+    02_標本画像/
+    03_発掘地点/
+    data_update.py
+    make_thumbs.py
+    update_all.py
+    update_all.bat
+    test.py
+    index_buckup_map.html
+
+管理用ファイルはPC上から削除しない。
+GitHubへの登録対象からのみ除外する。
+
+============================================================
+必要ライブラリ
+============================================================
+
+pandas
+openpyxl
+Pillow
+trimesh
+"""
+
+from __future__ import annotations
+
+import json
+import os
+import shutil
+import subprocess
+import sys
+from datetime import datetime
+from pathlib import Path
+
+
+# ============================================================
+# 基本設定
+# ============================================================
+
+BASE_DIR = Path(__file__).resolve().parent
+
+SPECIMENS_XLSX = BASE_DIR / "specimens.xlsx"
+
+LOCALITIES_CANDIDATES = [
+    BASE_DIR / "localities_open.xlsx",
+    BASE_DIR / "03_発掘地点" / "localities_open.xlsx",
+    BASE_DIR / "03_発掘地点" / "localities.xlsx",
+]
+
+SOURCE_IMAGE_DIRS = [
+    BASE_DIR / "02_標本画像",
+    BASE_DIR / "02_標本画像" / "images",
+    BASE_DIR / "images",
+]
+
+# 3Dデータの管理用フォルダ。
+# Excelの「3Dデータ」列に記載したファイルをここから検索する。
+SOURCE_3D_DIRS = [
+    BASE_DIR / "02_3Dデータ",
+    BASE_DIR / "02_3Dデータ" / "models",
+]
+
+PUBLIC_IMAGE_DIR = BASE_DIR / "images"
+PUBLIC_3D_DIR = BASE_DIR / "models"
+
+THUMB_DIR = PUBLIC_IMAGE_DIR / "thumbs"
+
+PUBLIC_DATA_DIR = BASE_DIR / "public_data"
+
+SPECIMENS_JSON = PUBLIC_DATA_DIR / "specimens.json"
+
+LOCALITIES_JSON = PUBLIC_DATA_DIR / "localities_public.json"
+
+# ============================================================
+# 説明文同期
+# ============================================================
+#
+# 説明文の元ファイルは about/content.html です。
+# このファイルを編集して update_all.bat を実行すると、
+# index.html と about/index.html の説明文を自動更新します。
+#
+ABOUT_CONTENT_HTML = BASE_DIR / "about" / "content.html"
+INDEX_HTML = BASE_DIR / "index.html"
+ABOUT_INDEX_HTML = BASE_DIR / "about" / "index.html"
+
+TOP_CONTENT_START = "<!-- AUTO_ABOUT_TOP_START -->
 
 <p>
     「鵡川高校 化石デジタルライブラリー」は、
@@ -1285,2520 +164,3081 @@ footer{
     「このデータベースについて」の詳細ページで説明しています。
 </p>
 
-<!-- AUTO_ABOUT_TOP_END -->
-
-            <a class="about-link" href="about/">
-                詳細な説明を見る →
-            </a>
-
-        </div>
-
-    </div>
-
-</section>
-
-<!-- =========================================================
-     SEARCH
-     ========================================================= -->
-
-<section id="database" class="search-box">
-
-    <div class="section-heading">
-        <div class="section-icon">⌕</div>
-        <div>
-            <h2>検索する</h2>
-            <p>標本番号・化石名・分類・地層・時代などから検索できます</p>
-        </div>
-    </div>
-
-    <div class="search-main">
-        <span class="search-icon">🔎</span>
-        <input
-            type="text"
-            id="search-input"
-            placeholder="標本番号・化石名・発掘地区・分類・地層・時代などで検索"
-            autocomplete="off"
-        >
-    </div>
-
-    <div class="filter-search">
-
-        <select id="classification-filter">
-            <option value="">分類：すべて</option>
-        </select>
-
-        <select id="formation-filter">
-            <option value="">地層：すべて</option>
-        </select>
-
-        <select id="age-filter">
-            <option value="">時代：すべて</option>
-        </select>
-
-    </div>
-
-</section>
+<!-- AUTO_ABOUT_TOP_END -->"
+DETAIL_CONTENT_START = "<!-- AUTO_ABOUT_DETAIL_START -->"
+DETAIL_CONTENT_END = "<!-- AUTO_ABOUT_DETAIL_END -->"
 
 
-</div><!-- /.top-left-column -->
+GIT_REMOTE = "origin"
 
-<div class="top-right-column">
+GIT_BRANCH = "main"
 
-<!-- =========================================================
-     MAP
-     ========================================================= -->
 
-<section id="map-section" class="map-container">
+# ============================================================
+# 公開対象
+# ============================================================
 
-    <div class="map-title">化石採集地点</div>
+PUBLIC_PATHS = [
+    "index.html",
+    "about",
+    "images",
+    "models",
+    "public_data",
+    ".gitignore",
+]
 
-    <div id="map"></div>
 
-    <div class="map-note">
-        ※ 地図上の区域は、公開用採集座標から生成したものではなく、
-        別ファイルの行政区域GeoJSONをそのまま表示しています。<br>
-        ※ 行政区域をクリックすると、その区域に対応付けた標本を表示できます。
-        詳細な採集位置は地図上に表示しません。
-    </div>
+# ============================================================
+# GitHubへ公開してはいけないファイル
+# ============================================================
 
-</section>
+FORBIDDEN_GIT_PATTERNS = [
+    "specimens.xlsx",
+    "localities_open.xlsx",
+    "data_update.py",
+    "make_thumbs.py",
+    "update_all.py",
+    "update_all.bat",
+    "test.py",
+    "index_buckup_map.html",
+    "01_標本データ/",
+    "02_標本画像/",
+    "02_3Dデータ/",
+    "03_発掘地点/",
+]
 
-</div><!-- /.top-right-column -->
 
-</div><!-- /.top-content-grid -->
+# ============================================================
+# Excel列名
+# ============================================================
 
-<!-- =========================================================
-     STATISTICS
-     ========================================================= -->
-
-<section class="statistics">
-
-    <div class="stat-card">
-        <div id="stat-specimens" class="stat-number">-</div>
-        <div class="stat-label">登録標本数</div>
-    </div>
-
-    <div class="stat-card">
-        <div id="stat-classifications" class="stat-number">-</div>
-        <div class="stat-label">分類群数</div>
-    </div>
-
-    <div class="stat-card">
-        <div id="stat-localities" class="stat-number">-</div>
-        <div class="stat-label">採集地点数</div>
-    </div>
-
-</section>
-
-<!-- =========================================================
-     SITE FILTER
-     ========================================================= -->
-
-<section id="filter-box" class="filter-box">
-
-    <div id="filter-title"></div>
-
-    <button
-        id="clear-filter-button"
-        class="clear-filter-button"
-        type="button"
-    >
-        すべての標本を見る
-    </button>
-
-</section>
-
-<div class="result-bar">
-    <div id="result-count">読み込み中……</div>
-</div>
-
-<div id="specimen-list">
-    <div class="message">標本データを読み込んでいます……</div>
-</div>
-
-</main>
-
-<footer>
-    <div class="footer-title">鵡川高校 化石デジタルライブラリー</div>
-    <div>北海道鵡川高等学校</div>
-</footer>
-
-<!-- =========================================================
-     DETAIL
-     ========================================================= -->
-
-<div id="detail-overlay" class="detail-overlay">
-
-    <div class="detail-window">
-
-        <button
-            class="close-detail"
-            type="button"
-            onclick="closeDetail()"
-            aria-label="詳細を閉じる"
-        >×</button>
-
-        <div id="detail-image-panel" class="detail-image-panel"></div>
-
-        <div id="detail-data-panel" class="detail-data-panel"></div>
-
-    </div>
-
-</div>
-
-<!-- =========================================================
-     ZOOM
-     ========================================================= -->
-
-<div
-    id="zoom-overlay"
-    class="zoom-overlay"
-    onclick="closeZoom()"
->
-    <div class="close-zoom">×</div>
-
-    <img
-        id="zoom-image"
-        src=""
-        alt=""
-    >
-</div>
-
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-
-<!-- GLB / glTF 表示用。model-viewer は glTF / GLB に対応。 -->
-<script
-    type="module"
-    src="https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js"
-></script>
-
-<script>
-"use strict";
-
-// ================================================================
-// GLOBAL
-// ================================================================
-
-let specimens = [];
-let localities = [];
-let administrativeAreas = null;
-let map = null;
-let currentSiteId = null;
-
-// ================================================================
-// MAP
-// ================================================================
-
-function initializeMap() {
-
-    map = L.map("map").setView(
-        [42.58, 142.13],
-        10
-    );
-
-    L.tileLayer(
-        "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
-        {
-            maxZoom: 19,
-            attribution: "&copy; OpenStreetMap contributors"
-        }
-    ).addTo(map);
+COLUMN_ALIASES = {
+    "specimen_id": [
+        "標本Ｎｏ.（MDR〇〇）",
+        "標本No.",
+        "標本番号",
+        "標本Ｎｏ",
+        "MDR番号",
+    ],
+    "classification": [
+        "分　　類",
+        "分類",
+    ],
+    "scientific_name": [
+        "学　　名",
+        "学名",
+    ],
+    "common_name": [
+        "和　　名",
+        "和名",
+    ],
+    "place": [
+        "産　　地",
+        "産地",
+    ],
+    "formation": [
+        "地　層　名",
+        "地層名",
+    ],
+    "age": [
+        "時　　代",
+        "時代",
+    ],
+    "collection_date": [
+        "採　　集　日",
+        "採集日",
+        "採　　日",
+    ],
+    "collector": [
+        "採　　集　者",
+        "採集者",
+    ],
+    "note": [
+        "備考",
+    ],
+    "image_data": [
+        "画像データ",
+        "画像",
+        "画像ファイル",
+    ],
+    "model_3d": [
+        "3Dデータ",
+        "３Ｄデータ",
+        "3Dモデル",
+        "３Ｄモデル",
+        "3Dファイル",
+        "３Ｄファイル",
+        "model_3d",
+        "model3d",
+    ],
+    "site_id": [
+        "地点ＩＤ",
+        "地点ID",
+    ],
+    "collection_position_id": [
+        "採集位置ID",
+    ],
 }
 
-// ================================================================
-// MAP MARKERS
-// ================================================================
 
-async function loadAdministrativeAreas() {
-
-    const response = await fetch(
-        "public_data/administrative_areas.geojson",
-        { cache: "no-store" }
-    );
-
-    if (!response.ok) {
-        throw new Error(
-            "administrative_areas.geojsonを読み込めませんでした。"
-        );
-    }
-
-    const geojson = await response.json();
-
-    if (
-        !geojson ||
-        geojson.type !== "FeatureCollection" ||
-        !Array.isArray(geojson.features)
-    ) {
-        throw new Error(
-            "administrative_areas.geojsonの形式が正しくありません。"
-        );
-    }
-
-    administrativeAreas = geojson;
+LOCALITY_COLUMN_ALIASES = {
+    "site_id": [
+        "地点ＩＤ",
+        "地点ID",
+        "site_id",
+    ],
+    "collection_position_id": [
+        "採集位置ID",
+        "採集位置ＩＤ",
+        "collection_position_id",
+    ],
+    "place": [
+        "産地",
+        "産　地",
+        "place",
+    ],
+    "district": [
+        "地区",
+        "地区名",
+        "発掘地区",
+        "採集地区",
+        "district",
+    ],
+    "region": [
+        "地域",
+        "地域名",
+        "発掘地域",
+        "採集地域",
+        "region",
+    ],
+    "formation": [
+        "地層名",
+        "地　層　名",
+        "formation",
+    ],
+    "age": [
+        "時代",
+        "時　代",
+        "age",
+    ],
+    "latitude": [
+        "公開用北緯",
+        "北緯",
+        "latitude",
+    ],
+    "longitude": [
+        "公開用東経",
+        "東経",
+        "longitude",
+    ],
 }
 
-function getAdministrativeSiteIds(properties) {
 
-    if (!properties || typeof properties !== "object") {
-        return [];
+# ============================================================
+# 表示
+# ============================================================
+
+def print_line(char="=", length=60):
+    print(char * length)
+
+
+def print_title(text):
+    print()
+    print_line("=")
+    print(text)
+    print_line("=")
+
+
+def print_step(number, text):
+    print()
+    print_line("-")
+    print(f"【{number}】{text}")
+    print_line("-")
+
+
+# ============================================================
+# エラー終了
+# ============================================================
+
+def fail(message):
+    print()
+    print("!" * 60)
+    print("ERROR")
+    print(message)
+    print("!" * 60)
+    print()
+    input("Enterキーを押して終了してください。")
+    sys.exit(1)
+
+
+# ============================================================
+# pandas
+# ============================================================
+
+try:
+    import pandas as pd
+except ImportError:
+    fail(
+        "pandas がインストールされていません。\n"
+        "PowerShellで次を実行してください。\n\n"
+        "pip install pandas openpyxl pillow trimesh fast-simplification"
+    )
+
+
+# ============================================================
+# Pillow
+# ============================================================
+
+try:
+    from PIL import Image
+except ImportError:
+    fail(
+        "Pillow がインストールされていません。\n"
+        "PowerShellで次を実行してください。\n\n"
+        "pip install Pillow"
+    )
+
+
+# ============================================================
+# 文字列処理
+# ============================================================
+
+def clean_text(value):
+    if value is None:
+        return ""
+
+    try:
+        if pd.isna(value):
+            return ""
+    except Exception:
+        pass
+
+    text = str(value)
+
+    text = text.replace("\ufeff", "")
+    text = text.replace("\u3000", " ")
+
+    return text.strip()
+
+
+def normalize_column_name(value):
+    text = clean_text(value)
+
+    replacements = {
+        " ": "",
+        "\u3000": "",
+        "　": "",
     }
 
-    const value =
-        properties.site_ids ??
-        properties.siteIds ??
-        properties.site_id ??
-        properties.siteId ??
-        [];
+    for old, new in replacements.items():
+        text = text.replace(old, new)
 
-    if (Array.isArray(value)) {
-        return value
-            .map(item => String(item).trim())
-            .filter(Boolean);
-    }
+    return text
 
-    if (typeof value === "string") {
-        return value
-            .split(/[、,\s]+/)
-            .map(item => item.trim())
-            .filter(Boolean);
-    }
 
-    return [];
+def find_column(df, aliases):
+    normalized_columns = {}
+
+    for column in df.columns:
+        normalized_columns[
+            normalize_column_name(column)
+        ] = column
+
+    for alias in aliases:
+        key = normalize_column_name(alias)
+
+        if key in normalized_columns:
+            return normalized_columns[key]
+
+    return None
+
+
+# ============================================================
+# ファイル確認
+# ============================================================
+
+def find_localities_file():
+    for path in LOCALITIES_CANDIDATES:
+        if path.exists():
+            return path
+
+    return None
+
+
+# ============================================================
+# 日付
+# ============================================================
+
+def format_date(value):
+    if value is None:
+        return ""
+
+    try:
+        if pd.isna(value):
+            return ""
+    except Exception:
+        pass
+
+    if isinstance(value, datetime):
+        return value.strftime("%Y-%m-%d")
+
+    text = clean_text(value)
+
+    if not text:
+        return ""
+
+    # 2026-05-30 00:00:00
+    if " " in text:
+        text = text.split(" ")[0]
+
+    return text
+
+
+# ============================================================
+# 画像ファイル名処理
+# ============================================================
+
+def split_image_names(value):
+    """
+    Excelの「画像データ」に複数画像が書かれている場合にも対応。
+
+    例：
+
+        MDR260530-01.jpg
+        MDR260530-01.jpg, MDR260530-01-2.jpg
+
+    区切り文字：
+        ,
+        ，
+        ;
+        ；
+        改行
+    """
+
+    text = clean_text(value)
+
+    if not text:
+        return []
+
+    for separator in ["，", "；", ";", "\n", "\r"]:
+        text = text.replace(separator, ",")
+
+    names = []
+
+    for item in text.split(","):
+        item = item.strip()
+
+        if item:
+            names.append(item)
+
+    # 重複削除
+    result = []
+
+    for name in names:
+        if name not in result:
+            result.append(name)
+
+    return result
+
+
+# ============================================================
+# 3Dデータファイル名処理
+# ============================================================
+
+def split_3d_names(value):
+    """
+    Excelの「3Dデータ」に複数ファイルが書かれている場合にも対応。
+
+    例：
+        MDR260530-01.glb
+        MDR260530-01.stl, MDR260530-01b.stl
+    """
+
+    text = clean_text(value)
+
+    if not text:
+        return []
+
+    for separator in ["，", "；", ";", "\n", "\r"]:
+        text = text.replace(separator, ",")
+
+    names = []
+
+    for item in text.split(","):
+        item = item.strip()
+        if item:
+            names.append(item)
+
+    result = []
+
+    for name in names:
+        if name not in result:
+            result.append(name)
+
+    return result
+
+
+# ============================================================
+# 3Dデータ検索
+# ============================================================
+
+THREE_D_EXTENSIONS = {
+    ".glb",
+    ".gltf",
+    ".stl",
 }
 
-// ================================================================
-// 公開採集地域の対応関係
-// ================================================================
-// 行政区域Polygonと地区代表Pointは役割を分ける。
-//
-// Polygon : 国土数値情報等の行政区域
-// Point   : 「穂別長和」「穂別稲里」などの公開地図用代表点
-//
-// 標本との対応付けには公開用採集座標を使用しない。
-// GeoJSONのsite_idsが設定されていればそれを最優先し、
-// 未設定の場合はlocalities_public.jsonの「place」等から
-// 地区名を読み取ってsite_idを対応付ける。
-// ================================================================
+# STLはWebブラウザでそのまま表示するのではなく、
+# 軽量Web用GLBへ変換して公開する。
+# 数値は「Web表示用の目安」であり、変換に失敗した場合は
+# 元形状を維持したGLB生成へフォールバックする。
+STL_WEB_MAX_FACES = 100000
+STL_WEB_SUFFIX = "_web.glb"
 
-function getRegionPointFeatures() {
 
-    if (
-        !administrativeAreas ||
-        !Array.isArray(administrativeAreas.features)
-    ) {
-        return [];
-    }
+# ============================================================
+# 3Dデータ検索
+# ============================================================
 
-    return administrativeAreas.features.filter(feature =>
-        feature &&
-        feature.geometry &&
-        feature.geometry.type === "Point" &&
-        feature.properties &&
-        (
-            feature.properties.feature_type === "region_point" ||
-            feature.properties.region_point === true
+def find_3d_file(filename):
+    """
+    Excelの「3Dデータ」欄に記載されたファイルを
+    管理用3Dフォルダから検索する。
+
+    ・絶対パスには依存しない。
+    ・入力にフォルダを含む場合はファイル名だけを使用する。
+    ・SOURCE_3D_DIRS を上から順に検索する。
+    ・サブフォルダも再帰検索する。
+    ・同名ファイルが複数ある場合は最初に見つかったものを採用する。
+    """
+    if not filename:
+        return None
+
+    filename = clean_text(filename)
+    if not filename:
+        return None
+
+    filename_only = Path(filename).name
+    if not filename_only:
+        return None
+
+    # まず指定された名前をそのまま検索する。
+    candidates = []
+
+    for directory in SOURCE_3D_DIRS:
+        if not directory.exists():
+            continue
+
+        candidates.append(directory / filename_only)
+
+        try:
+            candidates.extend(directory.rglob(filename_only))
+        except Exception:
+            pass
+
+    # Windowsでは通常ファイル名の大文字・小文字を区別しないが、
+    # GitHub/公開環境との違いを考慮し、見つからない場合だけ
+    # 大文字・小文字を無視した検索も行う。
+    checked = set()
+
+    for path in candidates:
+        try:
+            resolved = path.resolve()
+        except Exception:
+            resolved = path
+
+        if resolved in checked:
+            continue
+        checked.add(resolved)
+
+        if path.exists() and path.is_file():
+            if path.suffix.lower() in THREE_D_EXTENSIONS:
+                return path
+
+    target_lower = filename_only.lower()
+
+    for directory in SOURCE_3D_DIRS:
+        if not directory.exists():
+            continue
+
+        try:
+            for path in directory.rglob('*'):
+                if not path.is_file():
+                    continue
+                if path.name.lower() != target_lower:
+                    continue
+                if path.suffix.lower() not in THREE_D_EXTENSIONS:
+                    continue
+                return path
+        except Exception:
+            pass
+
+    return None
+
+
+# ============================================================
+# trimesh確認
+# ============================================================
+
+def load_trimesh():
+    """STL→GLB変換に必要なtrimeshを遅延読み込みする。"""
+    try:
+        import trimesh
+        return trimesh
+    except ImportError:
+        raise RuntimeError(
+            "STL→GLB変換に必要な trimesh がインストールされていません。\n\n"
+            "PowerShellで次を実行してください。\n\n"
+            "pip install trimesh\n\n"
+            "既存の画像・JSON・GitHub処理はこのエラーとは独立しています。"
         )
-    );
-}
 
-function normalizePublicPlace(value) {
 
-    return String(value || "")
-        .trim()
-        .replace(/\s+/g, "");
-}
+# ============================================================
+# STL読み込み・Web用GLB変換
+# ============================================================
 
-function getRegionSiteIdsFromLocalities(
-    regionName,
-    keywords,
-    district
-) {
+def simplify_mesh_for_web(mesh, max_faces=STL_WEB_MAX_FACES):
+    """
+    Web表示用にSTLメッシュを可能な範囲で軽量化する。
 
-    const siteIds = new Set();
+    fast_simplification等の追加ライブラリが利用できる場合のみ
+    面数削減を試みる。利用できない場合や削減に失敗した場合は
+    元メッシュをそのまま使用する。
+    """
+    try:
+        faces = len(mesh.faces)
+    except Exception:
+        return mesh
 
-    const normalizedRegionName = normalizePublicPlace(regionName);
-    const normalizedDistrict = normalizePublicPlace(district);
+    if faces <= max_faces:
+        return mesh
 
-    const keywordList = Array.isArray(keywords)
-        ? keywords
-            .map(keyword => normalizePublicPlace(keyword))
-            .filter(Boolean)
-        : [];
+    try:
+        simplified = mesh.simplify_quadric_decimation(
+            face_count=max_faces
+        )
 
-    // 地区名として最低限認識しておく名称。
-    // 将来的にはGeoJSONのkeywordsを追加するだけで拡張できる。
-    if (normalizedDistrict) {
-        keywordList.push(normalizedDistrict);
-    }
-
-    localities.forEach(locality => {
-
-        if (!locality || !locality.site_id) {
-            return;
-        }
-
-        const place = normalizePublicPlace(
-            locality.place ||
-            locality.region ||
-            locality.district ||
-            ""
-        );
-
-        if (!place) {
-            return;
-        }
-
-        const localityDistrict = normalizePublicPlace(
-            locality.district ||
-            ""
-        );
-
-        const matched =
-            (
-                normalizedRegionName &&
-                (
-                    place.includes(normalizedRegionName) ||
-                    normalizedRegionName.includes(place)
-                )
-            ) ||
-            (
-                normalizedDistrict &&
-                (
-                    place.includes(normalizedDistrict) ||
-                    localityDistrict.includes(normalizedDistrict)
-                )
-            ) ||
-            keywordList.some(keyword =>
-                place.includes(keyword) ||
-                localityDistrict.includes(keyword)
-            );
-
-        if (matched) {
-            siteIds.add(
-                String(locality.site_id).trim()
-            );
-        }
-    });
-
-    return Array.from(siteIds).filter(Boolean);
-}
-
-function getPublicRegionDefinitions() {
-
-    return getRegionPointFeatures().map(feature => {
-
-        const properties = feature.properties || {};
-
-        const regionName = String(
-            properties.region_name ||
-            properties.regionName ||
-            properties.display_name ||
-            properties.displayName ||
-            properties.name ||
-            "公開採集地域"
-        ).trim();
-
-        const regionKey = String(
-            properties.region_key ||
-            properties.regionKey ||
-            properties.area_id ||
-            properties.id ||
-            regionName
-        ).trim();
-
-        let siteIds = getAdministrativeSiteIds(properties);
-
-        // GeoJSONにsite_idsが明示されている場合は、それを最優先。
-        // site_idsが空の場合だけlocalities_public.jsonから対応付ける。
-        if (!siteIds.length) {
-            siteIds = getRegionSiteIdsFromLocalities(
-                regionName,
-                properties.keywords || [],
-                properties.district || ""
-            );
-        }
-
-        const regionSpecimens = specimens.filter(specimen =>
-            siteIds.includes(
-                String(specimen.site_id || "").trim()
+        if simplified is not None and len(simplified.faces) > 0:
+            print(
+                f"  OK：STLをWeb表示用に軽量化しました："
+                f"{faces:,}面 → {len(simplified.faces):,}面"
             )
-        );
+            return simplified
 
-        const coordinates =
-            feature.geometry &&
-            Array.isArray(feature.geometry.coordinates)
-                ? feature.geometry.coordinates
-                : [];
+    except Exception as error:
+        print(
+            "  WARNING：STLの軽量化を実行できませんでした。"
+        )
+        print(
+            f"           {error}"
+        )
+        print(
+            "           元の形状を維持したGLBを生成します。"
+        )
 
-        // map_centerを最優先する。
-        // GeoJSON Pointのcoordinatesは [経度, 緯度] なので、
-        // Leaflet用には [緯度, 経度] に変換する。
-        let mapCenter = null;
+    return mesh
 
-        if (
-            Array.isArray(properties.map_center) &&
-            properties.map_center.length === 2
-        ) {
-            const lat = Number(properties.map_center[0]);
-            const lng = Number(properties.map_center[1]);
 
-            if (
-                Number.isFinite(lat) &&
-                Number.isFinite(lng)
-            ) {
-                mapCenter = [lat, lng];
-            }
-        }
+def convert_stl_to_web_glb(source, destination):
+    """
+    管理用STLをWeb用GLBへ変換する。
 
-        if (
-            !mapCenter &&
-            coordinates.length === 2
-        ) {
-            const lng = Number(coordinates[0]);
-            const lat = Number(coordinates[1]);
+    重要：
+      - 公開側にはSTLをコピーしない。
+      - ExcelのSTLファイル名から *_web.glb を生成する。
+      - GLB生成後はindex.htmlが参照できる公開URLだけをJSONへ渡す。
+    """
+    trimesh = load_trimesh()
 
-            if (
-                Number.isFinite(lat) &&
-                Number.isFinite(lng)
-            ) {
-                mapCenter = [lat, lng];
-            }
-        }
+    try:
+        loaded = trimesh.load(
+            str(source),
+            file_type="stl",
+            force="mesh",
+            process=False
+        )
+    except Exception as error:
+        raise RuntimeError(
+            "STLの読み込みに失敗しました：\n"
+            f"{source}\n\n"
+            f"{error}"
+        )
 
-        return {
-            feature,
-            regionKey,
-            name: regionName,
-            siteIds,
-            specimenCount: regionSpecimens.length,
-            mapCenter
-        };
-    });
-}
-
-function getAdministrativeAreaName(properties) {
-
-    if (!properties || typeof properties !== "object") {
-        return "公開採集地域";
-    }
-
-    return String(
-        properties.region_name ??
-        properties.regionName ??
-        properties.display_name ??
-        properties.displayName ??
-        properties.name ??
-        properties.NAME ??
-        properties.municipality ??
-        "公開採集地域"
-    ).trim() || "公開採集地域";
-}
-
-function getAdministrativeAreaKey(properties, index) {
-
-    if (!properties || typeof properties !== "object") {
-        return "area-" + index;
-    }
-
-    return String(
-        properties.region_key ??
-        properties.regionKey ??
-        properties.area_id ??
-        properties.id ??
-        properties.code ??
-        "area-" + index
-    );
-}
-
-// ================================================================
-// 地区代表Point用の公開説明文
-// ================================================================
-// GeoJSONのdescriptionに同じ意味の文章が入っていても、
-// 画面では必ず一文だけ表示する。
-
-function getRegionPublicNote(_region) {
-
-    return "この位置は地区の代表位置であり、詳細な採集地点を示すものではありません。";
-}
-
-// ================================================================
-// 地区代表Pointへ移動
-// ================================================================
-
-function focusRegionPoint(regionKey) {
-
-    const region = getPublicRegionDefinitions().find(item =>
-        String(item.regionKey) === String(regionKey)
-    );
-
-    if (!region || !region.mapCenter || !map) {
-        return;
-    }
-
-    map.flyTo(
-        region.mapCenter,
-        Math.max(map.getZoom(), 13),
-        { duration: 0.8 }
-    );
-
-    // flyTo完了後に代表Pointの説明ポップアップを開く。
-    setTimeout(() => {
-
-        const popupHtml = createRegionPointPopupHtml(region);
-
-        L.popup({
-            maxWidth: 340,
-            closeButton: true,
-            autoPan: true
-        })
-        .setLatLng(region.mapCenter)
-        .setContent(popupHtml)
-        .openOn(map);
-
-    }, 850);
-}
-
-// ================================================================
-// 地区代表Pointのポップアップ
-// ================================================================
-
-function createRegionPointPopupHtml(region) {
-
-    const publicNote = getRegionPublicNote(region);
-
-    return `
-        <div class="map-popup">
-            <div class="map-popup-title">
-                ${escapeHtml(region.name)}
-            </div>
-
-            <div class="map-popup-note">
-                ${escapeHtml(publicNote)}
-            </div>
-
-            <div style="margin-bottom:8px;">
-                対象標本：${region.specimenCount}件
-            </div>
-
-            <button
-                class="map-popup-button"
-                type="button"
-                onclick="event.stopPropagation(); filterByRegionKey('${escapeAttribute(region.regionKey)}')"
-            >
-                この地域の化石を見る
-            </button>
-        </div>
-    `;
-}
-
-// ================================================================
-// 地区代表Pointの標本フィルタ
-// ================================================================
-// ポップアップHTMLへsite_id配列そのものを埋め込むのではなく、
-// regionKeyからGeoJSON上の地区定義を再取得して絞り込む。
-// これにより、将来地区を追加しても同じ仕組みで動作する。
-
-function filterByRegionKey(regionKey) {
-
-    const region = getPublicRegionDefinitions().find(item =>
-        String(item.regionKey) === String(regionKey)
-    );
-
-    if (!region) {
-        return;
-    }
-
-    filterByRegion(
-        region.siteIds,
-        region.name,
-        region.regionKey
-    );
-}
-
-// ================================================================
-// 「公開採集地域から選択」
-// ================================================================
-
-function createPublicRegionSelectorHtml(publicRegions) {
-
-    const usableRegions = publicRegions.filter(region =>
-        region.siteIds.length
-    );
-
-    if (!usableRegions.length) {
-        return "";
-    }
-
-    return `
-        <div class="map-region-select-title">
-            公開採集地域から選択
-        </div>
-        <div class="map-region-select-list">
-            ${usableRegions.map(region => `
-                <button
-                    class="map-popup-region-button"
-                    type="button"
-                    onclick="event.stopPropagation(); focusRegionPoint('${escapeAttribute(region.regionKey)}')"
-                >
-                    <span>${escapeHtml(region.name)}</span>
-                    <span>${region.specimenCount}件</span>
-                </button>
-            `).join("")}
-        </div>
-    `;
-}
-
-// ================================================================
-// 地区代表Pointを地図上に表示
-// ================================================================
-
-function displayRegionPointFeatures() {
-
-    if (!map) {
-        return;
-    }
-
-    const publicRegions = getPublicRegionDefinitions();
-
-    publicRegions.forEach(region => {
-
-        if (!region.mapCenter) {
-            return;
-        }
-
-        const marker = L.marker(
-            region.mapCenter,
-            {
-                icon: L.divIcon({
-                    className: "region-point-marker-wrapper",
-                    html: '<div class="region-point-marker"></div>',
-                    iconSize: [27, 27],
-                    iconAnchor: [13.5, 13.5]
-                }),
-                zIndexOffset: 300
-            }
-        ).addTo(map);
-
-        marker.bindTooltip(
-            region.name,
-            {
-                direction: "top",
-                offset: [0, -7],
-                className: "region-point-label",
-                opacity: 1
-            }
-        );
-
-        marker.bindPopup(
-            createRegionPointPopupHtml(region),
-            {
-                maxWidth: 340
-            }
-        );
-
-        marker.on("click", function() {
-            marker.openPopup();
-        });
-    });
-}
-
-// ================================================================
-// 鵡川高校固定ピン
-// ================================================================
-
-function displaySchoolPin() {
-
-    if (!map) {
-        return;
-    }
-
-    // 北海道鵡川高等学校
-    // 〒054-0032 北海道勇払郡むかわ町福住4丁目2番地1
-    const schoolLatLng = [42.5835966, 141.919786];
-
-    const schoolMarker = L.marker(
-        schoolLatLng,
-        {
-            icon: L.divIcon({
-                className: "school-marker-wrapper",
-                html: '<div class="school-map-marker"></div>',
-                iconSize: [22, 22],
-                iconAnchor: [11, 11]
-            }),
-            zIndexOffset: 1000
-        }
-    ).addTo(map);
-
-    schoolMarker.bindTooltip(
-        "鵡川高校",
-        {
-            permanent: true,
-            direction: "top",
-            offset: [0, -10],
-            className: "region-point-label",
-            opacity: 1
-        }
-    );
-
-    schoolMarker.bindPopup(`
-        <div class="map-popup">
-            <div class="map-popup-title">鵡川高校</div>
-            <div class="map-popup-note">
-                学校保管標本など、採集地点を特定できない標本を
-                「鵡川高校」として表示するための固定ピンです。
-            </div>
-            <button
-                class="map-popup-button"
-                type="button"
-                onclick="event.stopPropagation(); filterSchoolSpecimens()"
-            >
-                鵡川高校の標本を見る
-            </button>
-        </div>
-    `);
-
-    schoolMarker.on("click", function() {
-        schoolMarker.openPopup();
-    });
-}
-
-function filterSchoolSpecimens() {
-
-    const filtered = specimens.filter(specimen => {
-        const values = [
-            specimen.site_id,
-            specimen.region_id,
-            specimen.region_key,
-            specimen.place,
-            specimen.locality,
-            specimen.location
+    # STLは通常Trimeshだが、環境差を考慮してSceneにも対応する。
+    if isinstance(loaded, trimesh.Scene):
+        meshes = [
+            geometry.copy()
+            for geometry in loaded.geometry.values()
+            if isinstance(geometry, trimesh.Trimesh)
         ]
-        .map(value =>
-            String(value || "").trim().toUpperCase()
-        );
 
-        return values.includes("SCHOOL");
-    });
+        if not meshes:
+            raise RuntimeError(
+                f"STLから有効なメッシュを取得できませんでした：{source}"
+            )
 
-    currentSiteId = "SCHOOL";
+        mesh = trimesh.util.concatenate(meshes)
+    elif isinstance(loaded, trimesh.Trimesh):
+        mesh = loaded
+    else:
+        raise RuntimeError(
+            f"STLから対応するメッシュを取得できませんでした：{source}"
+        )
 
-    document.getElementById("search-input").value = "";
-    resetDropdownFilters();
+    try:
+        mesh.remove_unreferenced_vertices()
+    except Exception:
+        pass
 
-    const box = document.getElementById("filter-box");
-    box.classList.add("active");
+    mesh = simplify_mesh_for_web(mesh)
 
-    document.getElementById("filter-title").innerHTML = `
-        <strong>鵡川高校</strong>
-        の標本　${filtered.length}件
-    `;
+    destination.parent.mkdir(
+        parents=True,
+        exist_ok=True
+    )
 
-    displaySpecimens(filtered);
+    try:
+        mesh.export(
+            str(destination),
+            file_type="glb"
+        )
+    except Exception as error:
+        raise RuntimeError(
+            "STL→GLB変換に失敗しました：\n"
+            f"入力：{source}\n"
+            f"出力：{destination}\n\n"
+            f"{error}"
+        )
 
-    document.getElementById("filter-box").scrollIntoView({
-        behavior: "smooth",
-        block: "center"
-    });
-}
+    if not destination.exists() or destination.stat().st_size == 0:
+        raise RuntimeError(
+            "STL→GLB変換後のGLBファイルが生成されませんでした：\n"
+            f"{destination}"
+        )
 
-// ================================================================
-// 行政区域Polygonを表示
-// ================================================================
+    print(
+        f"  OK：STL→Web用GLB変換："
+        f"{source.name} → {destination.name}"
+    )
 
-function displayAdministrativeAreasOnMap() {
 
-    if (!map || !administrativeAreas) {
-        return;
-    }
+def make_web_glb_name(source_name):
+    """STLファイル名からWeb用GLBファイル名を作る。"""
+    source = Path(source_name)
+    return source.stem + STL_WEB_SUFFIX
 
-    const layers = [];
-    const publicRegions = getPublicRegionDefinitions();
 
-    administrativeAreas.features.forEach((feature, index) => {
+# ============================================================
+# glTF外部ファイルのコピー
+# ============================================================
 
-        if (!feature || !feature.geometry) {
-            return;
-        }
+def copy_gltf_dependencies(source, destination):
+    """
+    .gltf が参照している外部 .bin / テクスチャ等を、
+    .gltf と同じ相対構造で公開フォルダへコピーする。
 
-        // Point Featureは行政区域Polygonとは別に表示する。
-        if (feature.geometry.type === "Point") {
-            return;
-        }
+    data: URI と http(s) URL は対象外。
+    """
+    try:
+        gltf_data = json.loads(
+            source.read_text(encoding="utf-8")
+        )
+    except Exception as error:
+        print(
+            f"  WARNING：glTF JSONの解析に失敗しました："
+            f"{source.name}"
+        )
+        print(f"           {error}")
+        return
 
-        const properties = feature.properties || {};
-        const regionName = getAdministrativeAreaName(properties);
-        const regionKey = getAdministrativeAreaKey(properties, index);
+    uris = []
+    for section_name in ["buffers", "images"]:
+        section = gltf_data.get(section_name, [])
 
-        let siteIds = getAdministrativeSiteIds(properties);
+        if not isinstance(section, list):
+            continue
 
-        // むかわ町Polygon全体については、公開用localitiesに登録された
-        // 地点IDをまとめて「この区域の標本」とする。
-        if (
-            !siteIds.length &&
-            String(regionName).includes("むかわ町")
-        ) {
-            siteIds = Array.from(
-                new Set(
-                    localities
-                        .map(locality =>
-                            String(locality.site_id || "").trim()
-                        )
-                        .filter(Boolean)
+        for item in section:
+            if not isinstance(item, dict):
+                continue
+
+            uri = item.get("uri")
+
+            if not uri or not isinstance(uri, str):
+                continue
+
+            if uri.startswith("data:"):
+                continue
+
+            if "://" in uri:
+                print(
+                    f"  WARNING：外部URL参照は自動コピーしません："
+                    f"{uri}"
                 )
-            );
-        }
+                continue
 
-        const regionSpecimens = specimens.filter(specimen =>
-            siteIds.includes(
-                String(specimen.site_id || "").trim()
+            uris.append(uri)
+
+    seen = set()
+
+    # sourceが属する管理用3Dフォルダを特定する。
+    source_root = None
+
+    try:
+        resolved_source = source.resolve()
+
+        for root in SOURCE_3D_DIRS:
+            if not root.exists():
+                continue
+
+            resolved_root = root.resolve()
+
+            try:
+                resolved_source.relative_to(resolved_root)
+                source_root = resolved_root
+                break
+            except ValueError:
+                continue
+
+    except Exception:
+        source_root = None
+
+    if source_root is None:
+        source_root = source.parent.resolve()
+
+    for uri in uris:
+        if uri in seen:
+            continue
+
+        seen.add(uri)
+
+        try:
+            relative_path = Path(uri)
+            dependency_source = (
+                source.parent / relative_path
+            ).resolve()
+
+            dependency_source.relative_to(source_root)
+
+        except Exception:
+            print(
+                f"  WARNING：glTF参照ファイルを安全に解決できません："
+                f"{uri}"
             )
-        );
+            continue
 
-        const selectorHtml = createPublicRegionSelectorHtml(
-            publicRegions
-        );
-
-        const layer = L.geoJSON(
-            feature,
-            {
-                style: {
-                    color: "#24563d",
-                    weight: 2.5,
-                    fillColor: "#2f6b4c",
-                    fillOpacity: 0.14,
-                    className: "administrative-area"
-                },
-                onEachFeature: function(_feature, areaLayer) {
-
-                    areaLayer.bindTooltip(
-                        regionName,
-                        {
-                            permanent: true,
-                            direction: "center",
-                            className: "administrative-area-label",
-                            opacity: 1
-                        }
-                    );
-
-                    areaLayer.bindPopup(`
-                        <div class="map-popup">
-                            <div class="map-popup-title">
-                                ${escapeHtml(regionName)}
-                            </div>
-
-                            <div>
-                                対象標本：${regionSpecimens.length}件
-                            </div>
-
-                            <div class="map-popup-note">
-                                この区域は国土数値情報の行政区域GeoJSONを
-                                そのまま表示しています。<br>
-                                公開用採集座標から区域を作成・推定していません。
-                            </div>
-
-                            <button
-                                class="map-popup-button"
-                                type="button"
-                                onclick="event.stopPropagation(); filterByRegion(
-                                    ${JSON.stringify(siteIds)},
-                                    '${escapeAttribute(regionName)}',
-                                    '${escapeAttribute(regionKey)}'
-                                )"
-                            >
-                                この区域の標本を見る
-                            </button>
-
-                            ${selectorHtml}
-                        </div>
-                    `);
-
-                    // Polygonをクリックしただけでは標本一覧を変更しない。
-                    // 「公開採集地域から選択」または「この区域の標本を見る」から
-                    // 明示的に標本フィルタを実行する。
-                    areaLayer.on("click", function() {
-                        areaLayer.openPopup();
-                    });
-                }
-            }
-        ).addTo(map);
-
-        layers.push(layer);
-    });
-
-    // 地区代表Pointを表示
-    displayRegionPointFeatures();
-
-    // 鵡川高校固定ピンを常時表示
-    displaySchoolPin();
-
-    if (layers.length) {
-        const group = L.featureGroup(layers);
-        map.fitBounds(
-            group.getBounds(),
-            { padding: [30, 30] }
-        );
-    }
-}
-
-// ================================================================
-// REGION FILTER
-// ================================================================
-// 行政区域GeoJSONまたは地区代表Pointから渡されたsite_idを使って
-// 標本を絞り込む。公開座標との空間判定は行わない。
-
-function filterByRegion(siteIds, regionName, regionKey) {
-
-    const normalizedSiteIds = (Array.isArray(siteIds) ? siteIds : [])
-        .map(siteId => String(siteId).trim())
-        .filter(Boolean);
-
-    currentSiteId = null;
-
-    document.getElementById("search-input").value = "";
-    resetDropdownFilters();
-
-    const filtered = specimens.filter(
-        specimen =>
-            normalizedSiteIds.includes(
-                String(specimen.site_id || "").trim()
+        if not dependency_source.exists() or not dependency_source.is_file():
+            print(
+                f"  WARNING：glTF参照ファイルが見つかりません："
+                f"{uri}"
             )
-    );
+            continue
 
-    const box = document.getElementById("filter-box");
-    box.classList.add("active");
+        try:
+            relative_to_root = dependency_source.relative_to(source_root)
 
-    document.getElementById("filter-title").innerHTML = `
-        <strong>${escapeHtml(regionName)}</strong>
-        の標本　${filtered.length}件
-    `;
-
-    displaySpecimens(filtered);
-
-    document.getElementById("filter-box").scrollIntoView({
-        behavior: "smooth",
-        block: "center"
-    });
-}
-
-// ================================================================
-// LOAD DATA
-// ================================================================
-
-async function loadData() {
-
-    try {
-
-        initializeMap();
-
-        const specimenResponse = await fetch(
-            "public_data/specimens.json",
-            { cache: "no-store" }
-        );
-
-        if (!specimenResponse.ok) {
-            throw new Error(
-                "specimens.jsonを読み込めませんでした。"
-            );
-        }
-
-        specimens = await specimenResponse.json();
-
-        // 公開地域名と地点IDの対応だけを取得する。
-        // 緯度・経度は地図区域の生成・判定には使用しない。
-        const localityResponse = await fetch(
-            "public_data/localities_public.json",
-            { cache: "no-store" }
-        );
-
-        if (!localityResponse.ok) {
-            throw new Error(
-                "localities_public.jsonを読み込めませんでした。"
-            );
-        }
-
-        localities = await localityResponse.json();
-
-        if (!Array.isArray(localities)) {
-            throw new Error(
-                "localities_public.jsonの形式が正しくありません。"
-            );
-        }
-
-        // ============================================================
-        // 地図はlocalities_public.jsonの公開座標を使用しない。
-        // 行政区域GeoJSONそのものを表示し、区域と標本の対応は
-        // GeoJSONのproperties.site_idsで明示的に管理する。
-        // ============================================================
-        try {
-            await loadAdministrativeAreas();
-            displayAdministrativeAreasOnMap();
-        } catch (mapError) {
-            console.error(mapError);
-
-            const mapNote = document.querySelector(".map-note");
-
-            if (mapNote) {
-                mapNote.innerHTML = `
-                    ※ 行政区域GeoJSONを読み込めなかったため、
-                    地図上の区域表示は現在利用できません。<br>
-                    標本検索・絞り込み・画像表示など、
-                    地図以外の機能はそのまま利用できます。<br>
-                    ※ 地図表示には公開用採集座標を使用していません。
-                `;
-            }
-        }
-
-        runDataIntegrityChecks();
-        updateStatistics();
-        createFilterOptions();
-        displaySpecimens(specimens);
-
-        openSpecimenFromURL();
-
-    } catch (error) {
-
-        console.error(error);
-
-        document.getElementById(
-            "specimen-list"
-        ).innerHTML = `
-            <div class="message">
-                データを読み込めませんでした。<br><br>
-                ${escapeHtml(error.message)}
-            </div>
-        `;
-    }
-}
-
-// ================================================================
-// STATISTICS
-// ================================================================
-
-function runDataIntegrityChecks() {
-
-    const duplicateSpecimenIds = new Set();
-    const seenSpecimenIds = new Set();
-
-    specimens.forEach(specimen => {
-        const id = String(specimen.specimen_id || "").trim();
-        if (!id) return;
-        if (seenSpecimenIds.has(id)) {
-            duplicateSpecimenIds.add(id);
-        }
-        seenSpecimenIds.add(id);
-    });
-
-    const localitySiteIds = new Set(
-        localities
-            .map(locality => String(locality.site_id || "").trim())
-            .filter(Boolean)
-    );
-
-    const missingSiteIds = new Set();
-    specimens.forEach(specimen => {
-        const siteId = String(specimen.site_id || "").trim();
-        if (siteId && siteId !== "SCHOOL" && !localitySiteIds.has(siteId)) {
-            missingSiteIds.add(siteId);
-        }
-    });
-
-    const quoteMarker = String.fromCharCode(39,39,39);
-    const tripleQuoteHits = specimens.filter(specimen =>
-        Object.values(specimen || {}).some(value =>
-            String(value ?? "").includes(quoteMarker)
-        )
-    );
-
-    if (duplicateSpecimenIds.size) {
-        console.warn("標本番号重複:", Array.from(duplicateSpecimenIds));
-    }
-
-    if (missingSiteIds.size) {
-        console.warn("localities_public.jsonに対応しないsite_id:", Array.from(missingSiteIds));
-    }
-
-    if (tripleQuoteHits.length) {
-        console.warn("三重引用符を含む標本データ:", tripleQuoteHits);
-    }
-
-    console.info("データ整合性チェック完了", {
-        specimens: specimens.length,
-        localities: localities.length,
-        duplicateSpecimenIds: duplicateSpecimenIds.size,
-        missingSiteIds: missingSiteIds.size,
-        tripleQuoteHits: tripleQuoteHits.length
-    });
-}
-
-function updateStatistics() {
-
-    const classifications = new Set(
-        specimens
-            .map(specimen =>
-                String(specimen.classification || "").trim()
+            dependency_destination = (
+                destination.parent / relative_to_root
             )
-            .filter(Boolean)
-    );
 
-    const localityIds = new Set(
-        specimens
-            .map(specimen =>
-                String(specimen.site_id || "").trim()
+            dependency_destination.parent.mkdir(
+                parents=True,
+                exist_ok=True
             )
-            .filter(Boolean)
-    );
 
-    document.getElementById(
-        "stat-specimens"
-    ).textContent = specimens.length;
+            shutil.copy2(
+                dependency_source,
+                dependency_destination
+            )
 
-    document.getElementById(
-        "stat-classifications"
-    ).textContent = classifications.size;
+        except Exception as error:
+            print(
+                f"  WARNING：glTF参照ファイルのコピーに失敗しました："
+                f"{uri}"
+            )
+            print(f"           {error}")
 
-    document.getElementById(
-        "stat-localities"
-    ).textContent = localityIds.size;
-}
 
-// ================================================================
-// FILTER OPTIONS
-// ================================================================
+# ============================================================
+# 公開3Dデータ生成
+# ============================================================
 
-function createFilterOptions() {
+def prepare_public_3d_models(specimen_id, model_names):
+    """
+    Excelに登録された3Dデータを公開用フォルダへ整理する。
 
-    createOptions(
-        "classification-filter",
-        specimens.map(s => s.classification)
-    );
+    GLB：
+        そのまま公開用フォルダへコピーする。
 
-    createOptions(
-        "formation-filter",
-        specimens.map(s => s.formation)
-    );
+    glTF：
+        .gltf本体と外部bin・画像を公開用フォルダへコピーする。
 
-    createOptions(
-        "age-filter",
-        specimens.map(s => s.age)
-    );
-}
+    STL：
+        元STLは公開せず、Web表示用の
 
-function createOptions(elementId, values) {
+            <元ファイル名>_web.glb
 
-    const select = document.getElementById(elementId);
+        を自動生成して公開する。
 
-    const unique = [
-        ...new Set(
-            values
-                .map(value =>
-                    String(value || "").trim()
+    戻り値：
+        公開3Dモデル情報一覧
+    """
+    specimen_dir = PUBLIC_3D_DIR / specimen_id
+
+    specimen_dir.mkdir(
+        parents=True,
+        exist_ok=True
+    )
+
+    public_models = []
+
+    for model_name in model_names:
+        source = find_3d_file(model_name)
+
+        if source is None:
+            print(
+                f"  WARNING：3Dデータが見つかりません："
+                f"{model_name}"
+            )
+            continue
+
+        suffix = source.suffix.lower()
+
+        if suffix not in THREE_D_EXTENSIONS:
+            print(
+                f"  WARNING：対応していない3D形式："
+                f"{source.name}"
+            )
+            continue
+
+        # --------------------------------------------------------
+        # STL → Web用GLB
+        # --------------------------------------------------------
+        if suffix == ".stl":
+            destination_name = make_web_glb_name(
+                source.name
+            )
+
+            destination = specimen_dir / destination_name
+
+            try:
+                convert_stl_to_web_glb(
+                    source,
+                    destination
                 )
-                .filter(Boolean)
+            except Exception as error:
+                print(
+                    "  WARNING：STL→Web用GLB生成に失敗しました。"
+                )
+                print(
+                    f"           {error}"
+                )
+                continue
+
+            public_url = (
+                f"models/{specimen_id}/"
+                f"{destination_name}"
+            ).replace("\\", "/")
+
+            public_models.append({
+                "url": public_url,
+                "name": destination_name,
+                "format": "glb",
+                "source_format": "stl",
+            })
+
+            continue
+
+        # --------------------------------------------------------
+        # GLB / glTF
+        # --------------------------------------------------------
+        destination_name = source.name
+        destination = specimen_dir / destination_name
+
+        try:
+            shutil.copy2(
+                source,
+                destination
+            )
+        except Exception as error:
+            raise RuntimeError(
+                f"3Dデータコピーに失敗しました：\n"
+                f"{source}\n"
+                f"{destination}\n"
+                f"{error}"
+            )
+
+        if suffix == ".gltf":
+            copy_gltf_dependencies(
+                source,
+                destination
+            )
+
+        public_url = (
+            f"models/{specimen_id}/"
+            f"{destination_name}"
+        ).replace("\\", "/")
+
+        public_models.append({
+            "url": public_url,
+            "name": destination_name,
+            "format": suffix.lstrip("."),
+        })
+
+    return public_models
+
+
+# ============================================================
+# 画像検索
+# ============================================================
+
+def find_image_file(filename):
+    if not filename:
+        return None
+
+    filename = clean_text(filename)
+
+    # 絶対パスは使用しない
+    filename_only = Path(filename).name
+
+    candidates = []
+
+    for directory in SOURCE_IMAGE_DIRS:
+        if not directory.exists():
+            continue
+
+        candidates.append(
+            directory / filename_only
         )
-    ].sort((a, b) =>
-        a.localeCompare(b, "ja")
-    );
 
-    unique.forEach(value => {
+        # サブフォルダも検索
+        try:
+            candidates.extend(
+                directory.rglob(filename_only)
+            )
+        except Exception:
+            pass
 
-        const option = document.createElement("option");
+    # 重複除去
+    checked = set()
 
-        option.value = value;
-        option.textContent = value;
+    for path in candidates:
 
-        select.appendChild(option);
-    });
+        try:
+            resolved = path.resolve()
+        except Exception:
+            resolved = path
+
+        if resolved in checked:
+            continue
+
+        checked.add(resolved)
+
+        if path.exists() and path.is_file():
+            return path
+
+    return None
+
+
+# ============================================================
+# 画像拡張子
+# ============================================================
+
+IMAGE_EXTENSIONS = {
+    ".jpg",
+    ".jpeg",
+    ".png",
+    ".webp",
 }
 
-// ================================================================
-// 検索用の発掘地区情報
-// ================================================================
-// specimens.jsonにplace等が含まれていない場合でも、
-// localities_public.jsonのsite_idから発掘地区名を検索対象にする。
 
-function getSpecimenSearchLocalityText(specimen) {
+# ============================================================
+# 公開画像生成
+# ============================================================
 
-    const specimenSiteId = String(
-        specimen.site_id ||
-        specimen.region_id ||
-        specimen.region_key ||
-        ""
-    ).trim();
+def prepare_public_images(specimen_id, image_names):
+    """
+    標本の画像を
 
-    return localities
-        .filter(locality =>
-            String(locality.site_id || "").trim() === specimenSiteId
+        images/MDRxxxx/
+            MDRxxxx-01.jpg
+            MDRxxxx-02.jpg
+
+    として公開用フォルダへコピーする。
+
+    また、
+
+        images/thumbs/
+
+    にサムネイルを生成する。
+
+    戻り値：
+        公開画像URL一覧
+    """
+
+    specimen_dir = PUBLIC_IMAGE_DIR / specimen_id
+
+    specimen_dir.mkdir(
+        parents=True,
+        exist_ok=True
+    )
+
+    public_images = []
+
+    for index, image_name in enumerate(image_names, start=1):
+
+        source = find_image_file(image_name)
+
+        if source is None:
+            print(
+                f"  WARNING：画像が見つかりません："
+                f"{image_name}"
+            )
+            continue
+
+        suffix = source.suffix.lower()
+
+        if suffix not in IMAGE_EXTENSIONS:
+            print(
+                f"  WARNING：対応していない画像形式："
+                f"{source.name}"
+            )
+            continue
+
+        destination_name = source.name
+
+        destination = (
+            specimen_dir /
+            destination_name
         )
-        .flatMap(locality => [
-            locality.place,
-            locality.region,
-            locality.district,
-            locality.locality,
-            locality.location,
-            locality.name
-        ]);
-}
 
-function getSpecimenSearchText(specimen) {
+        try:
+            shutil.copy2(
+                source,
+                destination
+            )
+        except Exception as error:
+            raise RuntimeError(
+                f"画像コピーに失敗しました：\n"
+                f"{source}\n"
+                f"{destination}\n"
+                f"{error}"
+            )
 
-    return [
-        specimen.specimen_id,
-        specimen.classification,
-        specimen.scientific_name,
-        specimen.common_name,
-        specimen.formation,
-        specimen.age,
-        specimen.collection_date,
-        specimen.note,
-        specimen.notes,
-        specimen.site_id,
-        specimen.region_id,
-        specimen.region_key,
-        specimen.place,
-        specimen.locality,
-        specimen.location,
-        specimen.district,
-        specimen.region,
-        ...getSpecimenSearchLocalityText(specimen)
+        public_url = (
+            f"images/{specimen_id}/"
+            f"{destination_name}"
+        ).replace("\\", "/")
+
+        # ----------------------------------------------------
+        # サムネイル
+        # ----------------------------------------------------
+        # 拡張子と実体の形式を一致させるため、
+        # サムネイルは必ずJPEGとして .jpg で保存する。
+        thumb_name = Path(destination_name).stem + ".jpg"
+        thumb_path = THUMB_DIR / thumb_name
+
+        try:
+            with Image.open(source) as image:
+
+                image = image.convert("RGB")
+
+                image.thumbnail(
+                    (500, 500),
+                    Image.Resampling.LANCZOS
+                )
+
+                thumb_path.parent.mkdir(
+                    parents=True,
+                    exist_ok=True
+                )
+
+                image.save(
+                    thumb_path,
+                    "JPEG",
+                    quality=88,
+                    optimize=True
+                )
+
+        except Exception as error:
+
+            print(
+                f"  WARNING：サムネイル生成失敗："
+                f"{source.name}"
+            )
+
+            print(
+                f"           {error}"
+            )
+
+            thumb_url = public_url
+
+        else:
+            thumb_url = (
+                f"images/thumbs/{thumb_name}"
+            ).replace("\\", "/")
+
+        public_images.append({
+            "original": public_url,
+            "thumb": thumb_url
+        })
+
+    return public_images
+
+
+# ============================================================
+# 説明文同期処理
+# ============================================================
+
+def read_utf8(path):
+    try:
+        return path.read_text(encoding="utf-8")
+    except Exception as error:
+        raise RuntimeError(
+            f"HTMLファイルの読み込みに失敗しました：\n{path}\n{error}"
+        )
+
+
+def write_utf8(path, text):
+    try:
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(text, encoding="utf-8", newline="\n")
+    except Exception as error:
+        raise RuntimeError(
+            f"HTMLファイルの書き込みに失敗しました：\n{path}\n{error}"
+        )
+
+
+def extract_content_fragment(source, start_marker, end_marker, label):
+    start = source.find(start_marker)
+    end = source.find(end_marker)
+
+    if start < 0 or end < 0 or end <= start:
+        raise RuntimeError(
+            f"about/content.html の {label} 用マーカーが正しくありません。\n\n"
+            f"必要なマーカー：\n{start_marker}\n{end_marker}"
+        )
+
+    content_start = start + len(start_marker)
+    return source[content_start:end].strip()
+
+
+def replace_marked_content(source, start_marker, end_marker, fragment, path):
+    start = source.find(start_marker)
+    end = source.find(end_marker)
+
+    if start < 0 or end < 0 or end <= start:
+        raise RuntimeError(
+            f"{path} に説明文同期用マーカーがありません。\n\n"
+            f"必要なマーカー：\n{start_marker}\n{end_marker}"
+        )
+
+    content_start = start + len(start_marker)
+    replacement = (
+        start_marker
+        + "\n\n"
+        + fragment
+        + "\n\n"
+        + end_marker
+    )
+
+    return source[:start] + replacement + source[end + len(end_marker):]
+
+
+def find_matching_section_end(source, section_start):
+    """指定した <section> の対応する </section> を探す。"""
+    lower = source.lower()
+    start_tag = lower.find("<section", section_start)
+    if start_tag < 0:
+        return -1
+
+    open_end = lower.find(">", start_tag)
+    if open_end < 0:
+        return -1
+
+    depth = 1
+    position = open_end + 1
+
+    while depth > 0:
+        next_open = lower.find("<section", position)
+        next_close = lower.find("</section", position)
+
+        if next_close < 0:
+            return -1
+
+        if next_open >= 0 and next_open < next_close:
+            open_tag_end = lower.find(">", next_open)
+            if open_tag_end < 0:
+                return -1
+            depth += 1
+            position = open_tag_end + 1
+        else:
+            close_end = lower.find(">", next_close)
+            if close_end < 0:
+                return -1
+            depth -= 1
+            position = close_end + 1
+
+    return position
+
+
+def ensure_about_markers(index_source, about_source):
+    """既存ページに同期マーカーがない場合、初回だけ安全に挿入する。"""
+
+    # --------------------------------------------------------
+    # トップページ
+    # --------------------------------------------------------
+    if TOP_CONTENT_START not in index_source:
+        lower = index_source.lower()
+        section_pos = lower.find('<section\n    id="about"')
+        if section_pos < 0:
+            section_pos = lower.find('<section id="about"')
+
+        if section_pos < 0:
+            raise RuntimeError(
+                "index.html に id=\"about\" の説明欄が見つかりません。\n"
+                "既存のトップページ構成を壊さないため、処理を中止します。"
+            )
+
+        section_end = find_matching_section_end(
+            index_source,
+            section_pos
+        )
+
+        if section_end < 0:
+            raise RuntimeError(
+                "index.html の説明欄の終了位置を特定できません。\n"
+                "既存ページを壊さないため、処理を中止します。"
+            )
+
+        existing_section = index_source[section_pos:section_end].strip()
+        index_source = (
+            index_source[:section_pos]
+            + TOP_CONTENT_START
+            + "\n"
+            + existing_section
+            + "\n"
+            + TOP_CONTENT_END
+            + index_source[section_end:]
+        )
+
+    # --------------------------------------------------------
+    # 詳細ページ
+    # --------------------------------------------------------
+    if DETAIL_CONTENT_START not in about_source:
+        lower = about_source.lower()
+        main_start = lower.find('<main class="container">')
+
+        if main_start < 0:
+            main_start = lower.find('<main')
+
+        if main_start < 0:
+            raise RuntimeError(
+                "about/index.html に <main> が見つかりません。\n"
+                "既存ページを壊さないため、処理を中止します。"
+            )
+
+        main_open_end = lower.find(">", main_start)
+        if main_open_end < 0:
+            raise RuntimeError(
+                "about/index.html の <main> タグを解析できません。"
+            )
+
+        main_close = lower.find("</main>", main_open_end + 1)
+        if main_close < 0:
+            raise RuntimeError(
+                "about/index.html の </main> が見つかりません。\n"
+                "既存ページを壊さないため、処理を中止します。"
+            )
+
+        existing_main_content = about_source[
+            main_open_end + 1:main_close
+        ].strip()
+
+        about_source = (
+            about_source[:main_open_end + 1]
+            + "\n\n"
+            + DETAIL_CONTENT_START
+            + "\n"
+            + existing_main_content
+            + "\n"
+            + DETAIL_CONTENT_END
+            + "\n\n"
+            + about_source[main_close:]
+        )
+
+    return index_source, about_source
+
+
+def sync_description_pages():
+    """about/content.html を唯一の説明文ソースとして両ページへ反映する。"""
+
+    print()
+    print("説明文同期：about/content.html を確認します。")
+
+    if not ABOUT_CONTENT_HTML.exists():
+        raise RuntimeError(
+            "説明文の元ファイル about/content.html が見つかりません。\n\n"
+            f"必要なファイル：{ABOUT_CONTENT_HTML}\n\n"
+            "このファイルだけを編集して説明文を管理してください。"
+        )
+
+    if not INDEX_HTML.exists():
+        raise RuntimeError(
+            f"index.html が見つかりません：{INDEX_HTML}"
+        )
+
+    if not ABOUT_INDEX_HTML.exists():
+        raise RuntimeError(
+            f"about/index.html が見つかりません：{ABOUT_INDEX_HTML}"
+        )
+
+    content_source = read_utf8(ABOUT_CONTENT_HTML)
+
+    top_fragment = extract_content_fragment(
+        content_source,
+        TOP_CONTENT_START,
+        TOP_CONTENT_END,
+        "トップページ"
+    )
+
+    detail_fragment = extract_content_fragment(
+        content_source,
+        DETAIL_CONTENT_START,
+        DETAIL_CONTENT_END,
+        "詳細ページ"
+    )
+
+    index_source = read_utf8(INDEX_HTML)
+    about_source = read_utf8(ABOUT_INDEX_HTML)
+
+    # 初回実行時のみ、既存ページへ同期マーカーを追加する。
+    index_source, about_source = ensure_about_markers(
+        index_source,
+        about_source
+    )
+
+    new_index_source = replace_marked_content(
+        index_source,
+        TOP_CONTENT_START,
+        TOP_CONTENT_END,
+        top_fragment,
+        INDEX_HTML
+    )
+
+    new_about_source = replace_marked_content(
+        about_source,
+        DETAIL_CONTENT_START,
+        DETAIL_CONTENT_END,
+        detail_fragment,
+        ABOUT_INDEX_HTML
+    )
+
+    if new_index_source != index_source:
+        write_utf8(INDEX_HTML, new_index_source)
+        print(f"OK：トップページへ説明文を反映しました。")
+    else:
+        print("OK：トップページの説明文に変更はありません。")
+
+    if new_about_source != about_source:
+        write_utf8(ABOUT_INDEX_HTML, new_about_source)
+        print(f"OK：詳細ページへ説明文を反映しました。")
+    else:
+        print("OK：詳細ページの説明文に変更はありません。")
+
+    print(
+        "説明文同期完了：about/content.html → index.html / about/index.html"
+    )
+
+
+# ============================================================
+# Excel読み込み
+# ============================================================
+
+def load_specimens():
+    print(f"読み込み：{SPECIMENS_XLSX}")
+
+    if not SPECIMENS_XLSX.exists():
+        fail(
+            f"specimens.xlsx が見つかりません。\n"
+            f"{SPECIMENS_XLSX}"
+        )
+
+    try:
+        df = pd.read_excel(
+            SPECIMENS_XLSX,
+            dtype=object
+        )
+    except Exception as error:
+        fail(
+            f"specimens.xlsx の読み込みに失敗しました。\n\n"
+            f"{error}"
+        )
+
+    print(f"標本データ：{len(df)}件")
+
+    return df
+
+
+def load_localities():
+    path = find_localities_file()
+
+    if path is None:
+        fail(
+            "localities_open.xlsx / localities.xlsx が見つかりません。\n\n"
+            "以下のいずれかに配置してください。\n"
+            "・プロジェクト直下\n"
+            "・03_発掘地点/"
+        )
+
+    print(f"読み込み：{path}")
+
+    try:
+        df = pd.read_excel(
+            path,
+            dtype=object
+        )
+    except Exception as error:
+        fail(
+            f"地点データの読み込みに失敗しました。\n\n"
+            f"{error}"
+        )
+
+    print(f"地点データ：{len(df)}件")
+
+    return df
+
+
+# ============================================================
+# 標本列確認
+# ============================================================
+
+def resolve_specimen_columns(df):
+
+    columns = {}
+
+    for key, aliases in COLUMN_ALIASES.items():
+
+        column = find_column(
+            df,
+            aliases
+        )
+
+        columns[key] = column
+
+    required = [
+        "specimen_id",
+        "classification",
+        "scientific_name",
+        "common_name",
+        "formation",
+        "age",
+        "collection_date",
+        "note",
+        "image_data",
+        "site_id",
     ]
-    .filter(value => value !== null && value !== undefined)
-    .map(value => String(value).trim().toLowerCase())
-    .filter(Boolean)
-    .join(" ");
-}
 
-// ================================================================
-// APPLY FILTERS
-// ================================================================
+    missing = []
 
-function applyFilters() {
+    for key in required:
 
-    currentSiteId = null;
+        if columns[key] is None:
+            missing.append(key)
 
-    document.getElementById(
-        "filter-box"
-    ).classList.remove("active");
+    if missing:
+        fail(
+            "specimens.xlsx に必要な列がありません。\n\n"
+            + "\n".join(
+                f"- {item}"
+                for item in missing
+            )
+        )
 
-    const keyword = document.getElementById(
-        "search-input"
-    ).value.trim().toLowerCase();
+    return columns
 
-    const classification = document.getElementById(
-        "classification-filter"
-    ).value;
 
-    const formation = document.getElementById(
-        "formation-filter"
-    ).value;
+# ============================================================
+# 地点列確認
+# ============================================================
 
-    const age = document.getElementById(
-        "age-filter"
-    ).value;
+def resolve_locality_columns(df):
 
-    const filtered = specimens.filter(specimen => {
+    columns = {}
 
-        const text = getSpecimenSearchText(specimen);
+    for key, aliases in LOCALITY_COLUMN_ALIASES.items():
 
-        return (
-            (!keyword || text.includes(keyword)) &&
-            (!classification ||
-                specimen.classification === classification) &&
-            (!formation ||
-                specimen.formation === formation) &&
-            (!age ||
-                specimen.age === age)
-        );
-    });
+        columns[key] = find_column(
+            df,
+            aliases
+        )
 
-    displaySpecimens(filtered);
-}
+    required = [
+        "site_id",
+        "latitude",
+        "longitude",
+    ]
 
-// ================================================================
-// DISPLAY SPECIMENS
-// ================================================================
+    missing = []
 
-function displaySpecimens(data) {
+    for key in required:
 
-    document.getElementById(
-        "result-count"
-    ).textContent = `${data.length}件の標本`;
+        if columns[key] is None:
+            missing.append(key)
 
-    const list = document.getElementById(
-        "specimen-list"
-    );
+    if missing:
+        fail(
+            "地点データに必要な列がありません。\n\n"
+            + "\n".join(
+                f"- {item}"
+                for item in missing
+            )
+        )
 
-    if (!data.length) {
+    return columns
 
-        list.innerHTML = `
-            <div class="message">
-                条件に該当する標本がありません。
-            </div>
-        `;
 
-        return;
-    }
+# ============================================================
+# 標本データチェック
+# ============================================================
 
-    list.innerHTML = data
-        .map(createSpecimenCard)
-        .join("");
-}
+def validate_specimens(df, columns):
 
-// ================================================================
-// IMAGE DATA
-// ================================================================
+    errors = []
 
-function getImages(specimen) {
+    specimen_ids = []
 
-    const originals = [];
+    for row_index, row in df.iterrows():
 
-    if (
-        Array.isArray(specimen.images) &&
-        specimen.images.length
-    ) {
-        specimen.images.forEach(image => {
+        specimen_id = clean_text(
+            row[columns["specimen_id"]]
+        )
 
-            if (typeof image === "string") {
-                originals.push(image);
-                return;
-            }
+        if not specimen_id:
+            errors.append(
+                f"{row_index + 2}行目：標本番号が空欄"
+            )
+            continue
 
-            if (image && typeof image === "object") {
-                const original =
-                    image.original ||
-                    image.image ||
-                    image.thumb ||
-                    image.url ||
-                    image.path ||
-                    "";
+        specimen_ids.append(
+            specimen_id
+        )
 
-                if (original) {
-                    originals.push(original);
-                }
-            }
-        });
-    }
+    # 重複
+    duplicates = sorted(
+        {
+            item
+            for item in specimen_ids
+            if specimen_ids.count(item) > 1
+        }
+    )
 
-    if (!originals.length && specimen.image) {
-        originals.push(specimen.image);
-    }
+    if duplicates:
 
-    return originals.map((original, index) => {
+        errors.append(
+            "標本番号重複："
+            + ", ".join(duplicates)
+        )
 
-        let thumb = "";
+    # 地点ID
+    for row_index, row in df.iterrows():
+
+        specimen_id = clean_text(
+            row[columns["specimen_id"]]
+        )
+
+        site_id = clean_text(
+            row[columns["site_id"]]
+        )
+
+        if specimen_id and not site_id:
+
+            errors.append(
+                f"{row_index + 2}行目："
+                f"{specimen_id} の地点IDが空欄"
+            )
+
+    return errors
+
+
+# ============================================================
+# 地点データチェック
+# ============================================================
+
+def validate_localities(df, columns):
+
+    errors = []
+
+    site_ids = []
+
+    for row_index, row in df.iterrows():
+
+        site_id = clean_text(
+            row[columns["site_id"]]
+        )
+
+        latitude = clean_text(
+            row[columns["latitude"]]
+        )
+
+        longitude = clean_text(
+            row[columns["longitude"]]
+        )
+
+        if not site_id:
+            errors.append(
+                f"{row_index + 2}行目：地点IDが空欄"
+            )
+            continue
+
+        site_ids.append(site_id)
+
+        try:
+            float(latitude)
+            float(longitude)
+        except Exception:
+
+            errors.append(
+                f"{row_index + 2}行目："
+                f"{site_id} の公開用座標が不正"
+            )
+
+    return errors
+
+
+# ============================================================
+# 地点ID対応チェック
+# ============================================================
+
+def validate_site_relationship(
+    specimen_df,
+    specimen_columns,
+    locality_df,
+    locality_columns
+):
+
+    locality_ids = set()
+
+    for _, row in locality_df.iterrows():
+
+        site_id = clean_text(
+            row[locality_columns["site_id"]]
+        )
+
+        if site_id:
+            locality_ids.add(site_id)
+
+    errors = []
+
+    for row_index, row in specimen_df.iterrows():
+
+        specimen_id = clean_text(
+            row[specimen_columns["specimen_id"]]
+        )
+
+        site_id = clean_text(
+            row[specimen_columns["site_id"]]
+        )
+
+        # SCHOOLはlocalities_open.xlsxに登録された採集地点ではなく、
+        # Web上の「鵡川高校」固定表示用の特別な地点IDとして扱う。
+        if site_id.upper() == "SCHOOL":
+            continue
 
         if (
-            index === 0 &&
-            specimen.thumb
-        ) {
-            thumb = specimen.thumb;
-        }
+            specimen_id
+            and site_id
+            and site_id not in locality_ids
+        ):
 
-        if (!thumb) {
-            const filename = String(
-                original
-            ).split("/").pop();
+            errors.append(
+                f"{specimen_id}："
+                f"地点ID {site_id} が地点データに存在しません"
+            )
 
-            thumb = filename
-                ? `images/thumbs/${filename}`
-                : original;
-        }
+    return errors
 
-        return {
-            thumb,
-            original
-        };
-    });
-}
 
-// ================================================================
-// 3D MODEL DATA
-// ================================================================
-// specimens.json に以下のいずれかを持たせることで表示できる。
-//
-//   "model_3d": "models/MDRxxxx/model.glb"
-//   "model3d": "models/MDRxxxx/model.glb"
-//   "models_3d": ["models/MDRxxxx/a.glb", "models/MDRxxxx/b.glb"]
-//
-// オブジェクト形式にも対応：
-//   {"url":"models/MDRxxxx/model.glb", "name":"3Dモデル"}
-//
-// 公開Webで読み込む形式：GLB / glTF
-// STLは公開サイトへ直接配信せず、更新処理で軽量Web用GLBへ変換する。
+# ============================================================
+# 画像チェック
+# ============================================================
 
-function get3DModels(specimen) {
+def validate_images(df, columns):
 
-    if (!specimen || typeof specimen !== "object") {
-        return [];
-    }
+    warnings = []
 
-    const candidates = [
-        specimen.models_3d,
-        specimen.models3d,
-        specimen.three_d_models,
-        specimen.threeDModels,
-        specimen.model_3d,
-        specimen.model3d,
-        specimen.three_d_model,
-        specimen.threeDModel,
-        specimen["3d_model"],
-        specimen["3Dモデル"],
-        specimen["3Dデータ"]
-    ];
+    for row_index, row in df.iterrows():
 
-    const flat = [];
-
-    function append(value) {
-
-        if (value === null || value === undefined) {
-            return;
-        }
-
-        if (Array.isArray(value)) {
-            value.forEach(append);
-            return;
-        }
-
-        if (typeof value === "string") {
-            const url = value.trim();
-            if (url) {
-                flat.push({ url });
-            }
-            return;
-        }
-
-        if (typeof value === "object") {
-            const url = String(
-                value.url ||
-                value.src ||
-                value.path ||
-                value.file ||
-                value.model ||
-                value.model_3d ||
-                value["3Dモデル"] ||
-                value["3Dデータ"] ||
-                ""
-            ).trim();
-
-            if (!url) {
-                return;
-            }
-
-            flat.push({
-                url,
-                name: String(
-                    value.name ||
-                    value.title ||
-                    value.label ||
-                    ""
-                ).trim(),
-                format: String(
-                    value.format ||
-                    value.type ||
-                    ""
-                ).trim().toLowerCase()
-            });
-        }
-    }
-
-    candidates.forEach(append);
-
-    const seen = new Set();
-    const result = [];
-
-    flat.forEach(item => {
-
-        if (!item.url || seen.has(item.url)) {
-            return;
-        }
-
-        seen.add(item.url);
-
-        const cleanUrl = item.url.split("?")[0].split("#")[0];
-        const filename = cleanUrl.split("/").pop() || "3Dモデル";
-        const extensionMatch = filename.match(/\.([a-zA-Z0-9]+)$/);
-        const extension = extensionMatch
-            ? extensionMatch[1].toLowerCase()
-            : "";
-
-        let format = item.format;
-
-        if (format.startsWith(".")) {
-            format = format.slice(1);
-        }
-
-        if (!format) {
-            format = extension;
-        }
-
-        result.push({
-            url: item.url,
-            name: item.name || filename,
-            format: format
-        });
-    });
-
-    return result.filter(model => isSupported3DFormat(model));
-}
-
-function isSupported3DFormat(model) {
-
-    const format = String(model?.format || "")
-        .toLowerCase()
-        .replace(/^\./, "");
-
-    return [
-        "glb",
-        "gltf"
-    ].includes(format);
-}
-
-// ================================================================
-// 軽量Web用3D表示
-// ================================================================
-// 公開ページではSTLを直接読み込まない。
-// update_all.py がSTLをWeb用GLBへ変換し、公開JSONにはGLBだけを登録する。
-
-async function render3DModelHost(host, model) {
-
-    if (!host || !model) {
-        return;
-    }
-
-    host.innerHTML = `
-        <div class="three-d-message">
-            3Dモデルを読み込んでいます……
-        </div>
-    `;
-
-    const format = String(model.format || "")
-        .toLowerCase()
-        .replace(/^\./, "");
-
-    if (!isSupported3DFormat(model)) {
-        host.innerHTML = `
-            <div class="three-d-message">
-                この3DデータはWeb公開用形式ではありません。<br>
-                公開用GLBを生成してから表示してください。
-            </div>
-        `;
-        return;
-    }
-
-    try {
-
-        if (window.customElements &&
-            !customElements.get("model-viewer")) {
-            await customElements.whenDefined("model-viewer");
-        }
-
-        const viewer = document.createElement("model-viewer");
-
-        viewer.setAttribute("src", model.url);
-        viewer.setAttribute(
-            "alt",
-            model.name || "3D化石標本"
-        );
-        viewer.setAttribute("camera-controls", "");
-        viewer.setAttribute("touch-action", "pan-y");
-        viewer.setAttribute("shadow-intensity", "1");
-        viewer.setAttribute("exposure", "1");
-        viewer.setAttribute("interaction-prompt", "auto");
-        viewer.setAttribute("loading", "eager");
-        viewer.setAttribute("reveal", "auto");
-
-        viewer.addEventListener("error", function() {
-            host.innerHTML = `
-                <div class="three-d-message">
-                    3Dモデルを読み込めませんでした。<br>
-                    公開用GLBのファイルパスまたはファイル内容を確認してください。
-                </div>
-            `;
-        }, { once:true });
-
-        host.innerHTML = "";
-        host.appendChild(viewer);
-
-    } catch (error) {
-
-        console.error(error);
-
-        host.innerHTML = `
-            <div class="three-d-message">
-                3Dモデル表示の準備に失敗しました。<br>
-                ${escapeHtml(error.message || "不明なエラー")}
-            </div>
-        `;
-    }
-}
-
-function render3DModelsInDetail(models) {
-
-    if (!models.length) {
-        return "";
-    }
-
-    const supported = models.filter(isSupported3DFormat);
-    const first = supported[0] || models[0];
-
-    const buttons = models.length > 1
-        ? `
-            <div class="three-d-model-list">
-                ${models.map((model, index) => `
-                    <button
-                        type="button"
-                        class="three-d-model-button${index === 0 ? " active" : ""}"
-                        data-model-index="${index}"
-                        onclick="selectDetail3DModel(${index})"
-                    >
-                        ${escapeHtml(model.name)}
-                    </button>
-                `).join("")}
-            </div>
-        `
-        : "";
-
-    return `
-        <div class="three-d-section">
-            <div class="three-d-section-title">
-                <span>3Dモデル</span>
-                <span class="three-d-format">
-                    ${escapeHtml(String(first.format || "").toUpperCase())}
-                </span>
-            </div>
-            ${buttons}
-            <div
-                id="detail-3d-viewer-host"
-                class="three-d-viewer-host"
-            ></div>
-        </div>
-    `;
-}
-
-let currentDetail3DModels = [];
-let currentDetail3DIndex = 0;
-
-function selectDetail3DModel(index) {
-
-    if (
-        !Array.isArray(currentDetail3DModels) ||
-        !currentDetail3DModels[index]
-    ) {
-        return;
-    }
-
-    currentDetail3DIndex = index;
-
-    document.querySelectorAll(
-        ".three-d-model-button"
-    ).forEach(button => {
-        button.classList.toggle(
-            "active",
-            Number(button.dataset.modelIndex) === index
-        );
-    });
-
-    const host = document.getElementById(
-        "detail-3d-viewer-host"
-    );
-
-    if (host) {
-        render3DModelHost(
-            host,
-            currentDetail3DModels[index]
-        );
-    }
-}
-
-// ================================================================
-// CARD
-// ================================================================
-
-function createSpecimenCard(specimen) {
-
-    const images = getImages(specimen);
-    const firstImage = images[0];
-
-    let imageHtml = "";
-
-    if (firstImage) {
-
-        imageHtml = `
-            <a
-                class="image-link"
-                href="#"
-                onclick="
-                    openSpecimenDetailById(
-                        '${escapeAttribute(specimen.specimen_id)}'
-                    );
-                    return false;
-                "
-            >
-                <img
-                    class="specimen-image"
-                    src="${escapeAttribute(firstImage.thumb)}"
-                    alt="${escapeAttribute(
-                        specimen.common_name ||
-                        "化石標本"
-                    )}"
-                    loading="lazy"
-                    onerror="
-                        this.onerror=null;
-                        this.src='${escapeAttribute(firstImage.original)}';
-                    "
-                >
-
-                <div class="image-caption">
-                    ${
-                        images.length > 1
-                            ? `${images.length}枚の画像・クリックで詳細`
-                            : "画像をクリックして詳細を表示"
-                    }
-                </div>
-            </a>
-        `;
-
-    } else {
-
-        imageHtml = `
-            <div
-                class="image-error"
-                style="
-                    height:220px;
-                    display:grid;
-                    place-items:center;
-                    color:#77837b;
-                    background:#eef2ef;
-                    font-size:13px;
-                "
-            >
-                画像未登録
-            </div>
-        `;
-    }
-
-    const note = specimen.note || specimen.notes || "";
-    const threeDModels = get3DModels(specimen);
-    const threeDBadge = threeDModels.length
-        ? `<div class="three-d-badge">◇ 3Dモデルあり</div>`
-        : "";
-
-    return `
-        <article class="specimen-card">
-
-            ${imageHtml}
-
-            <div class="specimen-content">
-
-                <div class="specimen-id">
-                    標本番号：${escapeHtml(
-                        specimen.specimen_id || ""
-                    )}
-                </div>
-
-                <div class="common-name">
-                    ${escapeHtml(
-                        specimen.common_name ||
-                        "名称未入力"
-                    )}
-                </div>
-
-                ${
-                    specimen.scientific_name
-                    ? `
-                        <div class="scientific-name">
-                            ${escapeHtml(
-                                specimen.scientific_name
-                            )}
-                        </div>
-                    `
-                    : ""
-                }
-
-                <div class="classification">
-                    ${escapeHtml(
-                        specimen.classification ||
-                        "分類未入力"
-                    )}
-                </div>
-
-                ${threeDBadge}
-
-                <div class="specimen-info mobile-hide">
-
-                    ${
-                        specimen.formation
-                        ? `
-                            <div class="info-row">
-                                <div class="info-label">地層</div>
-                                <div class="info-value">
-                                    ${escapeHtml(
-                                        specimen.formation
-                                    )}
-                                </div>
-                            </div>
-                        `
-                        : ""
-                    }
-
-                    ${
-                        specimen.age
-                        ? `
-                            <div class="info-row">
-                                <div class="info-label">時代</div>
-                                <div class="info-value">
-                                    ${escapeHtml(
-                                        specimen.age
-                                    )}
-                                </div>
-                            </div>
-                        `
-                        : ""
-                    }
-
-                    ${
-                        formatDate(
-                            specimen.collection_date
-                        )
-                        ? `
-                            <div class="info-row">
-                                <div class="info-label">採集日</div>
-                                <div class="info-value">
-                                    ${escapeHtml(
-                                        formatDate(
-                                            specimen.collection_date
-                                        )
-                                    )}
-                                </div>
-                            </div>
-                        `
-                        : ""
-                    }
-
-                </div>
-
-            </div>
-        </article>
-    `;
-}
-
-// ================================================================
-// DETAIL
-// ================================================================
-
-function openSpecimenDetailById(specimenId) {
-
-    const specimen = specimens.find(
-        s =>
-            String(s.specimen_id) ===
-            String(specimenId)
-    );
-
-    if (specimen) {
-        openSpecimenDetail(specimen);
-    }
-}
-
-function openSpecimenDetail(specimen) {
-
-    const images = getImages(specimen);
-    const models = get3DModels(specimen).filter(isSupported3DFormat);
-
-    currentDetail3DModels = models;
-    currentDetail3DIndex = 0;
-
-    const panel = document.getElementById(
-        "detail-image-panel"
-    );
-
-    const dataPanel = document.getElementById(
-        "detail-data-panel"
-    );
-
-    panel.className = "detail-image-panel";
-
-    // ------------------------------------------------------------
-    // 左側：画像＋3Dモデル
-    // ------------------------------------------------------------
-
-    let imageBox = "";
-
-    if (images.length) {
-
-        imageBox = `
-            <div class="detail-visual-box detail-image-box">
-                <div class="detail-visual-label">標本画像</div>
-                <img
-                    id="detail-main-image"
-                    src="${escapeAttribute(images[0].original)}"
-                    alt="${escapeAttribute(
-                        specimen.common_name ||
-                        "化石標本"
-                    )}"
-                    onclick="
-                        openZoom(
-                            this.src,
-                            this.alt
-                        )
-                    "
-                >
-            </div>
-        `;
-
-    } else if (!models.length) {
-
-        imageBox = `
-            <div class="detail-visual-box detail-image-box">
-                <div
-                    style="
-                        color:#aaa;
-                        text-align:center;
-                    "
-                >
-                    画像は登録されていません。
-                </div>
-            </div>
-        `;
-    }
-
-    let modelBox = "";
-
-    if (models.length) {
-
-        const firstModel = models[0];
-
-        modelBox = `
-            <div class="detail-visual-box">
-                <div class="detail-visual-label">
-                    3Dモデル
-                </div>
-                <div
-                    id="detail-3d-viewer-host"
-                    class="three-d-viewer-host"
-                ></div>
-            </div>
-        `;
-    }
-
-    if (images.length && models.length) {
-        panel.classList.add("has-3d");
-        panel.innerHTML = imageBox + modelBox;
-    } else if (models.length) {
-        panel.classList.add("only-3d");
-        panel.innerHTML = modelBox;
-    } else {
-        panel.innerHTML = imageBox;
-    }
-
-    // ------------------------------------------------------------
-    // 3Dモデルを実際に読み込む
-    // ------------------------------------------------------------
-
-    if (models.length) {
-        const host = document.getElementById(
-            "detail-3d-viewer-host"
-        );
-
-        if (host) {
-            render3DModelHost(
-                host,
-                models[0]
-            );
-        }
-    }
-
-    // ------------------------------------------------------------
-    // ギャラリー
-    // ------------------------------------------------------------
-
-    let galleryHtml = "";
-
-    if (images.length > 1) {
-
-        galleryHtml = `
-            <div class="gallery">
-                ${images.map(
-                    (image, index) => `
-                        <img
-                            class="gallery-thumb"
-                            src="${escapeAttribute(
-                                image.thumb
-                            )}"
-                            alt="画像 ${index + 1}"
-                            onclick="
-                                changeDetailImage(
-                                    '${escapeAttribute(
-                                        image.original
-                                    )}'
-                                )
-                            "
-                            onerror="
-                                this.onerror=null;
-                                this.src='${escapeAttribute(
-                                    image.original
-                                )}';
-                            "
-                        >
-                    `
-                ).join("")}
-            </div>
-        `;
-    }
-
-    // ------------------------------------------------------------
-    // 3Dモデル一覧
-    // ------------------------------------------------------------
-
-    let modelListHtml = "";
-
-    if (models.length > 1) {
-
-        modelListHtml = `
-            <div class="three-d-section">
-                <div class="three-d-section-title">
-                    <span>3Dモデル</span>
-                    <span class="three-d-format">
-                        ${models.length}ファイル
-                    </span>
-                </div>
-
-                <div class="three-d-model-list">
-                    ${models.map((model, index) => `
-                        <button
-                            type="button"
-                            class="three-d-model-button${index === 0 ? " active" : ""}"
-                            data-model-index="${index}"
-                            onclick="selectDetail3DModel(${index})"
-                        >
-                            ${escapeHtml(model.name)}
-                        </button>
-                    `).join("")}
-                </div>
-            </div>
-        `;
-    } else if (models.length === 1) {
-
-        modelListHtml = `
-            <div class="three-d-section">
-                <div class="three-d-section-title">
-                    <span>3Dモデル</span>
-                    <span class="three-d-format">
-                        ${escapeHtml(
-                            String(models[0].format || "").toUpperCase()
-                        )}
-                    </span>
-                </div>
-                <div style="color:#66736b;font-size:12px;">
-                    ${escapeHtml(models[0].name)}
-                </div>
-            </div>
-        `;
-    }
-
-    const note = specimen.note || specimen.notes || "";
-
-    dataPanel.innerHTML = `
-
-        <h2>
-            ${escapeHtml(
-                specimen.common_name ||
-                "名称未入力"
-            )}
-        </h2>
-
-        <table class="detail-table">
-
-            <tr>
-                <th>標本番号</th>
-                <td>
-                    ${escapeHtml(
-                        specimen.specimen_id || ""
-                    )}
-                </td>
-            </tr>
-
-            ${
-                specimen.scientific_name
-                ? `
-                    <tr>
-                        <th>学名</th>
-                        <td>
-                            <i>
-                                ${escapeHtml(
-                                    specimen.scientific_name
-                                )}
-                            </i>
-                        </td>
-                    </tr>
-                `
-                : ""
-            }
-
-            ${
-                specimen.classification
-                ? `
-                    <tr>
-                        <th>分類</th>
-                        <td>
-                            ${escapeHtml(
-                                specimen.classification
-                            )}
-                        </td>
-                    </tr>
-                `
-                : ""
-            }
-
-            ${
-                specimen.formation
-                ? `
-                    <tr>
-                        <th>地層</th>
-                        <td>
-                            ${escapeHtml(
-                                specimen.formation
-                            )}
-                        </td>
-                    </tr>
-                `
-                : ""
-            }
-
-            ${
-                specimen.age
-                ? `
-                    <tr>
-                        <th>時代</th>
-                        <td>
-                            ${escapeHtml(
-                                specimen.age
-                            )}
-                        </td>
-                    </tr>
-                `
-                : ""
-            }
-
-            ${
-                formatDate(
-                    specimen.collection_date
-                )
-                ? `
-                    <tr>
-                        <th>採集日</th>
-                        <td>
-                            ${escapeHtml(
-                                formatDate(
-                                    specimen.collection_date
-                                )
-                            )}
-                        </td>
-                    </tr>
-                `
-                : ""
-            }
-
-        </table>
-
-        ${galleryHtml}
-
-        ${modelListHtml}
-
-        ${
-            note
-            ? `
-                <div class="detail-notes">
-                    <strong>備考</strong>
-                    <br>
-                    ${escapeHtml(note)}
-                </div>
-            `
-            : ""
-        }
-
-        <div class="detail-public-note">
-            公開用データのみを表示しています。
-            詳細な採集産地・詳細な採集位置・採集位置ID・採集者など、
-            非公開情報は掲載していません。
-        </div>
-    `;
-
-    document.getElementById(
-        "detail-overlay"
-    ).classList.add("active");
-
-    document.body.style.overflow = "hidden";
-
-    history.pushState(
-        null,
-        "",
-        "?id=" +
-        encodeURIComponent(
-            specimen.specimen_id
+        specimen_id = clean_text(
+            row[columns["specimen_id"]]
         )
-    );
-}
 
-function closeDetail() {
+        image_value = row[
+            columns["image_data"]
+        ]
 
-    currentDetail3DModels = [];
-    currentDetail3DIndex = 0;
+        image_names = split_image_names(
+            image_value
+        )
 
-    document.getElementById(
-        "detail-overlay"
-    ).classList.remove("active");
+        if not image_names:
 
-    document.body.style.overflow = "";
+            warnings.append(
+                f"{specimen_id}：画像未登録"
+            )
+            continue
 
-    history.pushState(
-        null,
-        "",
-        window.location.pathname
-    );
-}
+        for image_name in image_names:
 
-function changeDetailImage(image) {
+            if find_image_file(image_name) is None:
 
-    const main = document.getElementById(
-        "detail-main-image"
-    );
+                warnings.append(
+                    f"{specimen_id}："
+                    f"画像が見つかりません → "
+                    f"{image_name}"
+                )
 
-    if (main) {
-        main.src = image;
+    return warnings
+
+
+# ============================================================
+# 3Dデータチェック
+# ============================================================
+
+def validate_3d_models(df, columns):
+
+    warnings = []
+
+    if columns.get("model_3d") is None:
+        return warnings
+
+    for row_index, row in df.iterrows():
+
+        specimen_id = clean_text(
+            row[columns["specimen_id"]]
+        )
+
+        model_names = split_3d_names(
+            row[columns["model_3d"]]
+        )
+
+        for model_name in model_names:
+
+            source = find_3d_file(model_name)
+
+            if source is None:
+                warnings.append(
+                    f"{specimen_id}："
+                    f"3Dデータが見つかりません → "
+                    f"{model_name}"
+                )
+
+    return warnings
+
+
+# ============================================================
+# 公開用 specimens.json
+# ============================================================
+
+def create_public_specimens(
+    df,
+    columns
+):
+
+    public_data = []
+
+    for _, row in df.iterrows():
+
+        specimen_id = clean_text(
+            row[columns["specimen_id"]]
+        )
+
+        if not specimen_id:
+            continue
+
+        image_names = split_image_names(
+            row[columns["image_data"]]
+        )
+
+        public_images = prepare_public_images(
+            specimen_id,
+            image_names
+        )
+
+        model_names = []
+
+        if columns.get("model_3d") is not None:
+            model_names = split_3d_names(
+                row[columns["model_3d"]]
+            )
+
+        public_3d_models = prepare_public_3d_models(
+            specimen_id,
+            model_names
+        )
+
+        first_image = ""
+
+        if public_images:
+            first_image = public_images[0].get(
+                "original",
+                ""
+            ) if isinstance(public_images[0], dict) else public_images[0]
+
+        item = {
+            "specimen_id": specimen_id,
+
+            "classification": clean_text(
+                row[columns["classification"]]
+            ),
+
+            "scientific_name": clean_text(
+                row[columns["scientific_name"]]
+            ),
+
+            "common_name": clean_text(
+                row[columns["common_name"]]
+            ),
+
+            "formation": clean_text(
+                row[columns["formation"]]
+            ),
+
+            "age": clean_text(
+                row[columns["age"]]
+            ),
+
+            "collection_date": format_date(
+                row[columns["collection_date"]]
+            ),
+
+            "note": clean_text(
+                row[columns["note"]]
+            ),
+
+            "site_id": clean_text(
+                row[columns["site_id"]]
+            ),
+
+            "image": first_image,
+
+            "images": public_images,
+        }
+
+        if public_3d_models:
+            item["model_3d"] = public_3d_models[0]["url"]
+            item["models_3d"] = public_3d_models
+
+        public_data.append(item)
+
+    return public_data
+
+
+# ============================================================
+# 公開用地点JSON
+# ============================================================
+
+def create_public_localities(
+    df,
+    columns
+):
+
+    public_data = []
+
+    # 同じ地点IDが複数ある場合、
+    # 最初の有効な公開座標を採用する。
+    used_site_ids = set()
+
+    for _, row in df.iterrows():
+
+        site_id = clean_text(
+            row[columns["site_id"]]
+        )
+
+        if not site_id:
+            continue
+
+        if site_id in used_site_ids:
+            continue
+
+        latitude = clean_text(
+            row[columns["latitude"]]
+        )
+
+        longitude = clean_text(
+            row[columns["longitude"]]
+        )
+
+        try:
+            latitude_value = float(
+                latitude
+            )
+
+            longitude_value = float(
+                longitude
+            )
+
+        except Exception:
+            continue
+
+        item = {
+            "site_id": site_id,
+
+            "latitude": latitude_value,
+
+            "longitude": longitude_value,
+        }
+
+        # 公開可能な名称がある場合のみ
+        # 必要最低限として保持
+        if columns["place"] is not None:
+
+            place = clean_text(
+                row[columns["place"]]
+            )
+
+            if place:
+                item["place"] = place
+
+        # 地区・地域は公開用の分類情報としてのみ保持する。
+        # 採集位置IDなどの管理用情報は出力しない。
+        if columns.get("district") is not None:
+
+            district = clean_text(
+                row[columns["district"]]
+            )
+
+            if district:
+                item["district"] = district
+
+        if columns.get("region") is not None:
+
+            region = clean_text(
+                row[columns["region"]]
+            )
+
+            if region:
+                item["region"] = region
+
+        if columns["formation"] is not None:
+
+            formation = clean_text(
+                row[columns["formation"]]
+            )
+
+            if formation:
+                item["formation"] = formation
+
+        if columns["age"] is not None:
+
+            age = clean_text(
+                row[columns["age"]]
+            )
+
+            if age:
+                item["age"] = age
+
+        public_data.append(item)
+
+        used_site_ids.add(site_id)
+
+    return public_data
+
+
+# ============================================================
+# JSON保存
+# ============================================================
+
+def save_json(path, data):
+
+    path.parent.mkdir(
+        parents=True,
+        exist_ok=True
+    )
+
+    with open(
+        path,
+        "w",
+        encoding="utf-8"
+    ) as file:
+
+        json.dump(
+            data,
+            file,
+            ensure_ascii=False,
+            indent=2
+        )
+
+
+# ============================================================
+# 公開JSON安全チェック
+# ============================================================
+
+def validate_public_json(
+    specimens,
+    localities
+):
+    """公開JSONへ管理用項目が混入していないか再帰的に確認する。"""
+
+    forbidden_exact = {
+        "collector",
+        "collection_position_id",
+        "place_detail",
+        "detailed_place",
+        "detailed_locality",
+        "採集者",
+        "採集位置id",
+        "詳細産地",
+        "詳細採集位置",
     }
-}
 
-// ================================================================
-// IMAGE ZOOM
-// ================================================================
+    forbidden_fragments = (
+        "collector",
+        "collection_position",
+        "detailed_place",
+        "detailed_locality",
+        "private_location",
+        "管理用座標",
+        "採集者",
+        "採集位置",
+        "詳細産地",
+        "詳細採集位置",
+    )
 
-function openZoom(src, alt) {
-
-    document.getElementById(
-        "zoom-image"
-    ).src = src;
-
-    document.getElementById(
-        "zoom-image"
-    ).alt = alt || "";
-
-    document.getElementById(
-        "zoom-overlay"
-    ).classList.add("active");
-}
-
-function closeZoom() {
-
-    document.getElementById(
-        "zoom-overlay"
-    ).classList.remove("active");
-}
-
-// ================================================================
-// URL -> SPECIMEN
-// ================================================================
-
-function openSpecimenFromURL() {
-
-    const params = new URLSearchParams(
-        window.location.search
-    );
-
-    const specimenId = params.get("id");
-
-    if (!specimenId) {
-        return;
-    }
-
-    const specimen = specimens.find(
-        s =>
-            String(s.specimen_id) ===
-            String(specimenId)
-    );
-
-    if (specimen) {
-        openSpecimenDetail(specimen);
-    }
-}
-
-// ================================================================
-// DATE
-// ================================================================
-
-function formatDate(value) {
-
-    if (
-        value === null ||
-        value === undefined
-    ) {
-        return "";
-    }
-
-    let text = String(value).trim();
-
-    if (!text) {
-        return "";
-    }
-
-    if (text.includes("T")) {
-        text = text.split("T")[0];
-    }
-
-    if (text.includes(" ")) {
-        text = text.split(" ")[0];
-    }
-
-    const japaneseDate = text.match(
-        /^(\d{4})年(\d{1,2})月(\d{1,2})日$/
-    );
-
-    if (japaneseDate) {
+    def normalize_key(key):
         return (
-            japaneseDate[1] +
-            "/" +
-            japaneseDate[2].padStart(2, "0") +
-            "/" +
-            japaneseDate[3].padStart(2, "0")
-        );
+            str(key)
+            .strip()
+            .lower()
+            .replace(" ", "")
+            .replace("　", "")
+            .replace("－", "-")
+            .replace("＿", "_")
+        )
+
+    forbidden_exact_normalized = {
+        normalize_key(item)
+        for item in forbidden_exact
     }
 
-    return text;
-}
+    def is_forbidden_key(key):
+        normalized = normalize_key(key)
 
-// ================================================================
-// RESET FILTER
-// ================================================================
+        if normalized in forbidden_exact_normalized:
+            return True
 
-function resetDropdownFilters() {
+        return any(
+            fragment in normalized
+            for fragment in forbidden_fragments
+        )
 
-    document.getElementById(
-        "classification-filter"
-    ).value = "";
+    def scan(value, path="root"):
+        if isinstance(value, dict):
+            for key, child in value.items():
+                if is_forbidden_key(key):
+                    raise RuntimeError(
+                        "公開禁止項目を検出しました："
+                        f"{path}.{key}"
+                    )
+                scan(child, f"{path}.{key}")
 
-    document.getElementById(
-        "formation-filter"
-    ).value = "";
+        elif isinstance(value, list):
+            for index, child in enumerate(value):
+                scan(child, f"{path}[{index}]")
 
-    document.getElementById(
-        "age-filter"
-    ).value = "";
-}
+    scan(specimens)
+    scan(localities)
 
-// ================================================================
-// CLEAR FILTER
-// ================================================================
 
-function clearSiteFilter() {
+# ============================================================
+# Gitコマンド
+# ============================================================
 
-    currentSiteId = null;
+def run_git(args, check=True):
 
-    const box = document.getElementById("filter-box");
-    if (box) {
-        box.classList.remove("active");
+    command = [
+        "git",
+        *args
+    ]
+
+    print()
+    print("> " + " ".join(command))
+
+    result = subprocess.run(
+        command,
+        cwd=BASE_DIR,
+        text=True,
+        encoding="utf-8",
+        errors="replace",
+        capture_output=True
+    )
+
+    if result.stdout:
+        print(result.stdout)
+
+    if result.stderr:
+        print(result.stderr)
+
+    if check and result.returncode != 0:
+
+        raise RuntimeError(
+            "Gitコマンドが失敗しました：\n"
+            + " ".join(command)
+        )
+
+    return result
+
+
+# ============================================================
+# .gitignore安全設定
+# ============================================================
+
+REQUIRED_GITIGNORE_LINES = [
+    "specimens.xlsx",
+    "localities_open.xlsx",
+    "data_update.py",
+    "make_thumbs.py",
+    "update_all.py",
+    "update_all.bat",
+    "test.py",
+    "index_buckup_map.html",
+    "01_標本データ/",
+    "02_標本画像/",
+    "02_3Dデータ/",
+    "03_発掘地点/",
+]
+
+
+def ensure_gitignore():
+    """管理用ファイルのGit除外設定を確認し、不足分だけ追加する。"""
+
+    gitignore_path = BASE_DIR / ".gitignore"
+
+    existing = ""
+
+    if gitignore_path.exists():
+        existing = gitignore_path.read_text(encoding="utf-8")
+
+    existing_lines = {
+        line.strip()
+        for line in existing.splitlines()
+        if line.strip() and not line.strip().startswith("#")
     }
 
-    const searchInput = document.getElementById("search-input");
-    if (searchInput) {
-        searchInput.value = "";
-    }
+    missing = [
+        line
+        for line in REQUIRED_GITIGNORE_LINES
+        if line not in existing_lines
+    ]
 
-    resetDropdownFilters();
-    displaySpecimens(specimens);
-}
+    if not missing:
+        print("OK：.gitignoreの管理用除外設定を確認しました。")
+        return
 
-// ================================================================
-// SEARCH EVENTS
-// ================================================================
+    with gitignore_path.open(
+        "a",
+        encoding="utf-8",
+        newline="\n"
+    ) as file:
 
-document.getElementById(
-    "search-input"
-).addEventListener(
-    "input",
-    applyFilters
-);
+        if existing and not existing.endswith("\n"):
+            file.write("\n")
 
-document.getElementById(
-    "classification-filter"
-).addEventListener(
-    "change",
-    applyFilters
-);
+        file.write(
+            "\n# 鵡川高校 化石デジタルライブラリー：管理用ファイル\n"
+        )
 
-document.getElementById(
-    "formation-filter"
-).addEventListener(
-    "change",
-    applyFilters
-);
+        for line in missing:
+            file.write(line + "\n")
 
-document.getElementById(
-    "age-filter"
-).addEventListener(
-    "change",
-    applyFilters
-);
+    print(
+        f"OK：.gitignoreへ管理用除外設定を{len(missing)}件追加しました。"
+    )
 
-document.getElementById(
-    "clear-filter-button"
-).addEventListener(
-    "click",
-    clearSiteFilter
-);
 
-// ================================================================
-// KEYBOARD
-// ================================================================
+# ============================================================
+# Gitリポジトリ確認
+# ============================================================
 
-document.addEventListener(
-    "keydown",
-    function(event) {
+def validate_git_repository():
 
-        if (event.key === "Escape") {
+    result = run_git(
+        [
+            "rev-parse",
+            "--is-inside-work-tree"
+        ],
+        check=False
+    )
 
-            closeZoom();
+    if result.returncode != 0:
+        fail(
+            "このフォルダはGitリポジトリではありません。\n\n"
+            "Gitリポジトリ：\n"
+            f"{BASE_DIR}"
+        )
+
+
+# ============================================================
+# Git管理対象の安全確認
+# ============================================================
+
+def validate_git_tracked_files():
+
+    result = run_git(
+        [
+            "ls-files"
+        ]
+    )
+
+    tracked_files = [
+        line.strip()
+        for line in result.stdout.splitlines()
+        if line.strip()
+    ]
+
+    forbidden = []
+
+    for file_path in tracked_files:
+
+        normalized = file_path.replace(
+            "\\",
+            "/"
+        )
+
+        lower = normalized.lower()
+
+        for pattern in FORBIDDEN_GIT_PATTERNS:
+
+            pattern_lower = pattern.lower().rstrip("/")
 
             if (
-                document.getElementById(
-                    "detail-overlay"
-                ).classList.contains("active")
-            ) {
-                closeDetail();
-            }
-        }
-    }
-);
+                lower == pattern_lower
+                or lower.startswith(pattern_lower + "/")
+            ):
 
-// ================================================================
-// HTML ESCAPE
-// ================================================================
+                forbidden.append(
+                    normalized
+                )
 
-function escapeHtml(value) {
+                break
 
-    if (
-        value === null ||
-        value === undefined
-    ) {
-        return "";
-    }
+        # 管理用Excel・Python・バッチが別名で混入することも防ぐ。
+        if (
+            lower.endswith(".xlsx")
+            or lower.endswith(".xlsm")
+            or lower.endswith(".py")
+            or lower.endswith(".bat")
+        ):
+            forbidden.append(normalized)
 
-    return String(value)
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/"/g, "&quot;")
-        .replace(/'/g, "&#039;");
-}
+    if forbidden:
 
-function escapeAttribute(value) {
-    return escapeHtml(value);
-}
+        raise RuntimeError(
+            "Git管理対象に管理用ファイルが存在します。\n\n"
+            + "\n".join(
+                f" - {item}"
+                for item in forbidden
+            )
+            + "\n\n"
+            "安全のためcommit/pushを中止します。"
+        )
 
-// ================================================================
-// START
-// ================================================================
+    print(
+        "OK：Git管理対象に"
+        "管理用ファイルはありません。"
+    )
 
-loadData();
 
-</script>
+# ============================================================
+# 公開対象以外をaddしない
+# ============================================================
 
-</body>
-</html>
+def git_add_public_files():
+
+    print()
+    print("公開用ファイルだけをGitへ登録します。")
+
+    # 重要：
+    # git add . は使用しない。
+
+    result = run_git(
+        [
+            "add",
+            "-A",
+            "--",
+            "index.html",
+            "about",
+            "images",
+            "models",
+            "public_data",
+            ".gitignore",
+        ]
+    )
+
+    return result
+
+
+# ============================================================
+# stagedファイル確認
+# ============================================================
+
+def validate_staged_files():
+
+    result = run_git(
+        [
+            "diff",
+            "--cached",
+            "--name-status"
+        ]
+    )
+
+    lines = [
+        line.strip()
+        for line in result.stdout.splitlines()
+        if line.strip()
+    ]
+
+    forbidden = []
+    unexpected = []
+
+    def is_public_path(path):
+        normalized = path.replace("\\", "/").lstrip("./")
+
+        if normalized == ".gitignore":
+            return True
+
+        public_roots = (
+            "index.html",
+            "about/",
+            "images/",
+            "models/",
+            "public_data/",
+        )
+
+        return any(
+            normalized == root.rstrip("/")
+            or normalized.startswith(root)
+            for root in public_roots
+        )
+
+    for line in lines:
+
+        parts = line.split("\t")
+
+        if len(parts) < 2:
+            continue
+
+        for path in parts[1:]:
+
+            path = path.strip().replace("\\", "/")
+
+            if not path:
+                continue
+
+            if not is_public_path(path):
+                unexpected.append(path)
+
+            lower = path.lower()
+
+            for pattern in FORBIDDEN_GIT_PATTERNS:
+
+                pattern_lower = pattern.lower().rstrip("/")
+
+                if (
+                    lower == pattern_lower
+                    or lower.startswith(pattern_lower + "/")
+                ):
+                    forbidden.append(path)
+                    break
+
+    print()
+    print("Gitへ登録するファイル：")
+
+    for line in lines:
+        print("  " + line)
+
+    if unexpected:
+        raise RuntimeError(
+            "公開許可されていないファイルがstagedされています。\n\n"
+            + "\n".join(
+                f" - {item}"
+                for item in sorted(set(unexpected))
+            )
+            + "\n\n"
+            "安全のためcommit/pushを中止します。"
+        )
+
+    if forbidden:
+        raise RuntimeError(
+            "公開禁止ファイルがstagedされています。\n\n"
+            + "\n".join(
+                f" - {item}"
+                for item in sorted(set(forbidden))
+            )
+            + "\n\n"
+            "安全のためcommit/pushを中止します。"
+        )
+
+    print()
+    print(
+        "OK：公開許可されたファイルだけが"
+        "Gitへ登録されています。"
+    )
+
+
+# ============================================================
+# GitHub remote確認
+# ============================================================
+
+def validate_remote():
+
+    result = run_git(
+        [
+            "remote",
+            "get-url",
+            GIT_REMOTE
+        ],
+        check=False
+    )
+
+    if result.returncode != 0:
+
+        raise RuntimeError(
+            "GitHubのoriginが設定されていません。"
+        )
+
+    remote_url = result.stdout.strip()
+
+    print(
+        f"GitHub：{remote_url}"
+    )
+
+
+# ============================================================
+# GitHub push前に同期
+# ============================================================
+
+def sync_with_remote():
+
+    print()
+    print(
+        "GitHubの最新状態を確認します。"
+    )
+
+    run_git(
+        [
+            "fetch",
+            GIT_REMOTE
+        ]
+    )
+
+    # ローカルとGitHubが異なる場合、
+    # 安全のため自動mergeではなく、
+    # pull --rebaseを試す。
+    #
+    # ただし管理用ファイルを巻き込む可能性があるため、
+    # rebaseで問題が発生したら停止する。
+
+    result = run_git(
+        [
+            "rev-list",
+            "--left-right",
+            "--count",
+            f"HEAD...{GIT_REMOTE}/{GIT_BRANCH}"
+        ],
+        check=False
+    )
+
+    if result.returncode != 0:
+        return
+
+    values = result.stdout.strip().split()
+
+    if len(values) != 2:
+        return
+
+    ahead = int(values[0])
+    behind = int(values[1])
+
+    print(
+        f"ローカル先行：{ahead} "
+        f"／ GitHub先行：{behind}"
+    )
+
+    if behind > 0:
+
+        print()
+        print(
+            "GitHub側に新しいcommitがあります。"
+        )
+
+        print(
+            "自動rebaseを実行します。"
+        )
+
+        run_git(
+            [
+                "pull",
+                "--rebase",
+                GIT_REMOTE,
+                GIT_BRANCH
+            ]
+        )
+
+
+# ============================================================
+# commit
+# ============================================================
+
+def git_commit():
+
+    result = run_git(
+        [
+            "diff",
+            "--cached",
+            "--quiet"
+        ],
+        check=False
+    )
+
+    # returncode 0 = 変更なし
+    # returncode 1 = 変更あり
+
+    if result.returncode == 0:
+
+        print()
+        print(
+            "公開用ファイルに変更がありません。"
+        )
+
+        return False
+
+    timestamp = datetime.now().strftime(
+        "%Y-%m-%d %H:%M"
+    )
+
+    message = (
+        "化石デジタルライブラリー更新 "
+        f"({timestamp})"
+    )
+
+    run_git(
+        [
+            "commit",
+            "-m",
+            message
+        ]
+    )
+
+    return True
+
+
+# ============================================================
+# push
+# ============================================================
+
+def git_push():
+
+    print()
+    print(
+        "GitHubへ公開用ファイルをpushします。"
+    )
+
+    run_git(
+        [
+            "push",
+            GIT_REMOTE,
+            GIT_BRANCH
+        ]
+    )
+
+
+# ============================================================
+# メイン
+# ============================================================
+
+def main():
+
+    print_title(
+        "鵡川高校 化石デジタルライブラリー"
+    )
+
+    print(
+        "公開用データ自動更新を開始します。"
+    )
+
+    print()
+    print(
+        f"作業フォルダ：{BASE_DIR}"
+    )
+
+    # --------------------------------------------------------
+    # 1
+    # --------------------------------------------------------
+
+    print_step(
+        1,
+        "Gitリポジトリを確認します。"
+    )
+
+    validate_git_repository()
+
+    print_step(
+        "1-A",
+        ".gitignoreの安全設定を確認します。"
+    )
+
+    ensure_gitignore()
+    validate_remote()
+
+    # --------------------------------------------------------
+    # 2
+    # --------------------------------------------------------
+
+    print_step(
+        2,
+        "管理用Excelを読み込みます。"
+    )
+
+    specimen_df = load_specimens()
+    locality_df = load_localities()
+
+    specimen_columns = resolve_specimen_columns(
+        specimen_df
+    )
+
+    locality_columns = resolve_locality_columns(
+        locality_df
+    )
+
+    # --------------------------------------------------------
+    # 説明文同期
+    # --------------------------------------------------------
+
+    print_step(
+        "2-A",
+        "説明文を両ページへ同期します。"
+    )
+
+    sync_description_pages()
+
+    # --------------------------------------------------------
+    # 3
+    # --------------------------------------------------------
+
+    print_step(
+        3,
+        "標本データをチェックします。"
+    )
+
+    errors = validate_specimens(
+        specimen_df,
+        specimen_columns
+    )
+
+    if errors:
+
+        print()
+
+        for error in errors:
+            print(
+                "ERROR："
+                + error
+            )
+
+        fail(
+            "標本データに問題があります。"
+        )
+
+    print(
+        f"OK：標本数 {len(specimen_df)}件"
+    )
+
+    # --------------------------------------------------------
+    # 4
+    # --------------------------------------------------------
+
+    print_step(
+        4,
+        "地点データをチェックします。"
+    )
+
+    errors = validate_localities(
+        locality_df,
+        locality_columns
+    )
+
+    if errors:
+
+        print()
+
+        for error in errors:
+            print(
+                "ERROR："
+                + error
+            )
+
+        fail(
+            "地点データに問題があります。"
+        )
+
+    print(
+        f"OK：地点データ {len(locality_df)}件"
+    )
+
+    # --------------------------------------------------------
+    # 5
+    # --------------------------------------------------------
+
+    print_step(
+        5,
+        "標本と地点IDの対応をチェックします。"
+    )
+
+    errors = validate_site_relationship(
+        specimen_df,
+        specimen_columns,
+        locality_df,
+        locality_columns
+    )
+
+    if errors:
+
+        print()
+
+        for error in errors:
+            print(
+                "ERROR："
+                + error
+            )
+
+        fail(
+            "標本と地点IDの対応に問題があります。"
+        )
+
+    print(
+        "OK：標本と地点IDの対応に問題ありません。"
+    )
+
+    # --------------------------------------------------------
+    # 6
+    # --------------------------------------------------------
+
+    print_step(
+        6,
+        "画像をチェックします。"
+    )
+
+    warnings = validate_images(
+        specimen_df,
+        specimen_columns
+    )
+
+    if warnings:
+
+        print()
+
+        for warning in warnings:
+            print(
+                "WARNING："
+                + warning
+            )
+
+        print()
+        print(
+            f"画像に関する警告："
+            f"{len(warnings)}件"
+        )
+
+        print(
+            "画像がない標本がある場合でも、"
+            "JSON生成は続行します。"
+        )
+
+    else:
+
+        print(
+            "OK：登録画像をすべて確認しました。"
+        )
+
+    # --------------------------------------------------------
+    # 6-2
+    # --------------------------------------------------------
+
+    print_step(
+        "6-2",
+        "3Dデータをチェックします。"
+    )
+
+    three_d_warnings = validate_3d_models(
+        specimen_df,
+        specimen_columns
+    )
+
+    if three_d_warnings:
+
+        print()
+
+        for warning in three_d_warnings:
+            print(
+                "WARNING："
+                + warning
+            )
+
+        print()
+        print(
+            f"3Dデータに関する警告："
+            f"{len(three_d_warnings)}件"
+        )
+
+        print(
+            "3Dデータがない標本がある場合でも、"
+            "JSON生成は続行します。"
+        )
+
+    else:
+
+        if specimen_columns.get("model_3d") is None:
+            print(
+                "OK：3Dデータ列は未設定です。"
+                "既存の標本データのみで処理を続行します。"
+            )
+        else:
+            print(
+                "OK：登録3Dデータを確認しました。"
+            )
+
+    # --------------------------------------------------------
+    # 7
+    # --------------------------------------------------------
+
+    print_step(
+        7,
+        "公開用JSONを生成します。"
+    )
+
+    specimens = create_public_specimens(
+        specimen_df,
+        specimen_columns
+    )
+
+    localities = create_public_localities(
+        locality_df,
+        locality_columns
+    )
+
+    save_json(
+        SPECIMENS_JSON,
+        specimens
+    )
+
+    save_json(
+        LOCALITIES_JSON,
+        localities
+    )
+
+    print(
+        f"OK：{SPECIMENS_JSON}"
+    )
+
+    print(
+        f"OK：{LOCALITIES_JSON}"
+    )
+
+    # --------------------------------------------------------
+    # 8
+    # --------------------------------------------------------
+
+    print_step(
+        8,
+        "公開用JSONの安全確認をします。"
+    )
+
+    validate_public_json(
+        specimens,
+        localities
+    )
+
+    print(
+        "OK：公開用JSONに非公開項目がありません。"
+    )
+
+    print(
+        f"標本数：{len(specimens)}"
+    )
+
+    print(
+        f"公開地点数：{len(localities)}"
+    )
+
+    # --------------------------------------------------------
+    # 9
+    # --------------------------------------------------------
+
+    print_step(
+        9,
+        "GitHubの公開状態を確認します。"
+    )
+
+    validate_git_tracked_files()
+
+    # --------------------------------------------------------
+    # 10
+    # --------------------------------------------------------
+
+    print_step(
+        10,
+        "公開用ファイルだけをGitへ登録します。"
+    )
+
+    git_add_public_files()
+
+    # --------------------------------------------------------
+    # 11
+    # --------------------------------------------------------
+
+    print_step(
+        11,
+        "Gitへ登録するファイルを最終確認します。"
+    )
+
+    validate_staged_files()
+
+    # --------------------------------------------------------
+    # 12
+    # --------------------------------------------------------
+
+    print_step(
+        12,
+        "GitHub側との同期状態を確認します。"
+    )
+
+    sync_with_remote()
+
+    # rebase等によって状態が変わった場合に備えて、
+    # 最終的なGit管理対象をもう一度確認
+    validate_git_tracked_files()
+
+    # staged状態も再確認
+    validate_staged_files()
+
+    # --------------------------------------------------------
+    # 13
+    # --------------------------------------------------------
+
+    print_step(
+        13,
+        "公開用ファイルをcommitします。"
+    )
+
+    committed = git_commit()
+
+    # --------------------------------------------------------
+    # 14
+    # --------------------------------------------------------
+
+    if committed:
+
+        print_step(
+            14,
+            "GitHubへpushします。"
+        )
+
+        git_push()
+
+        print()
+        print_line("=")
+        print(
+            "更新完了"
+        )
+        print_line("=")
+
+        print()
+        print(
+            "公開用ファイルだけをGitHubへ反映しました。"
+        )
+
+    else:
+
+        print()
+        print_line("=")
+        print(
+            "更新不要"
+        )
+        print_line("=")
+
+        print()
+        print(
+            "公開用ファイルに変更がないため、"
+            "commit / push は行いません。"
+        )
+
+    # --------------------------------------------------------
+    # 最終状態
+    # --------------------------------------------------------
+
+    print()
+    print(
+        "最終Git状態："
+    )
+
+    run_git(
+        [
+            "status",
+            "--short"
+        ]
+    )
+
+    print()
+    print(
+        "処理が完了しました。"
+    )
+
+    input(
+        "\nEnterキーを押して終了してください。"
+    )
+
+
+# ============================================================
+# 実行
+# ============================================================
+
+if __name__ == "__main__":
+
+    try:
+
+        main()
+
+    except KeyboardInterrupt:
+
+        print()
+        print(
+            "処理を中断しました。"
+        )
+
+        input(
+            "Enterキーを押して終了してください。"
+        )
+
+        sys.exit(1)
+
+    except Exception as error:
+
+        print()
+        print("!" * 60)
+        print("ERROR")
+        print("!" * 60)
+        print()
+        print(str(error))
+        print()
+        print(
+            "安全のためGitHubへのpushは実行されていません。"
+        )
+        print()
+
+        input(
+            "Enterキーを押して終了してください。"
+        )
+
+        sys.exit(1)
