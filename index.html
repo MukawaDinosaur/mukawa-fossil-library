@@ -1625,8 +1625,6 @@ function getRegionSiteIdsFromLocalities(
             .filter(Boolean)
         : [];
 
-    // 地区名として最低限認識しておく名称。
-    // 将来的にはGeoJSONのkeywordsを追加するだけで拡張できる。
     if (normalizedDistrict) {
         keywordList.push(normalizedDistrict);
     }
@@ -1637,6 +1635,13 @@ function getRegionSiteIdsFromLocalities(
             return;
         }
 
+        // 新しい公開JSONでは public_area を使用する。
+        // 旧形式のJSONに残っている place も後方互換のため参照する。
+        const publicArea = normalizePublicPlace(
+            locality.public_area ||
+            ""
+        );
+
         const place = normalizePublicPlace(
             locality.place ||
             locality.region ||
@@ -1644,33 +1649,47 @@ function getRegionSiteIdsFromLocalities(
             ""
         );
 
-        if (!place) {
-            return;
-        }
-
         const localityDistrict = normalizePublicPlace(
             locality.district ||
             ""
         );
 
+        const localityRegion = normalizePublicPlace(
+            locality.region ||
+            ""
+        );
+
+        const searchable = [
+            publicArea,
+            place,
+            localityDistrict,
+            localityRegion
+        ].filter(Boolean);
+
+        if (!searchable.length) {
+            return;
+        }
+
         const matched =
             (
                 normalizedRegionName &&
-                (
-                    place.includes(normalizedRegionName) ||
-                    normalizedRegionName.includes(place)
+                searchable.some(text =>
+                    text.includes(normalizedRegionName) ||
+                    normalizedRegionName.includes(text)
                 )
             ) ||
             (
                 normalizedDistrict &&
-                (
-                    place.includes(normalizedDistrict) ||
-                    localityDistrict.includes(normalizedDistrict)
+                searchable.some(text =>
+                    text.includes(normalizedDistrict) ||
+                    normalizedDistrict.includes(text)
                 )
             ) ||
             keywordList.some(keyword =>
-                place.includes(keyword) ||
-                localityDistrict.includes(keyword)
+                searchable.some(text =>
+                    text.includes(keyword) ||
+                    keyword.includes(text)
+                )
             );
 
         if (matched) {
@@ -1679,6 +1698,38 @@ function getRegionSiteIdsFromLocalities(
             );
         }
     });
+
+    // 公開地点JSONの地区名だけでは対応できない場合に備え、
+    // 標本側のsite_idとの共通部分も確認する。
+    // これは内部的な対応付けにのみ使用し、画面にはsite_idを表示しない。
+    if (!siteIds.size && (normalizedDistrict || normalizedRegionName)) {
+        const matchedLocalitySiteIds = localities
+            .filter(locality => {
+                const texts = [
+                    locality?.public_area,
+                    locality?.place,
+                    locality?.district,
+                    locality?.region
+                ]
+                    .filter(Boolean)
+                    .map(normalizePublicPlace);
+
+                return texts.some(text =>
+                    (normalizedDistrict && (
+                        text.includes(normalizedDistrict) ||
+                        normalizedDistrict.includes(text)
+                    )) ||
+                    (normalizedRegionName && (
+                        text.includes(normalizedRegionName) ||
+                        normalizedRegionName.includes(text)
+                    ))
+                );
+            })
+            .map(locality => String(locality.site_id || "").trim())
+            .filter(Boolean);
+
+        matchedLocalitySiteIds.forEach(siteId => siteIds.add(siteId));
+    }
 
     return Array.from(siteIds).filter(Boolean);
 }
@@ -2135,15 +2186,38 @@ function displayAdministrativeAreasOnMap() {
             !siteIds.length &&
             String(regionName).includes("むかわ町")
         ) {
+            // むかわ町全体は、公開標本データに実際に存在する
+            // site_idを基準に対象標本を決める。
+            // localities_public.jsonの形式変更に左右されないよう、
+            // specimens側を主データとして扱う。SCHOOLは地区産標本ではないため除外する。
             siteIds = Array.from(
                 new Set(
-                    localities
-                        .map(locality =>
-                            String(locality.site_id || "").trim()
+                    specimens
+                        .map(specimen =>
+                            String(specimen.site_id || "").trim()
                         )
-                        .filter(Boolean)
+                        .filter(siteId =>
+                            siteId &&
+                            siteId.toUpperCase() !== "SCHOOL"
+                        )
                 )
             );
+
+            // 標本側にsite_idがない場合のみ、公開地点JSONへフォールバックする。
+            if (!siteIds.length) {
+                siteIds = Array.from(
+                    new Set(
+                        localities
+                            .map(locality =>
+                                String(locality.site_id || "").trim()
+                            )
+                            .filter(siteId =>
+                                siteId &&
+                                siteId.toUpperCase() !== "SCHOOL"
+                            )
+                    )
+                );
+            }
         }
 
         const regionSpecimens = specimens.filter(specimen =>
