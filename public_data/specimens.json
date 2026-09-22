@@ -11,8 +11,14 @@
     "site_id": "A001",
     "image": "images/MDR250628-01/MDR250628-01_01.jpg",
     "images": [
-      "images/MDR250628-01/MDR250628-01_01.jpg",
-      "images/MDR250628-01/MDR250628-01_02.jpg"
+      {
+        "original": "images/MDR250628-01/MDR250628-01_01.jpg",
+        "thumb": "images/thumbs/MDR250628-01_01.jpg"
+      },
+      {
+        "original": "images/MDR250628-01/MDR250628-01_02.jpg",
+        "thumb": "images/thumbs/MDR250628-01_02.jpg"
+      }
     ]
   },
   {
@@ -27,7 +33,10 @@
     "site_id": "A002",
     "image": "images/MDR260516-01/MDR260516-01.jpg",
     "images": [
-      "images/MDR260516-01/MDR260516-01.jpg"
+      {
+        "original": "images/MDR260516-01/MDR260516-01.jpg",
+        "thumb": "images/thumbs/MDR260516-01.jpg"
+      }
     ]
   },
   {
@@ -42,7 +51,10 @@
     "site_id": "A002",
     "image": "images/MDR260516-02/MDR260516-02.jpg",
     "images": [
-      "images/MDR260516-02/MDR260516-02.jpg"
+      {
+        "original": "images/MDR260516-02/MDR260516-02.jpg",
+        "thumb": "images/thumbs/MDR260516-02.jpg"
+      }
     ]
   },
   {
@@ -57,7 +69,10 @@
     "site_id": "A003",
     "image": "images/MDR260530-01/MDR260530-01.jpg",
     "images": [
-      "images/MDR260530-01/MDR260530-01.jpg"
+      {
+        "original": "images/MDR260530-01/MDR260530-01.jpg",
+        "thumb": "images/thumbs/MDR260530-01.jpg"
+      }
     ]
   },
   {
@@ -72,7 +87,10 @@
     "site_id": "A003",
     "image": "images/MDR260530-02/MDR260530-02.jpg",
     "images": [
-      "images/MDR260530-02/MDR260530-02.jpg"
+      {
+        "original": "images/MDR260530-02/MDR260530-02.jpg",
+        "thumb": "images/thumbs/MDR260530-02.jpg"
+      }
     ]
   },
   {
@@ -87,7 +105,10 @@
     "site_id": "A003",
     "image": "images/MDR260530-03/MDR260530-03.jpg",
     "images": [
-      "images/MDR260530-03/MDR260530-03.jpg"
+      {
+        "original": "images/MDR260530-03/MDR260530-03.jpg",
+        "thumb": "images/thumbs/MDR260530-03.jpg"
+      }
     ]
   },
   {
@@ -102,7 +123,10 @@
     "site_id": "A003",
     "image": "images/MDR260530-04/MDR260530-04.jpg",
     "images": [
-      "images/MDR260530-04/MDR260530-04.jpg"
+      {
+        "original": "images/MDR260530-04/MDR260530-04.jpg",
+        "thumb": "images/thumbs/MDR260530-04.jpg"
+      }
     ]
   },
   {
@@ -117,7 +141,10 @@
     "site_id": "A003",
     "image": "images/MDR260530-05/MDR260530-05.jpg",
     "images": [
-      "images/MDR260530-05/MDR260530-05.jpg"
+      {
+        "original": "images/MDR260530-05/MDR260530-05.jpg",
+        "thumb": "images/thumbs/MDR260530-05.jpg"
+      }
     ]
   },
   {
@@ -132,7 +159,10 @@
     "site_id": "A003",
     "image": "images/MDR260530-06/MDR260530-06.jpg",
     "images": [
-      "images/MDR260530-06/MDR260530-06.jpg"
+      {
+        "original": "images/MDR260530-06/MDR260530-06.jpg",
+        "thumb": "images/thumbs/MDR260530-06.jpg"
+      }
     ]
   },
   {
@@ -147,7 +177,10 @@
     "site_id": "A003",
     "image": "images/MDR260530-07/MDR260530-07.jpg",
     "images": [
-      "images/MDR260530-07/MDR260530-07.jpg"
+      {
+        "original": "images/MDR260530-07/MDR260530-07.jpg",
+        "thumb": "images/thumbs/MDR260530-07.jpg"
+      }
     ]
   },
   {
@@ -162,7 +195,10 @@
     "site_id": "A003",
     "image": "images/MDR260530-08/MDR260530-08.jpg",
     "images": [
-      "images/MDR260530-08/MDR260530-08.jpg"
+      {
+        "original": "images/MDR260530-08/MDR260530-08.jpg",
+        "thumb": "images/thumbs/MDR260530-08.jpg"
+      }
     ]
   },
   {
@@ -177,7 +213,10 @@
     "site_id": "A003",
     "image": "images/MDR260530-09/MDR260530-09.jpg",
     "images": [
-      "images/MDR260530-09/MDR260530-09.jpg"
+      {
+        "original": "images/MDR260530-09/MDR260530-09.jpg",
+        "thumb": "images/thumbs/MDR260530-09.jpg"
+      }
     ]
   },
   {
@@ -192,7 +231,10 @@
     "site_id": "A003",
     "image": "images/MDR260614-01/MDR260614-01.jpg",
     "images": [
-      "images/MDR260614-01/MDR260614-01.jpg"
+      {
+        "original": "images/MDR260614-01/MDR260614-01.jpg",
+        "thumb": "images/thumbs/MDR260614-01.jpg"
+      }
     ]
   },
   {
@@ -207,7 +249,10 @@
     "site_id": "A004",
     "image": "images/MDR260620-01/MDR260620-01.jpg",
     "images": [
-      "images/MDR260620-01/MDR260620-01.jpg"
+      {
+        "original": "images/MDR260620-01/MDR260620-01.jpg",
+        "thumb": "images/thumbs/MDR260620-01.jpg"
+      }
     ]
   },
   {
@@ -222,7 +267,10 @@
     "site_id": "A002",
     "image": "images/MDR260620-02/MDR260620-02.jpg",
     "images": [
-      "images/MDR260620-02/MDR260620-02.jpg"
+      {
+        "original": "images/MDR260620-02/MDR260620-02.jpg",
+        "thumb": "images/thumbs/MDR260620-02.jpg"
+      }
     ]
   },
   {
@@ -237,7 +285,10 @@
     "site_id": "A002",
     "image": "images/MDR260620-03/MDR260620-03.jpg",
     "images": [
-      "images/MDR260620-03/MDR260620-03.jpg"
+      {
+        "original": "images/MDR260620-03/MDR260620-03.jpg",
+        "thumb": "images/thumbs/MDR260620-03.jpg"
+      }
     ]
   },
   {
@@ -252,7 +303,10 @@
     "site_id": "A002",
     "image": "images/MDR260620-04/MDR260620-04.jpg",
     "images": [
-      "images/MDR260620-04/MDR260620-04.jpg"
+      {
+        "original": "images/MDR260620-04/MDR260620-04.jpg",
+        "thumb": "images/thumbs/MDR260620-04.jpg"
+      }
     ]
   },
   {
@@ -267,7 +321,10 @@
     "site_id": "A002",
     "image": "images/MDR260620-05/MDR260620-05.jpg",
     "images": [
-      "images/MDR260620-05/MDR260620-05.jpg"
+      {
+        "original": "images/MDR260620-05/MDR260620-05.jpg",
+        "thumb": "images/thumbs/MDR260620-05.jpg"
+      }
     ]
   },
   {
@@ -282,7 +339,10 @@
     "site_id": "A005",
     "image": "images/MDR260620-06/MDR260620-06.jpg",
     "images": [
-      "images/MDR260620-06/MDR260620-06.jpg"
+      {
+        "original": "images/MDR260620-06/MDR260620-06.jpg",
+        "thumb": "images/thumbs/MDR260620-06.jpg"
+      }
     ]
   },
   {
@@ -297,7 +357,10 @@
     "site_id": "A005",
     "image": "images/MDR260620-07/MDR260620-07.jpg",
     "images": [
-      "images/MDR260620-07/MDR260620-07.jpg"
+      {
+        "original": "images/MDR260620-07/MDR260620-07.jpg",
+        "thumb": "images/thumbs/MDR260620-07.jpg"
+      }
     ]
   },
   {
@@ -312,8 +375,14 @@
     "site_id": "SCHOOL",
     "image": "images/MDRMHS-001/MDRMHS-001_01.jpg",
     "images": [
-      "images/MDRMHS-001/MDRMHS-001_01.jpg",
-      "images/MDRMHS-001/MDRMHS-001_02.jpg"
+      {
+        "original": "images/MDRMHS-001/MDRMHS-001_01.jpg",
+        "thumb": "images/thumbs/MDRMHS-001_01.jpg"
+      },
+      {
+        "original": "images/MDRMHS-001/MDRMHS-001_02.jpg",
+        "thumb": "images/thumbs/MDRMHS-001_02.jpg"
+      }
     ]
   },
   {
@@ -328,8 +397,14 @@
     "site_id": "SCHOOL",
     "image": "images/MDRMHS-002/MDRMHS-002_01.jpg",
     "images": [
-      "images/MDRMHS-002/MDRMHS-002_01.jpg",
-      "images/MDRMHS-002/MDRMHS-002_02.jpg"
+      {
+        "original": "images/MDRMHS-002/MDRMHS-002_01.jpg",
+        "thumb": "images/thumbs/MDRMHS-002_01.jpg"
+      },
+      {
+        "original": "images/MDRMHS-002/MDRMHS-002_02.jpg",
+        "thumb": "images/thumbs/MDRMHS-002_02.jpg"
+      }
     ]
   },
   {
@@ -344,7 +419,10 @@
     "site_id": "SCHOOL",
     "image": "images/MDRMHS-003/MDRMHS-003.jpg",
     "images": [
-      "images/MDRMHS-003/MDRMHS-003.jpg"
+      {
+        "original": "images/MDRMHS-003/MDRMHS-003.jpg",
+        "thumb": "images/thumbs/MDRMHS-003.jpg"
+      }
     ]
   },
   {
@@ -359,8 +437,14 @@
     "site_id": "SCHOOL",
     "image": "images/MDRMHS-004/MDRMHS-004_01.jpg",
     "images": [
-      "images/MDRMHS-004/MDRMHS-004_01.jpg",
-      "images/MDRMHS-004/MDRMHS-004_02.jpg"
+      {
+        "original": "images/MDRMHS-004/MDRMHS-004_01.jpg",
+        "thumb": "images/thumbs/MDRMHS-004_01.jpg"
+      },
+      {
+        "original": "images/MDRMHS-004/MDRMHS-004_02.jpg",
+        "thumb": "images/thumbs/MDRMHS-004_02.jpg"
+      }
     ]
   },
   {
@@ -375,9 +459,18 @@
     "site_id": "SCHOOL",
     "image": "images/MDRMHS-005/MDRMHS-005_01.jpg",
     "images": [
-      "images/MDRMHS-005/MDRMHS-005_01.jpg",
-      "images/MDRMHS-005/MDRMHS-005_02.jpg",
-      "images/MDRMHS-005/MDRMHS-005_03.jpg"
+      {
+        "original": "images/MDRMHS-005/MDRMHS-005_01.jpg",
+        "thumb": "images/thumbs/MDRMHS-005_01.jpg"
+      },
+      {
+        "original": "images/MDRMHS-005/MDRMHS-005_02.jpg",
+        "thumb": "images/thumbs/MDRMHS-005_02.jpg"
+      },
+      {
+        "original": "images/MDRMHS-005/MDRMHS-005_03.jpg",
+        "thumb": "images/thumbs/MDRMHS-005_03.jpg"
+      }
     ]
   },
   {
@@ -392,7 +485,10 @@
     "site_id": "SCHOOL",
     "image": "images/MDRMHS-006/MDRMHS-006.jpg",
     "images": [
-      "images/MDRMHS-006/MDRMHS-006.jpg"
+      {
+        "original": "images/MDRMHS-006/MDRMHS-006.jpg",
+        "thumb": "images/thumbs/MDRMHS-006.jpg"
+      }
     ]
   },
   {
@@ -407,7 +503,10 @@
     "site_id": "SCHOOL",
     "image": "images/MDRMHS-007/MDRMHS-007.jpg",
     "images": [
-      "images/MDRMHS-007/MDRMHS-007.jpg"
+      {
+        "original": "images/MDRMHS-007/MDRMHS-007.jpg",
+        "thumb": "images/thumbs/MDRMHS-007.jpg"
+      }
     ]
   },
   {
@@ -422,7 +521,10 @@
     "site_id": "SCHOOL",
     "image": "images/MDRMHS-008/MDRMHS-008.jpg",
     "images": [
-      "images/MDRMHS-008/MDRMHS-008.jpg"
+      {
+        "original": "images/MDRMHS-008/MDRMHS-008.jpg",
+        "thumb": "images/thumbs/MDRMHS-008.jpg"
+      }
     ]
   },
   {
@@ -437,8 +539,14 @@
     "site_id": "A001",
     "image": "images/MDR260814-01/MDR260814-01_01.jpg",
     "images": [
-      "images/MDR260814-01/MDR260814-01_01.jpg",
-      "images/MDR260814-01/MDR260814-01_02.jpg"
+      {
+        "original": "images/MDR260814-01/MDR260814-01_01.jpg",
+        "thumb": "images/thumbs/MDR260814-01_01.jpg"
+      },
+      {
+        "original": "images/MDR260814-01/MDR260814-01_02.jpg",
+        "thumb": "images/thumbs/MDR260814-01_02.jpg"
+      }
     ]
   },
   {
@@ -453,10 +561,22 @@
     "site_id": "A001",
     "image": "images/MDR260814-02/MDR260814-02_01.jpg",
     "images": [
-      "images/MDR260814-02/MDR260814-02_01.jpg",
-      "images/MDR260814-02/MDR260814-02_02.jpg",
-      "images/MDR260814-02/MDR260814-02_03.jpg",
-      "images/MDR260814-02/MDR260814-02_04.jpg"
+      {
+        "original": "images/MDR260814-02/MDR260814-02_01.jpg",
+        "thumb": "images/thumbs/MDR260814-02_01.jpg"
+      },
+      {
+        "original": "images/MDR260814-02/MDR260814-02_02.jpg",
+        "thumb": "images/thumbs/MDR260814-02_02.jpg"
+      },
+      {
+        "original": "images/MDR260814-02/MDR260814-02_03.jpg",
+        "thumb": "images/thumbs/MDR260814-02_03.jpg"
+      },
+      {
+        "original": "images/MDR260814-02/MDR260814-02_04.jpg",
+        "thumb": "images/thumbs/MDR260814-02_04.jpg"
+      }
     ]
   },
   {
@@ -471,9 +591,18 @@
     "site_id": "A001",
     "image": "images/MDR260814-03/MDR260814-03_01.jpg",
     "images": [
-      "images/MDR260814-03/MDR260814-03_01.jpg",
-      "images/MDR260814-03/MDR260814-03_02.jpg",
-      "images/MDR260814-03/MDR260814-03_03.jpg"
+      {
+        "original": "images/MDR260814-03/MDR260814-03_01.jpg",
+        "thumb": "images/thumbs/MDR260814-03_01.jpg"
+      },
+      {
+        "original": "images/MDR260814-03/MDR260814-03_02.jpg",
+        "thumb": "images/thumbs/MDR260814-03_02.jpg"
+      },
+      {
+        "original": "images/MDR260814-03/MDR260814-03_03.jpg",
+        "thumb": "images/thumbs/MDR260814-03_03.jpg"
+      }
     ]
   },
   {
@@ -488,11 +617,26 @@
     "site_id": "A001",
     "image": "images/MDR260814-05/MDR260814-05_01.jpg",
     "images": [
-      "images/MDR260814-05/MDR260814-05_01.jpg",
-      "images/MDR260814-05/MDR260814-05_02.jpg",
-      "images/MDR260814-05/MDR260814-05_03.jpg",
-      "images/MDR260814-05/MDR260814-05_04.jpg",
-      "images/MDR260814-05/MDR260814-05_05.jpg"
+      {
+        "original": "images/MDR260814-05/MDR260814-05_01.jpg",
+        "thumb": "images/thumbs/MDR260814-05_01.jpg"
+      },
+      {
+        "original": "images/MDR260814-05/MDR260814-05_02.jpg",
+        "thumb": "images/thumbs/MDR260814-05_02.jpg"
+      },
+      {
+        "original": "images/MDR260814-05/MDR260814-05_03.jpg",
+        "thumb": "images/thumbs/MDR260814-05_03.jpg"
+      },
+      {
+        "original": "images/MDR260814-05/MDR260814-05_04.jpg",
+        "thumb": "images/thumbs/MDR260814-05_04.jpg"
+      },
+      {
+        "original": "images/MDR260814-05/MDR260814-05_05.jpg",
+        "thumb": "images/thumbs/MDR260814-05_05.jpg"
+      }
     ]
   },
   {
@@ -507,8 +651,14 @@
     "site_id": "A001",
     "image": "images/MDR260814-06/MDR260814-06_01.jpg",
     "images": [
-      "images/MDR260814-06/MDR260814-06_01.jpg",
-      "images/MDR260814-06/MDR260814-06_02.jpg"
+      {
+        "original": "images/MDR260814-06/MDR260814-06_01.jpg",
+        "thumb": "images/thumbs/MDR260814-06_01.jpg"
+      },
+      {
+        "original": "images/MDR260814-06/MDR260814-06_02.jpg",
+        "thumb": "images/thumbs/MDR260814-06_02.jpg"
+      }
     ]
   },
   {
@@ -523,9 +673,18 @@
     "site_id": "A001",
     "image": "images/MDR260814-07/MDR260814-07_01.jpg",
     "images": [
-      "images/MDR260814-07/MDR260814-07_01.jpg",
-      "images/MDR260814-07/MDR260814-07_02.jpg",
-      "images/MDR260814-07/MDR260814-07_03.jpg"
+      {
+        "original": "images/MDR260814-07/MDR260814-07_01.jpg",
+        "thumb": "images/thumbs/MDR260814-07_01.jpg"
+      },
+      {
+        "original": "images/MDR260814-07/MDR260814-07_02.jpg",
+        "thumb": "images/thumbs/MDR260814-07_02.jpg"
+      },
+      {
+        "original": "images/MDR260814-07/MDR260814-07_03.jpg",
+        "thumb": "images/thumbs/MDR260814-07_03.jpg"
+      }
     ]
   },
   {
@@ -540,8 +699,14 @@
     "site_id": "A001",
     "image": "images/MDR260814-08/MDR260814-08_01.jpg",
     "images": [
-      "images/MDR260814-08/MDR260814-08_01.jpg",
-      "images/MDR260814-08/MDR260814-08_02.jpg"
+      {
+        "original": "images/MDR260814-08/MDR260814-08_01.jpg",
+        "thumb": "images/thumbs/MDR260814-08_01.jpg"
+      },
+      {
+        "original": "images/MDR260814-08/MDR260814-08_02.jpg",
+        "thumb": "images/thumbs/MDR260814-08_02.jpg"
+      }
     ]
   },
   {
@@ -556,8 +721,14 @@
     "site_id": "SCHOOL",
     "image": "images/MDRMHS-009/MDRMHS-009_01.jpg",
     "images": [
-      "images/MDRMHS-009/MDRMHS-009_01.jpg",
-      "images/MDRMHS-009/MDRMHS-009_02.jpg"
+      {
+        "original": "images/MDRMHS-009/MDRMHS-009_01.jpg",
+        "thumb": "images/thumbs/MDRMHS-009_01.jpg"
+      },
+      {
+        "original": "images/MDRMHS-009/MDRMHS-009_02.jpg",
+        "thumb": "images/thumbs/MDRMHS-009_02.jpg"
+      }
     ],
     "model_3d": "models/MDRMHS-009/MDRMHS-009_web.glb",
     "models_3d": [
@@ -581,7 +752,10 @@
     "site_id": "SCHOOL",
     "image": "images/MDRMHS-010/MDRMHS-010_01.jpg",
     "images": [
-      "images/MDRMHS-010/MDRMHS-010_01.jpg"
+      {
+        "original": "images/MDRMHS-010/MDRMHS-010_01.jpg",
+        "thumb": "images/thumbs/MDRMHS-010_01.jpg"
+      }
     ]
   },
   {
@@ -596,7 +770,10 @@
     "site_id": "SCHOOL",
     "image": "images/MDRMHS-011/MDRMHS-011_01.jpg",
     "images": [
-      "images/MDRMHS-011/MDRMHS-011_01.jpg"
+      {
+        "original": "images/MDRMHS-011/MDRMHS-011_01.jpg",
+        "thumb": "images/thumbs/MDRMHS-011_01.jpg"
+      }
     ]
   },
   {
@@ -611,8 +788,14 @@
     "site_id": "A003",
     "image": "images/MDR210821-01/MDR210821-01_01.jpg",
     "images": [
-      "images/MDR210821-01/MDR210821-01_01.jpg",
-      "images/MDR210821-01/MDR210821-01_02.jpg"
+      {
+        "original": "images/MDR210821-01/MDR210821-01_01.jpg",
+        "thumb": "images/thumbs/MDR210821-01_01.jpg"
+      },
+      {
+        "original": "images/MDR210821-01/MDR210821-01_02.jpg",
+        "thumb": "images/thumbs/MDR210821-01_02.jpg"
+      }
     ]
   },
   {
@@ -627,7 +810,10 @@
     "site_id": "SCHOOL",
     "image": "images/MDRMHS-013/MDRMHS-013_01.jpg",
     "images": [
-      "images/MDRMHS-013/MDRMHS-013_01.jpg"
+      {
+        "original": "images/MDRMHS-013/MDRMHS-013_01.jpg",
+        "thumb": "images/thumbs/MDRMHS-013_01.jpg"
+      }
     ]
   },
   {
@@ -642,8 +828,14 @@
     "site_id": "A001",
     "image": "images/MDR240518-01/MDR240518-01_01.jpg",
     "images": [
-      "images/MDR240518-01/MDR240518-01_01.jpg",
-      "images/MDR240518-01/MDR240518-01_02.jpg"
+      {
+        "original": "images/MDR240518-01/MDR240518-01_01.jpg",
+        "thumb": "images/thumbs/MDR240518-01_01.jpg"
+      },
+      {
+        "original": "images/MDR240518-01/MDR240518-01_02.jpg",
+        "thumb": "images/thumbs/MDR240518-01_02.jpg"
+      }
     ]
   }
 ]
