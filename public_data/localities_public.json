@@ -46,5 +46,12 @@
     "public_area": "鵡川高校",
     "formation": "不明",
     "age": "不明"
+  },
+  {
+    "site_id": "A006",
+    "latitude": 42.72803888888889,
+    "longitude": 142.23725,
+    "formation": "蝦夷層群函淵層",
+    "age": "約8300万～7200万年前"
   }
 ]

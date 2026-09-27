@@ -837,5 +837,31 @@
         "thumb": "images/thumbs/MDR240518-01_02.jpg"
       }
     ]
+  },
+  {
+    "specimen_id": "MDR260926-01",
+    "classification": "二枚貝化石",
+    "scientific_name": "Trigonia sp.",
+    "common_name": "トリゴニアの一種",
+    "formation": "蝦夷層群函淵層",
+    "age": "約8300万～7200万年前",
+    "collection_date": "2026-09-26",
+    "note": "同好会初の平取町での発掘。穂別地区とはのじゅーつの色味や硬さが異なり、化石を探すのに苦労する。産出する化石も穂別地区とは異なり、アンモナイトは出にくく、本標本のような「トリゴニア」（サンカクガイという二枚貝の仲間）が産出しやすいとのこと。本標本は、あまりにも硬すぎるノジュールをたたきつけて割ろうとしたところ、足元の母岩のほうが崩壊。その中から偶然発見されたものである。母岩から発見されたことで、地質年代推定の精度を上げられることが期待される。",
+    "site_id": "A006",
+    "image": "images/MDR260926-01/MDR260926-01_01.jpg",
+    "images": [
+      {
+        "original": "images/MDR260926-01/MDR260926-01_01.jpg",
+        "thumb": "images/thumbs/MDR260926-01_01.jpg"
+      },
+      {
+        "original": "images/MDR260926-01/MDR260926-01_02.jpg",
+        "thumb": "images/thumbs/MDR260926-01_02.jpg"
+      },
+      {
+        "original": "images/MDR260926-01/MDR260926-01_03.jpg",
+        "thumb": "images/thumbs/MDR260926-01_03.jpg"
+      }
+    ]
   }
 ]
