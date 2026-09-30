@@ -863,5 +863,23 @@
         "thumb": "images/thumbs/MDR260926-01_03.jpg"
       }
     ]
+  },
+  {
+    "specimen_id": "MDR260920-01",
+    "classification": "アンモナイト類",
+    "scientific_name": "未同定",
+    "common_name": "アンモナイトの一種",
+    "formation": "中部蝦夷層群",
+    "age": "約9000万年前",
+    "collection_date": "2026-09-20",
+    "note": "勝山高校（福井県）との合同巡検において採集したアンモナイトと思われるもの。風化が進んでいるため種同定は難しいかもしれないが、反対側にノジュールがまだ付着しているため、今後のクリーニングにより明らかになる可能性もある。ちんみに、顧問は最後の最後で川で転び、水没しながら運び出した。",
+    "site_id": "A002",
+    "image": "images/MDR260920-01/MDR260920-01_01.jpg",
+    "images": [
+      {
+        "original": "images/MDR260920-01/MDR260920-01_01.jpg",
+        "thumb": "images/thumbs/MDR260920-01_01.jpg"
+      }
+    ]
   }
 ]
