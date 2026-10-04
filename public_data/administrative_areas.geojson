@@ -7,9 +7,10 @@
     "source_file": "N03-20260101_01.xml",
     "source_authority": "国土交通省 国土数値情報（原典：国土地理院「数値地図（国土基本情報）」等）",
     "coordinate_reference_system": "JGD2011 / (B, L)",
-    "note": "公開用採集座標から生成せず、行政区域データの境界をそのまま使用。長和・稲里はN03行政区域属性には存在しないため、行政区域Polygonとは別に、公開地図用の代表Point Featureを追加。代表点は詳細な採集地点を示さない。",
+    "note": "公開用採集座標から生成せず、行政区域データの境界をそのまま使用。長和・稲里はN03行政区域属性には存在しないため、行政区域Polygonとは別に、公開地図用の代表Point Featureを追加。代表点は詳細な採集地点を示さない。 平取町長知内の地区代表Pointを追加。代表点は詳細な採集地点を示さない。",
     "biratori_added": "2026-10-04",
-    "biratori_source": "国土数値情報 行政区域 2026年版（市町村コード01602）"
+    "biratori_source": "国土数値情報 行政区域 2026年版（市町村コード01602）",
+    "biratori_longchiuchi_added": "2026-10-04"
   },
   "features": [
     {
@@ -63317,6 +63318,35 @@
         "coordinates": [
           142.37362982082192,
           42.7064604145
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "feature_type": "region_point",
+        "region_key": "biratori-osachinai",
+        "region_name": "平取町長知内",
+        "municipality": "平取町",
+        "district": "長知内",
+        "keywords": [
+          "平取町長知内",
+          "長知内",
+          "字長知内"
+        ],
+        "site_ids": [],
+        "description": "平取町長知内地区の代表位置です。詳細な採集地点を示すものではありません。",
+        "source": "公開されている地域施設位置を参考にした地区代表点",
+        "map_center": [
+          42.70311111,
+          142.2295278
+        ]
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          142.2295278,
+          42.70311111
         ]
       }
     }
