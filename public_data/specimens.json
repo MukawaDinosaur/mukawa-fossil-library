@@ -846,7 +846,7 @@
     "formation": "蝦夷層群函淵層",
     "age": "約8300万～7200万年前",
     "collection_date": "2026-09-26",
-    "note": "同好会初の平取町での発掘。穂別地区とはのじゅーつの色味や硬さが異なり、化石を探すのに苦労する。産出する化石も穂別地区とは異なり、アンモナイトは出にくく、本標本のような「トリゴニア」（サンカクガイという二枚貝の仲間）が産出しやすいとのこと。本標本は、あまりにも硬すぎるノジュールをたたきつけて割ろうとしたところ、足元の母岩のほうが崩壊。その中から偶然発見されたものである。母岩から発見されたことで、地質年代推定の精度を上げられることが期待される。",
+    "note": "同好会初の平取町での発掘。穂別地区とはノジュールの色味や硬さが異なり、化石を探すのに苦労する。産出する化石も穂別地区とは異なり、アンモナイトは出にくく、本標本のような「トリゴニア」（サンカクガイという二枚貝の仲間）が産出しやすいとのこと。本標本は、あまりにも硬すぎるノジュールをたたきつけて割ろうとしたところ、足元の母岩のほうが崩壊。その中から偶然発見されたものである。母岩から発見されたことで、地質年代推定の精度を上げられることが期待される。",
     "site_id": "A006",
     "image": "images/MDR260926-01/MDR260926-01_01.jpg",
     "images": [
@@ -861,6 +861,14 @@
       {
         "original": "images/MDR260926-01/MDR260926-01_03.jpg",
         "thumb": "images/thumbs/MDR260926-01_03.jpg"
+      },
+      {
+        "original": "images/MDR260926-01/MDR260926-01_04.jpg",
+        "thumb": "images/thumbs/MDR260926-01_04.jpg"
+      },
+      {
+        "original": "images/MDR260926-01/MDR260926-01_05.jpg",
+        "thumb": "images/thumbs/MDR260926-01_05.jpg"
       }
     ]
   },
@@ -872,13 +880,109 @@
     "formation": "中部蝦夷層群",
     "age": "約9000万年前",
     "collection_date": "2026-09-20",
-    "note": "勝山高校（福井県）との合同巡検において採集したアンモナイトと思われるもの。風化が進んでいるため種同定は難しいかもしれないが、反対側にノジュールがまだ付着しているため、今後のクリーニングにより明らかになる可能性もある。ちんみに、顧問は最後の最後で川で転び、水没しながら運び出した。",
+    "note": "勝山高校（福井県）との合同巡検において採集したアンモナイトと思われるもの。風化が進んでいるため種同定は難しいかもしれないが、反対側にノジュールがまだ付着しているため、今後のクリーニングにより明らかになる可能性もある。ちなみに、顧問は最後の最後で川で転び、水没しながら運び出した。",
     "site_id": "A002",
     "image": "images/MDR260920-01/MDR260920-01_01.jpg",
     "images": [
       {
         "original": "images/MDR260920-01/MDR260920-01_01.jpg",
         "thumb": "images/thumbs/MDR260920-01_01.jpg"
+      }
+    ]
+  },
+  {
+    "specimen_id": "MDR260920-02",
+    "classification": "二枚貝化石",
+    "scientific_name": "Trigonia sp.",
+    "common_name": "トリゴニアの一種",
+    "formation": "蝦夷層群函淵層",
+    "age": "約8300万～7200万年前",
+    "collection_date": "2026-09-26",
+    "note": "平取町同一地域での採集化石。MDR260926-01のやや下流側に転石としてあったものを採集した。",
+    "site_id": "A006",
+    "image": "images/MDR260920-02/MDR260926-02_01.jpg",
+    "images": [
+      {
+        "original": "images/MDR260920-02/MDR260926-02_01.jpg",
+        "thumb": "images/thumbs/MDR260926-02_01.jpg"
+      },
+      {
+        "original": "images/MDR260920-02/MDR260926-02_02.jpg",
+        "thumb": "images/thumbs/MDR260926-02_02.jpg"
+      },
+      {
+        "original": "images/MDR260920-02/MDR260926-01_03.jpg",
+        "thumb": "images/thumbs/MDR260926-01_03.jpg"
+      }
+    ]
+  },
+  {
+    "specimen_id": "MDR260920-04",
+    "classification": "未同定",
+    "scientific_name": "未同定",
+    "common_name": "未同定",
+    "formation": "蝦夷層群函淵層",
+    "age": "約8300万～7200万年前",
+    "collection_date": "2026-09-26",
+    "note": "沢中にある大きなノジュールの下にひっそりと転石していた。これまで見てきたノジュールや化石とは質感が違うような…詳しい人からの情報を求む。",
+    "site_id": "A006",
+    "image": "images/MDR260920-04/MDR260926-04_01.jpg",
+    "images": [
+      {
+        "original": "images/MDR260920-04/MDR260926-04_01.jpg",
+        "thumb": "images/thumbs/MDR260926-04_01.jpg"
+      },
+      {
+        "original": "images/MDR260920-04/MDR260926-04_02.jpg",
+        "thumb": "images/thumbs/MDR260926-04_02.jpg"
+      },
+      {
+        "original": "images/MDR260920-04/MDR260926-04_03.jpg",
+        "thumb": "images/thumbs/MDR260926-04_03.jpg"
+      },
+      {
+        "original": "images/MDR260920-04/MDR260926-04_04.jpg",
+        "thumb": "images/thumbs/MDR260926-04_04.jpg"
+      }
+    ]
+  },
+  {
+    "specimen_id": "MDR260920-05",
+    "classification": "二枚貝化石",
+    "scientific_name": "Trigonia sp.",
+    "common_name": "トリゴニアの一種",
+    "formation": "蝦夷層群函淵層",
+    "age": "約8300万～7200万年前",
+    "collection_date": "2026-09-26",
+    "note": "平取町同一地域での採集化石。巡検終了に伴い沢を引き返している際に、ノジュールとして落ちているところを採集した。",
+    "site_id": "A006",
+    "image": "images/MDR260920-05/MDR260926-05_01.jpg",
+    "images": [
+      {
+        "original": "images/MDR260920-05/MDR260926-05_01.jpg",
+        "thumb": "images/thumbs/MDR260926-05_01.jpg"
+      },
+      {
+        "original": "images/MDR260920-05/MDR260926-01_03.jpg",
+        "thumb": "images/thumbs/MDR260926-01_03.jpg"
+      }
+    ]
+  },
+  {
+    "specimen_id": "MDR260920-06",
+    "classification": "植物",
+    "scientific_name": "coal",
+    "common_name": "石炭",
+    "formation": "蝦夷層群函淵層",
+    "age": "約8300万～7200万年前",
+    "collection_date": "2026-09-26",
+    "note": "平取町の産出化石の一つの特徴のように思われる。石炭が沢支流にも多く見られた。今回持ち帰ったものもなかなかの大きさだが、該当地域には、「木の切り株」並みに巨大な石炭もゴロっと落ちていた。",
+    "site_id": "A006",
+    "image": "images/MDR260920-06/MDR260926-06_01.jpg",
+    "images": [
+      {
+        "original": "images/MDR260920-06/MDR260926-06_01.jpg",
+        "thumb": "images/thumbs/MDR260926-06_01.jpg"
       }
     ]
   }
