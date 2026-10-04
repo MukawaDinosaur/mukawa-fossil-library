@@ -2180,42 +2180,46 @@ function displayAdministrativeAreasOnMap() {
 
         let siteIds = getAdministrativeSiteIds(properties);
 
-        // むかわ町Polygon全体については、公開用localitiesに登録された
-        // 地点IDをまとめて「この区域の標本」とする。
-        if (
-            !siteIds.length &&
-            String(regionName).includes("むかわ町")
-        ) {
-            // むかわ町全体は、公開標本データに実際に存在する
-            // site_idを基準に対象標本を決める。
-            // localities_public.jsonの形式変更に左右されないよう、
-            // specimens側を主データとして扱う。SCHOOLは地区産標本ではないため除外する。
-            siteIds = Array.from(
-                new Set(
-                    specimens
-                        .map(specimen =>
-                            String(specimen.site_id || "").trim()
-                        )
-                        .filter(siteId =>
-                            siteId &&
-                            siteId.toUpperCase() !== "SCHOOL"
-                        )
-                )
-            );
+        // 市町村Polygon全体のクリックでは、その市町村に属する公開地点を
+        // まとめて「この区域の標本」とする。既存のむかわ町の挙動は維持し、
+        // 平取町など追加市町村はlocalities_public.jsonの公開用地域名で対応付ける。
+        const municipalityName = String(
+            properties.municipality ||
+            properties.N03_004 ||
+            properties.city_name ||
+            ""
+        ).trim();
 
-            // 標本側にsite_idがない場合のみ、公開地点JSONへフォールバックする。
-            if (!siteIds.length) {
+        const isMunicipalityArea = Boolean(municipalityName);
+
+        if (!siteIds.length && isMunicipalityArea) {
+
+            if (municipalityName.includes("むかわ町")) {
+                // 既存のむかわ町全体表示は従来どおり、実データのsite_idを使用する。
+                // SCHOOLは町内採集地ではないため除外する。
                 siteIds = Array.from(
                     new Set(
-                        localities
-                            .map(locality =>
-                                String(locality.site_id || "").trim()
-                            )
-                            .filter(siteId =>
-                                siteId &&
-                                siteId.toUpperCase() !== "SCHOOL"
-                            )
+                        specimens
+                            .map(specimen => String(specimen.site_id || "").trim())
+                            .filter(siteId => siteId && siteId.toUpperCase() !== "SCHOOL")
                     )
+                );
+
+                if (!siteIds.length) {
+                    siteIds = Array.from(
+                        new Set(
+                            localities
+                                .map(locality => String(locality.site_id || "").trim())
+                                .filter(siteId => siteId && siteId.toUpperCase() !== "SCHOOL")
+                        )
+                    );
+                }
+            } else {
+                // 平取町などは市町村名と一致する公開用地域名からsite_idを取得。
+                siteIds = getRegionSiteIdsFromLocalities(
+                    municipalityName,
+                    [municipalityName],
+                    properties.district || ""
                 );
             }
         }
@@ -2304,7 +2308,7 @@ function displayAdministrativeAreasOnMap() {
     displaySchoolPin();
 
     if (layers.length) {
-        // むかわ町一円の行政区域GeoJSON全体を表示する。
+        // 登録された市町村の行政区域GeoJSON全体を表示する。
         const group = L.featureGroup(layers);
         const bounds = group.getBounds();
 
@@ -2318,7 +2322,7 @@ function displayAdministrativeAreasOnMap() {
             );
         }
     } else {
-        // 行政区域GeoJSONが空の場合も、むかわ町周辺を初期表示する。
+        // 行政区域GeoJSONが空の場合も、登録された市町村周辺を初期表示する。
         map.setView([42.55, 142.05], 10);
     }
 }
