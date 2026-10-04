@@ -63301,30 +63301,6 @@
       "type": "Feature",
       "properties": {
         "feature_type": "region_point",
-        "region_key": "biratori-town",
-        "region_name": "平取町",
-        "municipality": "平取町",
-        "district": "平取町",
-        "site_ids": [],
-        "description": "平取町の代表位置です。詳細な採集地点を示すものではありません。",
-        "source": "市町村代表点（公開地図用）",
-        "map_center": [
-          42.70646,
-          142.37363
-        ]
-      },
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          142.37362982082192,
-          42.7064604145
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "properties": {
-        "feature_type": "region_point",
         "region_key": "biratori-osachinai",
         "region_name": "平取町長知内",
         "municipality": "平取町",
