@@ -870,15 +870,6 @@
         "original": "images/MDR260926-01/MDR260926-01_05.jpg",
         "thumb": "images/thumbs/MDR260926-01_05.jpg"
       }
-    ],
-    "model_3d": "models/MDR260926-01/MDR260926-01_01_web.glb",
-    "models_3d": [
-      {
-        "url": "models/MDR260926-01/MDR260926-01_01_web.glb",
-        "name": "MDR260926-01_01_web.glb",
-        "format": "glb",
-        "source_format": "stl"
-      }
     ]
   },
   {
